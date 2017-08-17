@@ -1,6 +1,6 @@
 Attribute VB_Name = "Comum"
-' Módulo com rotinas comuns a todos os outros
-' Convenções VB: http://support.microsoft.com/kb/110264
+' Mï¿½dulo com rotinas comuns a todos os outros
+' Convenï¿½ï¿½es VB: http://support.microsoft.com/kb/110264
 Option Explicit
 
 Function IsPlanilhaAberta(rgPos As Range) As Boolean
@@ -10,7 +10,7 @@ End Function
 Sub MostrarMsgErro(strOrigem As String)
   MsgBox strOrigem & vbNewLine & vbNewLine _
     & "Erro: " & Err.Number & vbNewLine _
-    & "Descrição: " & Err.Description, vbCritical
+    & "Descriï¿½ï¿½o: " & Err.Description, vbCritical
 End Sub
 
 Function RetornarUltimaCelulaMovimentacoes() As Range
@@ -20,7 +20,7 @@ Function RetornarUltimaCelulaMovimentacoes() As Range
 End Function
 
 Function RetornarUltimaLinhaMovimentacoes() As Long
-  ' procura a última linha de Movimento preenchida
+  ' procura a ï¿½ltima linha de Movimento preenchida
   On Error GoTo ErroUltLinhaD
   RetornarUltimaLinhaMovimentacoes = Range(RANGE_HEADER_MOVIMENTACOES).End(xlDown).Row
   Exit Function
@@ -71,7 +71,7 @@ End Function
 Sub PosicionarTopo()
   '
   ' PosicionarTopo Macro
-  ' Posiciona a planilha na célula superior esquerda.
+  ' Posiciona a planilha na cï¿½lula superior esquerda.
   '
   ' Atalho do teclado: Ctrl+t
   '
@@ -84,3 +84,36 @@ Sub PosicionarTopo()
 erroposicionarTopo:
   MostrarMsgErro ("PosicionarTopo")
 End Sub
+
+Function MaxDrowdawn(rgArray As Range) As Double
+  Dim rgMyCell As Range
+  Dim dblCurValue As Double, dblMaxValue As Double, dblCurDd As Double, dblMaxDd As Double
+  
+  dblMaxValue = 0
+  dblMaxDd = 0
+  dblCurValue = 1000
+  
+  For Each rgMyCell In rgArray
+    dblCurValue = dblCurValue * (1 + rgMyCell.Value)
+    
+    If dblCurValue > dblMaxValue Then
+      dblMaxValue = dblCurValue
+    End If
+    
+    If dblMaxValue = 0 Then
+      GoTo NextInteration
+    End If
+    
+    dblCurDd = 0
+    If dblCurValue < dblMaxValue Then
+      dblCurDd = dblCurValue / dblMaxValue - 1
+    End If
+    
+    If dblCurDd < dblMaxDd Then
+        dblMaxDd = dblCurDd
+    End If
+NextInteration:
+  Next rgMyCell
+  
+  MaxDrowdawn = dblMaxDd
+End Function

@@ -117,3 +117,16 @@ NextInteration:
   
   MaxDrowdawn = dblMaxDd
 End Function
+
+Function TotalReturn(rgArray As Range) As Double
+  Dim rgMyCell As Range
+  Dim dblCurValue As Double
+    
+  dblCurValue = 1000
+  
+  For Each rgMyCell In rgArray
+    dblCurValue = dblCurValue * (1 + rgMyCell.Value)
+  Next rgMyCell
+  
+  TotalReturn = dblCurValue / 1000 - 1
+End Function

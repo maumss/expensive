@@ -85,7 +85,7 @@ erroposicionarTopo:
   MostrarMsgErro ("PosicionarTopo")
 End Sub
 
-Function MaxDrowdawn(rgArray As Range) As Double
+Function MaxDrawdown(rgArray As Range) As Double
   Dim rgMyCell As Range
   Dim dblCurValue As Double, dblMaxValue As Double, dblCurDd As Double, dblMaxDd As Double
   
@@ -115,7 +115,7 @@ Function MaxDrowdawn(rgArray As Range) As Double
 NextInteration:
   Next rgMyCell
   
-  MaxDrowdawn = dblMaxDd
+  MaxDrawdown = dblMaxDd
 End Function
 
 Function TotalReturn(rgArray As Range) As Double

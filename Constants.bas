@@ -13,7 +13,7 @@ Public Const TIPO_LANCAMENTO_INVESTIMENTOS As String = "investimentos"
 Public Const RANGE_CELULA_INICIO_ADHOC As String = "C67"
 Public Const RANGE_CELULA_FIM_ADHOC As String = "C72"
 Public Const RANGE_CELULA_INICIO_CONSOLIDADA As String = "C39"
-Public Const RANGE_CELULA_FIM_CONSOLIDADA As String = "C58"
+Public Const RANGE_CELULA_FIM_CONSOLIDADA As String = "C61"
 
 ' Planilhas Jan. a Dez - geral
 Public Const RANGE_SITUAC_PLANILHA As String = "E4"
@@ -23,7 +23,7 @@ Public Const SITUAC_FECHADO As String = "Fechado"
 Public Const RANGE_SALDO_MES As String = "B2"
 Public Const NOME_PLAN_DEZ As String = "Dez."
 
-' Planilhas Jan. a Dez - movimentações
+' Planilhas Jan. a Dez - movimentaï¿½ï¿½es
 Public Const RANGE_HEADER_MOVIMENTACOES As String = "D14"
 Public Const RANGE_HEADER_DATA_MOVIMENTACOES As String = "D15"
 Public Const RANGE_PRIMEIRA_DATA_MOVIMENTACOES As String = "D16"
@@ -33,7 +33,7 @@ Public Const RANGE_COL_DATA_MOVIMENTACOES As String = "D16:D66"
 Public Const RANGE_COL_VALOR_MOVIMENTACOES As String = "G16:G66"
 Public Const RANGE_TAB_MOVIMENTACOES As String = "D16:G66"
 
-' Planilhas Jan. a Dez - cartões
+' Planilhas Jan. a Dez - cartï¿½es
 Public Const RANGE_COL_VALOR_CARTOES As String = "N16:N66"
 Public Const RANGE_ULTIMO_VALOR_CARTAO As String = "N66"
 Public Const RANGE_HEADER_CARTOES As String = "J14"
@@ -41,7 +41,7 @@ Public Const RANGE_PRIMEIRA_DATA_CARTOES As String = "J16"
 Public Const RANGE_COL_DATA_CARTOES As String = "J16:J66"
 Public Const RANGE_TAB_CARTOES As String = "J16:N66"
 
-' Planilhas Jan. a Dez - movimentação dos ativos - carteiras
+' Planilhas Jan. a Dez - movimentaï¿½ï¿½o dos ativos - carteiras
 ' Carteira Ad Hoc
 Public Const RANGE_COLUNA_ATIVO_ADHOC As String = "D75:D79"
 Public Const RANGE_COLUNA_SALDO_INICIAL_ADHOC As String = "F75:F79"
@@ -52,7 +52,7 @@ Public Const RANGE_COLUNA_ATIVO_CONSOLIDADA As String = "D84:D104"
 Public Const RANGE_COLUNA_SALDO_INICIAL_CONSOLIDADA As String = "F84:F104"
 Public Const RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA As String = "N84:N104"
 
-' Carteira Ações
+' Carteira Aï¿½ï¿½es
 Public Const RANGE_COL_DATA_ACOES As String = "D109:D128"
 Public Const RANGE_COLUNA_ATIVO_ACOES As String = "E109:E128"
 Public Const RANGE_COLUNA_QTDE_ACOES As String = "G109:G128"
@@ -63,7 +63,7 @@ Public Const RANGE_CELULA_TRIBUTAL_ACOES As String = "Q129"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_ACOES As String = "W109:W128"
 Public Const RANGE_COLUNA_RESULTADO_DAYTRADE_ACOES As String = "AA109:AA128"
 
-' Carteira Opções
+' Carteira Opï¿½ï¿½es
 Public Const RANGE_COL_DATA_CART_OPCOES As String = "D135:D144"
 Public Const RANGE_COLUNA_ATIVO_CART_OPCOES As String = "E135:E144"
 Public Const RANGE_COLUNA_QTDE_CART_OPCOES As String = "G135:G144"
@@ -73,7 +73,7 @@ Public Const RANGE_COLUNA_CUSTO_MEDIO_CART_OPCOES As String = "S135:S144"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_OPCOES As String = "W135:W144"
 Public Const RANGE_COLUNA_RESULTADO_DAYTRADE_OPCOES As String = "AA135:AA144"
 
-' Carteira Fundos Imobiliários
+' Carteira Fundos Imobiliï¿½rios
 Public Const RANGE_COL_DATA_FII As String = "D151:D165"
 Public Const RANGE_COLUNA_ATIVO_FII As String = "E151:E165"
 Public Const RANGE_COLUNA_QTDE_FII As String = "G151:G165"

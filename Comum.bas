@@ -87,13 +87,18 @@ End Sub
 
 Function MaxDrawdown(rgArray As Range) As Double
   Dim rgMyCell As Range
-  Dim dblCurValue As Double, dblMaxValue As Double, dblCurDd As Double, dblMaxDd As Double
+  Dim dblCurValue As Double, dblMaxValue As Double, dblCurDd As Double, dblMaxDd As DoubleDim blnNumeric As Boolean
+  Dim blnNumeric As Boolean
   
   dblMaxValue = 0
   dblMaxDd = 0
   dblCurValue = 1000
   
   For Each rgMyCell In rgArray
+    If Not IsNumeric(rgMyCell) Then
+      GoTo NextInteration
+    End If
+    
     dblCurValue = dblCurValue * (1 + rgMyCell.Value)
     
     If dblCurValue > dblMaxValue Then

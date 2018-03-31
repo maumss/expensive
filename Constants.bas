@@ -15,6 +15,9 @@ Public Const RANGE_CELULA_FIM_ADHOC As String = "C72"
 Public Const RANGE_CELULA_INICIO_CONSOLIDADA As String = "C39"
 Public Const RANGE_CELULA_FIM_CONSOLIDADA As String = "C61"
 
+' Planilha Retrato
+Public Const RANGE_RELAT_RETRAT = "$A$1:$Q$74"
+
 ' Planilhas Jan. a Dez - geral
 Public Const RANGE_SITUAC_PLANILHA As String = "E4"
 Public Const RANGE_DATA_POSICAO As String = "N4"

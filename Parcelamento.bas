@@ -1,9 +1,8 @@
-Attribute VB_Name = "Parcelamento"
 Option Explicit
-' Módulo de construção de parcelamentos de uma conta no formato: conta (a/b)
-' Cria parcelamento do valor da seleção atual. Se a descrição contiver o texto "(1/x)", será
-' criada x entradas nas planilhas seguintes com o mesmo valor inicial, caso contrário perguntará
-' o número de parcelas e dividirá o valor atual.
+' MÃ³dulo de construÃ§Ã£o de parcelamentos de uma conta no formato: conta (a/b)
+' Cria parcelamento do valor da seleÃ§Ã£o atual. Se a descriÃ§Ã£o contiver o texto "(1/x)", serÃ¡
+' criada x entradas nas planilhas seguintes com o mesmo valor inicial, caso contrÃ¡rio perguntarÃ¡
+' o nÃºmero de parcelas e dividirÃ¡ o valor atual.
 
 Private Type InfoParcelamento
   intPosAbreParent As Integer
@@ -23,19 +22,17 @@ Private Type Movimentacao
   blnMovCartao As Boolean
 End Type
 
-'Cria entrada nas planilhas futuras com base no parcelamento da seleção corrente
+'Cria entrada nas planilhas futuras com base no parcelamento da seleÃ§Ã£o corrente
 Sub MontarParcelamento()
-Attribute MontarParcelamento.VB_Description = "Cria parcelamento do valor da seleção atual. Se a descrição contiver o texto ""(1/x)"", será criada x entradas nas planilhas seguintes com o mesmo valor inicial, caso contrário perguntará o número de parcelas e dividirá o valor atual."
-Attribute MontarParcelamento.VB_ProcData.VB_Invoke_Func = "p\n14"
    On Error GoTo ErroCriarParcelamento
    Dim strTextoOriginal As String
-   'Testa se é planilha mensal válida e se está aberta
+   'Testa se Ã© planilha mensal vÃ¡lida e se estÃ¡ aberta
    If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
      Exit Sub
    End If
-   'Testa se já está na planilha de Dezembro
+   'Testa se jÃ¡ estÃ¡ na planilha de Dezembro
    If ActiveSheet.Name = NOME_PLAN_DEZ Then
-    MsgBox "Não existe planilha posterior a essa para criar parcelas", vbCritical
+    MsgBox "NÃ£o existe planilha posterior a essa para criar parcelas", vbCritical
     Exit Sub
    End If
    Dim wsPlanilha As Worksheet
@@ -45,9 +42,9 @@ Attribute MontarParcelamento.VB_ProcData.VB_Invoke_Func = "p\n14"
    If IsLocalIvalido(rgAlvo) Then
      Exit Sub
    End If
-   'Pede confirmação
-   If MsgBox("Você deseja criar parcelas com base nesta movimentação?", _
-        vbYesNo + vbQuestion, "Mover lançamento") = vbNo Then
+   'Pede confirmaÃ§Ã£o
+   If MsgBox("VocÃª deseja criar parcelas com base nesta movimentaÃ§Ã£o?", _
+        vbYesNo + vbQuestion, "Mover lanÃ§amento") = vbNo Then
      Exit Sub
    End If
   
@@ -118,7 +115,7 @@ Private Function IsMovimentoCartao(rgAlvo As Range) As Boolean
   IsMovimentoCartao = (Not Application.Intersect(rgAlvo, Range(RANGE_TAB_CARTOES)) Is Nothing)
 End Function
 
-'Verifica o formato de parcelas dizendo a posição na string que os separadores ocupam
+'Verifica o formato de parcelas dizendo a posiÃ§Ã£o na string que os separadores ocupam
 Private Function RetornarInfoParcelamento(strTextoOriginal As String, dblValorMov As Double) As InfoParcelamento
   Dim udtInfoParcelamento As InfoParcelamento
   udtInfoParcelamento.intPosAbreParent = InStr(strTextoOriginal, "(")
@@ -151,11 +148,11 @@ Private Function RetornarParcelaInicialMaisUm(strTextoOriginal As String, udtInf
     End If
     Exit Function
   End If
-  'se não estiver no formato parcelado, supõe que a próxima parcela será a dois
+  'se nÃ£o estiver no formato parcelado, supÃµe que a prÃ³xima parcela serÃ¡ a dois
   RetornarParcelaInicialMaisUm = 2
 End Function
 
-'Busca ou define o total de parcelas que deverão ser criadas
+'Busca ou define o total de parcelas que deverÃ£o ser criadas
 Private Function RetornarTotalParcelas(strTextoOriginal As String, udtInfoParcelamento As InfoParcelamento) As Integer
   Dim strTotalParcelas
   RetornarTotalParcelas = 0
@@ -167,7 +164,7 @@ Private Function RetornarTotalParcelas(strTextoOriginal As String, udtInfoParcel
     End If
     Exit Function
   End If
-  'se não for formato parcelado, pede que o usuário digite
+  'se nÃ£o for formato parcelado, pede que o usuÃ¡rio digite
   strTotalParcelas = InputBox("Entre o total de parcelas ou pressione Cancelar para finalizar:")
   If Len(strTotalParcelas) = 0 Then
     'pressionou cancelar
@@ -189,7 +186,7 @@ Private Function RetornarValorParcela(udtInfoParcelamento As InfoParcelamento, d
   RetornarValorParcela = dblValorMov / udtInfoParcelamento.intTotalParcelas
 End Function
 
-'Monta um array com a descrição de cada parcela
+'Monta um array com a descriÃ§Ã£o de cada parcela
 Private Function RetornarArrayDeParcelamento(strTextoOriginal As String, udtInfoParcelamento As InfoParcelamento) As Variant
   Dim astrItems() As String
   On Error GoTo ErroRetornarArrayDeParcelamento
@@ -217,7 +214,7 @@ ErroRetornarArrayDeParcelamento:
   MostrarMsgErro ("RetornarArrayDeParcelamento")
 End Function
 
-'Retorna o prefixo da descrição de cada parcela
+'Retorna o prefixo da descriÃ§Ã£o de cada parcela
 Private Function RetornarParteFixaDoTexto(strTextoOriginal As String, udtInfoParcelamento As InfoParcelamento) As String
   Dim strParteFixa As String
   RetornarParteFixaDoTexto = strTextoOriginal & " ("
@@ -226,17 +223,17 @@ Private Function RetornarParteFixaDoTexto(strTextoOriginal As String, udtInfoPar
   End If
 End Function
 
-'Retorna se o texto já pressupõe um parcelamento
+'Retorna se o texto jÃ¡ pressupÃµe um parcelamento
 Private Function IsTextoPreParcelado(udtInfoParcelamento As InfoParcelamento) As Boolean
   IsTextoPreParcelado = (udtInfoParcelamento.intPosBarra > 0)
 End Function
 
-'Verifica se um array possui algum conteúdo
+'Verifica se um array possui algum conteÃºdo
 Private Function IsArrayEmpty(varArray As Variant) As Boolean
-   ' Determina se um array contém algum elemento
+   ' Determina se um array contÃ©m algum elemento
    Dim lngUBound As Long
    On Error Resume Next
-   ' Se o array estiver vazio, um erro ocorrerá quando checar os limites do array
+   ' Se o array estiver vazio, um erro ocorrerÃ¡ quando checar os limites do array
    lngUBound = UBound(varArray)
    If Err.Number <> 0 Then
       IsArrayEmpty = True
@@ -245,7 +242,7 @@ Private Function IsArrayEmpty(varArray As Variant) As Boolean
    End If
 End Function
 
-'Caso não for pre-parcelado, deve mudar o texto atual para conter a parcela 1/x
+'Caso nÃ£o for pre-parcelado, deve mudar o texto atual para conter a parcela 1/x
 Private Sub AlterarTextoAtual(rgAlvo As Range, udtInfoParcelamento As InfoParcelamento, udtMovimentacao As Movimentacao)
   Dim lngLinhaDest As Long
   Dim intColunaDestino As Integer, intColunaValor As Integer
@@ -262,12 +259,12 @@ Private Sub AlterarTextoAtual(rgAlvo As Range, udtInfoParcelamento As InfoParcel
   Cells(lngLinhaDest, intColunaValor).Value = udtInfoParcelamento.dblValorParcela
 End Sub
 
-'Cria tantas entradas quanto for o número de parcelas
+'Cria tantas entradas quanto for o nÃºmero de parcelas
 Private Sub CriarEntradaNaPlanilha(lngIndPlanDestino As Long, ByVal strTexto As String, _
      dblValorParcela As Double, udtMovimentacao As Movimentacao, intParcela As Integer)
    CongelarCalculosPlanilha (True)
    On Error GoTo EndMacro:
-   ' Se posiciona na próxima planilha
+   ' Se posiciona na prÃ³xima planilha
    Worksheets(lngIndPlanDestino).Activate
    If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
      Exit Sub

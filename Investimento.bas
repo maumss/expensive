@@ -1,20 +1,19 @@
-Attribute VB_Name = "Investimento"
-' MÛdulo de funÁıes sobre o controle de Investimentos
+' M√≥dulo de fun√ß√µes sobre o controle de Investimentos
 Option Explicit
 
 Function CalcularSaldoAtual(rgDescInvest As Range) As Double
   '
-  ' FunÁ„o saldoAtual   Data: 13/01/04
+  ' Fun√ß√£o saldoAtual   Data: 13/01/04
   ' Determina o saldo atual do investimento de acordo com
   ' o saldo inicial da Carteira da primeira planilha
   ' mensal aberta
   '
-  ' Vari·veis
+  ' Vari√°veis
   Dim wsPlanilha As Worksheet
   ' Principal
   On Error GoTo ErroSaldoAtual
   For Each wsPlanilha In Worksheets
-     ' A primeira planilha aberta que achar È a v·lida
+     ' A primeira planilha aberta que achar √© a v√°lida
      If IsPlanilhaAberta(wsPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
        CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_ADHOC), _
              rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_ADHOC)) + _
@@ -23,7 +22,7 @@ Function CalcularSaldoAtual(rgDescInvest As Range) As Double
        Exit Function
      End If
   Next wsPlanilha
-  ' Se todas as planilhas est„o fechadas, pega a de Dezembro
+  ' Se todas as planilhas est√£o fechadas, pega a de Dezembro
   CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_ADHOC), _
      rgDescInvest, Worksheets("Dez.").Range(RANGE_COLUNA_SALDO_FINAL_ADHOC)) + _
      Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_ADHOC), _
@@ -42,12 +41,12 @@ Function CalcularRendAtivo(rgColDescAtivo As Range, _
                         rgColSaldoFinalAtivo As Range, _
                         rgCelDescRentabilidade As Range) As Double
   '
-  ' FunÁ„o CalcularRendAtivo   Data: 29/04/16
-  ' Retorna o valor percentual do rendimento lÌquedo da aplicaÁ„o
-  ' Nota: todas as cÈlulas envolvidas devem estar nos par‚metros de
-  '  entrada da funÁ„o para que o Excel possa saber que deve recal-
-  '  cular a funÁ„o caso uma delas mude.
-  ' A outra maneira È teclar Ctrl + Alt + F9
+  ' Fun√ß√£o CalcularRendAtivo   Data: 29/04/16
+  ' Retorna o valor percentual do rendimento l√≠quedo da aplica√ß√£o
+  ' Nota: todas as c√©lulas envolvidas devem estar nos par√¢metros de
+  '  entrada da fun√ß√£o para que o Excel possa saber que deve recal-
+  '  cular a fun√ß√£o caso uma delas mude.
+  ' A outra maneira √© teclar Ctrl + Alt + F9
   '
   On Error GoTo ErroCalcularRendAtivo
   Dim dblSaldoInicial As Double, dblAplicacao As Double, dblRetorno As Double, dblResgate As Double, dblSaldoFinal As Double, dblCpmf As Double
@@ -77,17 +76,17 @@ Sub CriticarInvestimento(ByVal rgAlvo As Range)
   ' Sub CriticarInvestimento    Criado por: MSS  Em: 31.01.04
   ' critica o investimento digitado
   '
-  ' vari·veis
+  ' vari√°veis
   Dim strTemp As String
   ' principal
   On Error GoTo ErroCriticarInvestimento
-  If (rgAlvo.Value = "Broker" Or rgAlvo.Value = "Reserva estratÈgica") Then
+  If (rgAlvo.Value = BROKER Or rgAlvo.Value = RESERVA_ESTRATEGICA) Then
     Exit Sub
   End If
   If Not HasCarteira(rgAlvo.Value) Then
     strTemp = RetornarParteNomeCarteira(rgAlvo.Value)
     If strTemp > "" Then
-      If MsgBox("VocÍ se refere a " & vbLf & _
+      If MsgBox("Voc√™ se refere a " & vbLf & _
                 strTemp & " ?", vbQuestion + vbYesNo, "Investimentos") = vbYes Then
         rgAlvo.Value = strTemp
         Exit Sub
@@ -96,7 +95,7 @@ Sub CriticarInvestimento(ByVal rgAlvo As Range)
     If IsReserva(rgAlvo.Value) Then
       Exit Sub
     End If
-    MsgBox "N„o foi encontrado um investimento com esta descriÁ„o." & vbNewLine & _
+    MsgBox "N√£o foi encontrado um investimento com esta descri√ß√£o." & vbNewLine & _
                "Procure cadastrar o mesmo em uma de suas carteiras.", vbExclamation
   End If
   Exit Sub
@@ -107,9 +106,9 @@ End Sub
 Private Function HasCarteira(strDescricao As String) As Boolean
   '
   ' Function HasCarteira
-  ' procura a descriÁ„o fornecida dentro da Carteira1 e Carteira2
+  ' procura a descri√ß√£o fornecida dentro da Carteira1 e Carteira2
   '
-  ' vari·veis
+  ' vari√°veis
   Dim intInicioLinhaCarteira1 As Integer, intFinalLinhaCarteira1 As Integer, _
       intInicioLinhaCarteira2 As Integer, intFinalLinhaCarteira2 As Integer, _
       intColunaCarteira As Integer
@@ -155,7 +154,7 @@ Private Function RetornarParteNomeCarteira(strDescricao As String) As String
   ' Function achaSbstrCarteira
   ' procura por parte do nome dado na carteira1 e carteira2
   '
-  ' vari·veis
+  ' vari√°veis
   Dim intInicioLinhaCarteira1 As Integer, intFinalLinhaCarteira1 As Integer, _
       intInicioLinhaCarteira2 As Integer, intFinalLinhaCarteira2 As Integer, _
       intColunaCarteira As Integer
@@ -204,9 +203,9 @@ End Function
 Private Function IsReserva(strDescricao As String) As Boolean
   '
   ' Function IsReserva
-  ' verifica se trata de uma Reserva EstratÈgica
+  ' verifica se trata de uma Reserva Estrat√©gica
   '
-  ' vari·veis
+  ' vari√°veis
   Dim blnAchou As Boolean
   ' principal
   On Error GoTo ErroIsReserva

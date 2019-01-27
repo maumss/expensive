@@ -1,4 +1,3 @@
-Attribute VB_Name = "Relatorio"
 ' Módulo de funções sobre a geração de relatório
 Option Explicit
 
@@ -159,9 +158,15 @@ Sub GerarRelatRetrato()
   Dim dirFile As String
   Dim uniqueName As Boolean
   Dim userAnswer As VbMsgBoxResult
+  Dim monthNumber As String
+  Const XL_PORTRAIT As Integer = 1 ' retrato
   ' define o nome do PDF
   'MsgBox RetornarFileName()
-  fileName = RetornarFileName() & "-" & Range("planFechada").Value & ".pdf"
+  monthNumber = Month(DateValue("Fevereiro" & " 1"))
+  If (Len(monthNumber) < 2) Then
+    monthNumber = "0" & monthNumber
+  End If
+  fileName = RetornarFileName() & "-" & "snapshot" & monthNumber & ".pdf"
   dirFile = RetornarCurrentFolder() & fileName
   Do While uniqueName = False
     If Len(Dir(dirFile)) <> 0 Then
@@ -180,6 +185,7 @@ Sub GerarRelatRetrato()
             Exit Sub
           End If
         Loop While ValidFileName(fileName) = False
+        uniqueName = True
        Else
          Exit Sub 'cancela
        End If
@@ -190,23 +196,33 @@ Sub GerarRelatRetrato()
   
   Application.StatusBar = "Ajustando área de impressão. Por favor, aguarde..."
   Application.ScreenUpdating = False
-  With ActiveSheet
-    .PageSetup.PrintArea = RANGE_RELAT_RETRAT
-    .PageSetup.CenterHorizontally = True
-    .PageSetup.CenterVertically = False
-    .PageSetup.Orientation = RetornarOrientacao(Range(RANGE_RELAT_RETRAT)) ' Paisagem ou retrato
-    .PageSetup.PaperSize = xlPaperA4
-    .PageSetup.BlackAndWhite = False
-    .PageSetup.Zoom = False
-    .PageSetup.FitToPagesWide = 1 'força largura de uma página
-    .PageSetup.FitToPagesTall = 1 'força altura
-    .ExportAsFixedFormat Type:=xlTypePDF, _
+  With ActiveSheet.PageSetup
+    .PrintArea = RANGE_RELAT_RETRAT
+    .LeftMargin = Application.CentimetersToPoints(0.64)
+    .RightMargin = Application.CentimetersToPoints(0.64)
+    .TopMargin = Application.CentimetersToPoints(1.91)
+    .BottomMargin = Application.CentimetersToPoints(1.91)
+    .HeaderMargin = Application.CentimetersToPoints(0.76)
+    .FooterMargin = Application.CentimetersToPoints(0.76)
+    .PrintHeadings = False
+    .PrintGridlines = False
+    .PrintNotes = False
+    .CenterHorizontally = True
+    .CenterVertically = False
+    .Orientation = XL_PORTRAIT
+    .Draft = False
+    .PaperSize = xlPaperA4
+    .BlackAndWhite = False
+    .Zoom = False
+    .FitToPagesWide = 1 'força largura de uma página
+    .FitToPagesTall = False 'não força altura
+   End With
+   ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, _
         fileName:=fileName, _
         Quality:=xlQualityStandard, _
         IncludeDocProperties:=True, _
         IgnorePrintAreas:=False, _
         OpenAfterPublish:=True
-  End With
 fimRetrato:
   ActiveSheet.PageSetup.PrintArea = ""
   Application.StatusBar = "Pronto"
@@ -236,28 +252,33 @@ End Function
 Private Function ValidFileName(fileName As String) As Boolean
   'Determina se um dado nome de arquivo excel é válido
 
-  Dim TempPath As String
+  Dim tempPath As String
   Dim wb As Workbook
 
   'Determina a pasta onde arquivos temporários são gravados
-  TempPath = Environ("TEMP")
+  tempPath = Environ("TEMP")
 
   'Cria um arquivo XLSM temporário file (XLSM no caso de ter macros)
   On Error GoTo InvalidFileName
-  Set wb = ActiveWorkbook.SaveAs(ActiveWorkbook.TempPath & _
-     "\" & fileName & ".xlsm", xlExcel8)
+  CongelarCalculosPlanilha (True)
+  Set wb = Workbooks.Add
+  wb.SaveAs tempPath & "\" & fileName & ".xlsm", xlExcel8
+  
   On Error Resume Next
-
+  'Fecha o arquivo temporário
+  wb.Close (False)
   'Apaga o arquivo temporário
-  Kill wb.FullName
-
+  Kill tempPath & "\" & fileName & ".xlsm"
+  CongelarCalculosPlanilha (False)
   'O nome do arquivo é válido
   ValidFileName = True
   Exit Function
 
   'ERROR HANDLERS
 InvalidFileName:
+  wb.Close (False)
+  CongelarCalculosPlanilha (False)
   'O nome do arquivo é inválido
-   ValidFileName = False
+  ValidFileName = False
 End Function
 

@@ -1,13 +1,10 @@
-Attribute VB_Name = "Avaliacao"
 Option Explicit
-'MÛdulo referente ao formul·rio de avaliaÁ„o
+'M√≥dulo referente ao formul√°rio de avalia√ß√£o
 
 Public Sub AvaliarRisco()
-Attribute AvaliarRisco.VB_Description = "Avalia toler‚ncia ao risco nos investimentos"
-Attribute AvaliarRisco.VB_ProcData.VB_Invoke_Func = "a\n14"
   '
   ' Avalia Macro
-  ' Avalia toler‚ncia ao risco nos investimentos
+  ' Avalia toler√¢ncia ao risco nos investimentos
   '
   ' Atalho do teclado: Ctrl+a
   '

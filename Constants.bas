@@ -1,5 +1,8 @@
 ' Constantes globais
 
+Public Const BROKER As String = "Broker"
+Public Const RESERVA_ESTRATEGICA As String = "Reserva estratégica"
+
 ' Planilha Intro
 Public Const RANGE_DATA_ULTIMA_ATUALIZ As String = "E12"
 Public Const RANGE_POSICAO = "posicao"
@@ -9,10 +12,10 @@ Public Const RANGE_TOLERANCIA As String = "tolerancia"
 Public Const TIPO_LANCAMENTO_INVESTIMENTOS As String = "investimentos"
 
 ' Planilha Alocacao
-Public Const RANGE_CELULA_INICIO_ADHOC As String = "C67"
-Public Const RANGE_CELULA_FIM_ADHOC As String = "C72"
-Public Const RANGE_CELULA_INICIO_CONSOLIDADA As String = "C39"
-Public Const RANGE_CELULA_FIM_CONSOLIDADA As String = "C61"
+Public Const RANGE_CELULA_INICIO_ADHOC As String = "C81"
+Public Const RANGE_CELULA_FIM_ADHOC As String = "C90"
+Public Const RANGE_CELULA_INICIO_CONSOLIDADA As String = "C38"
+Public Const RANGE_CELULA_FIM_CONSOLIDADA As String = "C72"
 
 ' Planilha Retrato
 Public Const RANGE_RELAT_RETRAT = "$A$1:$Q$84"
@@ -31,6 +34,7 @@ Public Const RANGE_HEADER_DATA_MOVIMENTACOES As String = "D15"
 Public Const RANGE_PRIMEIRA_DATA_MOVIMENTACOES As String = "D16"
 Public Const RANGE_HEADER_DESC_MOVIMENTACAO As String = "E15"
 Public Const RANGE_HEADER_TIPO_MOVIMENTACAO As String = "F15"
+Public Const RANGE_HEADER_VALOR_MOVIMENTACAO As String = "G15"
 Public Const RANGE_COL_DATA_MOVIMENTACOES As String = "D16:D66"
 Public Const RANGE_COL_VALOR_MOVIMENTACOES As String = "G16:G66"
 Public Const RANGE_TAB_MOVIMENTACOES As String = "D16:G66"

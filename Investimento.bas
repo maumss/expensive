@@ -80,7 +80,7 @@ Sub CriticarInvestimento(ByVal rgAlvo As Range)
   Dim strTemp As String
   ' principal
   On Error GoTo ErroCriticarInvestimento
-  If (rgAlvo.Value = "Broker" Or rgAlvo.Value = "Reserva estratégica") Then
+  If (rgAlvo.Value = BROKER Or rgAlvo.Value = RESERVA_ESTRATEGICA) Then
     Exit Sub
   End If
   If Not HasCarteira(rgAlvo.Value) Then

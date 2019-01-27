@@ -1,6 +1,5 @@
-Attribute VB_Name = "Comum"
-' M�dulo com rotinas comuns a todos os outros
-' Conven��es VB: http://support.microsoft.com/kb/110264
+' Módulo com rotinas comuns a todos os outros
+' Convenções VB: http://support.microsoft.com/kb/110264
 Option Explicit
 
 Function IsPlanilhaAberta(rgPos As Range) As Boolean
@@ -10,7 +9,7 @@ End Function
 Sub MostrarMsgErro(strOrigem As String)
   MsgBox strOrigem & vbNewLine & vbNewLine _
     & "Erro: " & Err.Number & vbNewLine _
-    & "Descri��o: " & Err.Description, vbCritical
+    & "Descrição: " & Err.Description, vbCritical
 End Sub
 
 Function RetornarUltimaCelulaMovimentacoes() As Range
@@ -20,7 +19,7 @@ Function RetornarUltimaCelulaMovimentacoes() As Range
 End Function
 
 Function RetornarUltimaLinhaMovimentacoes() As Long
-  ' procura a �ltima linha de Movimento preenchida
+  ' procura a última linha de Movimento preenchida
   On Error GoTo ErroUltLinhaD
   RetornarUltimaLinhaMovimentacoes = Range(RANGE_HEADER_MOVIMENTACOES).End(xlDown).Row
   Exit Function
@@ -57,7 +56,7 @@ Function RetornarPrimeiraLinha(rgRange As Range) As Long
 End Function
 
 Function RetornarUltimaLinha(rgRange As Range) As Long
-  RetornarUltimaLinha = rgRange(rgRange.count).Row
+  RetornarUltimaLinha = rgRange(rgRange.Count).Row
 End Function
 
 Function RetornarPrimeiraColuna(rgRange As Range) As Long
@@ -65,13 +64,13 @@ Function RetornarPrimeiraColuna(rgRange As Range) As Long
 End Function
 
 Function RetornarUltimaColuna(rgRange As Range) As Long
-  RetornarUltimaColuna = rgRange(rgRange.count).Column
+  RetornarUltimaColuna = rgRange(rgRange.Count).Column
 End Function
 
 Sub PosicionarTopo()
   '
   ' PosicionarTopo Macro
-  ' Posiciona a planilha na c�lula superior esquerda.
+  ' Posiciona a planilha na célula superior esquerda.
   '
   ' Atalho do teclado: Ctrl+t
   '
@@ -87,7 +86,7 @@ End Sub
 
 Function MaxDrawdown(rgArray As Range) As Double
   Dim rgMyCell As Range
-  Dim dblCurValue As Double, dblMaxValue As Double, dblCurDd As Double, dblMaxDd As DoubleDim blnNumeric As Boolean
+  Dim dblCurValue As Double, dblMaxValue As Double, dblCurDd As Double, dblMaxDd As Double
   Dim blnNumeric As Boolean
   
   dblMaxValue = 0

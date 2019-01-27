@@ -1,13 +1,10 @@
-Attribute VB_Name = "Ordenacao"
-' MÛdulo de ordenamento das tabelas de movimentos e cartıes
+' M√≥dulo de ordenamento das tabelas de movimentos e cart√µes
 Option Explicit
 
 Sub OrdenarMovimentos()
-Attribute OrdenarMovimentos.VB_Description = "Ordena tabelas de DÈbitos e Cart„o em ordem crescente de data."
-Attribute OrdenarMovimentos.VB_ProcData.VB_Invoke_Func = "o\n14"
   '
   ' OrdenarMovimentos Macro
-  ' Ordena tabelas de Movimentos e Cartıes em ordem crescente de data.
+  ' Ordena tabelas de Movimentos e Cart√µes em ordem crescente de data.
   '
   ' Atalho do teclado: Ctrl+o
   '
@@ -59,11 +56,9 @@ ErroOrdena:
 End Sub
 
 Sub PuxarDataAtual()
-Attribute PuxarDataAtual.VB_Description = "Traz a data atual para a coluna de dÈbitos ou cart„o."
-Attribute PuxarDataAtual.VB_ProcData.VB_Invoke_Func = "d\n14"
   '
   ' dataAtual Macro
-  ' Traz a data atual para a coluna de movimentos ou cart„o.
+  ' Traz a data atual para a coluna de movimentos ou cart√£o.
   '
   ' Atalho do teclado: Ctrl+d
   ' Criado por: Mauricio SS  Em: 14/02/04
@@ -71,7 +66,7 @@ Attribute PuxarDataAtual.VB_ProcData.VB_Invoke_Func = "d\n14"
   If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
   End If
-  ' vari·veis
+  ' vari√°veis
   Dim rgAlvo As Range
   Dim wsPlanilha As Worksheet
   ' principal

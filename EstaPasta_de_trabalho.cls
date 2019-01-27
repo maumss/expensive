@@ -1,21 +1,12 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "EstaPasta_de_trabalho"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = True
-Attribute VB_Exposed = True
 Option Explicit
 
-' Variáveis locais
+' VariÃ¡veis locais
 Dim blnAtualizouArquivo As Boolean
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, cancel As Boolean)
   '
   ' sub Workbook_beforeSave
-  ' atualiza a data da última alteração na Planilha Intro
+  ' atualiza a data da Ãºltima alteraÃ§Ã£o na Planilha Intro
   ' criado por: Mauricio SS  em: 23.01.04
   '
   On Error GoTo final
@@ -24,7 +15,7 @@ Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, cancel As Boolean)
     Application.ScreenUpdating = False
     Worksheets("Intro").Unprotect
     Worksheets("Intro").Range(RANGE_DATA_ULTIMA_ATUALIZ).Value = _
-      Format(Now, "dddd, dd mmmm yyyy") & " às " & _
+      Format(Now, "dddd, dd mmmm yyyy") & " Ã s " & _
       Format(Now, "hh:mm:ss")
     Range(RANGE_POSICAO).Value = Now
     Worksheets("Intro").Protect
@@ -55,7 +46,7 @@ End Sub
 Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   '
   ' Sub Workbook_SheetChange
-  ' verifica se atualizou alguma planilha ou se está digitando a descrição
+  ' verifica se atualizou alguma planilha ou se estÃ¡ digitando a descriÃ§Ã£o
   ' de um investimento nas planilhas mensais
   '
   ' variaveis
@@ -63,63 +54,63 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   ' principal
   On Error GoTo erroSheetChange
   blnIsCriticouDescInvest = False
-  ' ajusta variável para avisar que houve mudanças
+  ' ajusta variÃ¡vel para avisar que houve mudanÃ§as
   blnAtualizouArquivo = True
   If Not IsPlanilhaAberta(Sh.Range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
   End If
   
-  ' testa se é uma planilha mensal
+  ' testa se Ã© uma planilha mensal
   Application.EnableEvents = False
   
-  ' testa se alterou os valores de movimentações
+  ' testa se alterou os valores de movimentaÃ§Ãµes
   If Not Application.Intersect(Target, Range(RANGE_COL_VALOR_MOVIMENTACOES)) Is Nothing Then
     ' testa saldo da planilha atual
-    If Target.count = 1 And Not IsEmpty(Target) Then
+    If Target.Count = 1 And Not IsEmpty(Target) Then
       If IsAlcancouValorCriticoNoMes(Worksheets(Sh.Name).Index, Target.Value) Then
         Beep
         Beep
-        MsgBox "Cuidado! Valor de tolerância alcançado para este mês.", vbExclamation
+        MsgBox "Cuidado! Valor de tolerÃ¢ncia alcanÃ§ado para este mÃªs.", vbExclamation
       End If
     End If
   End If
-  ' testa se alterou os valores de cartão
+  ' testa se alterou os valores de cartÃ£o
   If Not Application.Intersect(Target, Range(RANGE_COL_VALOR_CARTOES)) Is Nothing Then
-    ' testa saldo da próxima planilha
-    If Target.count = 1 And Not IsEmpty(Target) Then
+    ' testa saldo da prÃ³xima planilha
+    If Target.Count = 1 And Not IsEmpty(Target) Then
       If IsAlcancouValorCriticoNoMes(Worksheets(Sh.Name).Index + 1, Target.Value) Then
         Beep
         Beep
-        MsgBox "Cuidado! Valor de tolerância alcançado para o próximo mês.", vbExclamation
+        MsgBox "Cuidado! Valor de tolerÃ¢ncia alcanÃ§ado para o prÃ³ximo mÃªs.", vbExclamation
       End If
     End If
   End If
-  ' critica a descrição dos investimentos digitados
+  ' critica a descriÃ§Ã£o dos investimentos digitados
   If Cells(Target.Row, Range(RANGE_HEADER_TIPO_MOVIMENTACAO).Column).Value = TIPO_LANCAMENTO_INVESTIMENTOS Then
-    ' testa se alterou os valores dos créditos
+    ' testa se alterou os valores dos crÃ©ditos
     If Not Application.Intersect(Target, Range(RANGE_COL_VALOR_MOVIMENTACOES)) Is Nothing And Not IsEmpty(Target) Then
-      ' critica a descrição do investimento
+      ' critica a descriÃ§Ã£o do investimento
       blnIsCriticouDescInvest = True
       Application.ScreenUpdating = False
       Call CriticarInvestimento(Cells(Target.Row, Range(RANGE_HEADER_DESC_MOVIMENTACAO).Column))
     End If
   End If
-  ' testa se alterou os valores finais de ações, opções ou fii's
+  ' testa se alterou os valores finais de aÃ§Ãµes, opÃ§Ãµes ou fii's
   If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
     ' testa se gerou imposto a pagar
-    If Target.count = 1 And Not IsEmpty(Target) Then
+    If Target.Count = 1 And Not IsEmpty(Target) Then
       If IsGerouImpostoNoMes(Target) Then
         Beep
         Beep
-        MsgBox "Atenção! Você tem imposto a pagar este mês.", vbExclamation
+        MsgBox "AtenÃ§Ã£o! VocÃª tem imposto a pagar este mÃªs.", vbExclamation
       End If
     End If
   End If
   
 fimSheetChange:
-  ' só deve deixar a tela atualizar se passou pela rotina acima
+  ' sÃ³ deve deixar a tela atualizar se passou pela rotina acima
   If blnIsCriticouDescInvest Then
     Application.ScreenUpdating = True
   End If
@@ -135,14 +126,14 @@ End Sub
 Private Function IsAlcancouValorCriticoNoMes(intPlanilha As Integer, valor As Double) As Boolean
   '
   ' Function IsAlcancouValorCriticoNoMes
-  ' verifica se alcançou o ponto crítico neste mês
+  ' verifica se alcanÃ§ou o ponto crÃ­tico neste mÃªs
   '
   ' variaveis
   Dim dblValorTolerancia, dblSaldoAtual As Double
   ' principal
   On Error GoTo erroIsAlcancouValorCriticoNoMes
-  'Testa se a próxima planilha está aberta e é mensal
-  'este teste é necessário caso esteja se vendo a planilha do próximo mês
+  'Testa se a prÃ³xima planilha estÃ¡ aberta e Ã© mensal
+  'este teste Ã© necessÃ¡rio caso esteja se vendo a planilha do prÃ³ximo mÃªs
   If Not IsPlanilhaAberta(Worksheets(intPlanilha).Range(RANGE_SITUAC_PLANILHA)) Then
     IsAlcancouValorCriticoNoMes = False
     Exit Function

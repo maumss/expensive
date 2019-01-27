@@ -1,12 +1,11 @@
-Attribute VB_Name = "Bolsa"
-' Módulo de funções para baixar cotações da bolsa
+' MÃ³dulo de funÃ§Ãµes para baixar cotaÃ§Ãµes da bolsa
 Option Explicit
 Sub BaixarCotacoes()
   '
   ' Sub BaixarCotacoes    Criado por: MSS  Em: 25.04.16
-  ' baixa cotações do Yahoo Finanças
+  ' baixa cotaÃ§Ãµes do Yahoo FinanÃ§as
   '
-  ' variáveis
+  ' variÃ¡veis
   Dim dsDataSheet As Worksheet
   Dim strUrl As String
   Dim intLinha As Integer
@@ -21,7 +20,7 @@ Sub BaixarCotacoes()
   If dsDataSheet.ProtectContents Then
     dsDataSheet.Unprotect
   End If
-  'Apaga a região onde os dados serão atualizados
+  'Apaga a regiÃ£o onde os dados serÃ£o atualizados
   Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).CurrentRegion.ClearContents
   intLinha = Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).Row
   intColunaSimbolo = Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLO).Column

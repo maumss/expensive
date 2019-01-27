@@ -1,5 +1,4 @@
-Attribute VB_Name = "Cartao"
-'Módulo de transferência de lançamentos de cartão p/ outro mês
+'MÃ³dulo de transferÃªncia de lanÃ§amentos de cartÃ£o p/ outro mÃªs
 Option Explicit
 
 Private Type MovimentoCartao
@@ -12,11 +11,9 @@ Private Type MovimentoCartao
 End Type
 
 Public Sub MoverCartao()
-Attribute MoverCartao.VB_Description = "Move um lançamento de cartão para o próximo mês."
-Attribute MoverCartao.VB_ProcData.VB_Invoke_Func = "m\n14"
   '
   ' MoveCartao Macro
-  ' Move um lançamento de cartão de um mês para o próximo.
+  ' Move um lanÃ§amento de cartÃ£o de um mÃªs para o prÃ³ximo.
   '
   ' Atalho do teclado: Ctrl+m
   '
@@ -28,17 +25,17 @@ Attribute MoverCartao.VB_ProcData.VB_Invoke_Func = "m\n14"
     Exit Sub
   End If
     
-  'Pede confirmação
-  If MsgBox("Você deseja mover o lançamento para o próximo mês?", _
-        vbYesNo + vbQuestion, "Mover lançamento") = vbNo Then
+  'Pede confirmaÃ§Ã£o
+  If MsgBox("VocÃª deseja mover o lanÃ§amento para o prÃ³ximo mÃªs?", _
+        vbYesNo + vbQuestion, "Mover lanÃ§amento") = vbNo Then
     Exit Sub
   End If
   
-  'Começa o processo de mover o lançamento
+  'ComeÃ§a o processo de mover o lanÃ§amento
   CongelarCalculosPlanilha (True)
   On Error GoTo EndMacro:
   
-  ' Joga os valores da linha a mover em variáveis
+  ' Joga os valores da linha a mover em variÃ¡veis
   Dim udtMovimentoCartao As MovimentoCartao
   udtMovimentoCartao = RetornarDadosMovCartao(lngLinhaAtual)
   ' Apaga linha selecionada
@@ -47,10 +44,10 @@ Attribute MoverCartao.VB_ProcData.VB_Invoke_Func = "m\n14"
   intColunaFinalCartao = Range(RANGE_ULTIMO_VALOR_CARTAO).Column
   Range(Cells(lngLinhaAtual, intColunaInicioCartao), Cells(lngLinhaAtual, intColunaFinalCartao)).Select
   Selection.ClearContents
-  ' Habilita os eventos p/ marcar que houve mudança
+  ' Habilita os eventos p/ marcar que houve mudanÃ§a
   Application.EnableEvents = True
   Call JogarValoresCartaoNaPlanilha(lngIndPlan + 1, udtMovimentoCartao)
-  ' Volta a posição original
+  ' Volta a posiÃ§Ã£o original
   Worksheets(lngIndPlan).Activate
   ActiveSheet.Cells(lngLinhaAtual, intColunaInicioCartao).Select
   
@@ -64,24 +61,24 @@ ErroMoverCartao:
 End Sub
 
 Private Function IsMoverInvalido(lngIndPlan As Long, lngLinhaAtual As Long) As Boolean
-  'Testa se é planilha mensal válida e se está aberta
+  'Testa se Ã© planilha mensal vÃ¡lida e se estÃ¡ aberta
   If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
     IsMoverInvalido = True
     Exit Function
   End If
-  'Testa se já está na planilha de Dezembro
+  'Testa se jÃ¡ estÃ¡ na planilha de Dezembro
   If ActiveSheet.Name = NOME_PLAN_DEZ Then
-    MsgBox "Não existe planilha posterior a essa para mover valores", vbCritical
+    MsgBox "NÃ£o existe planilha posterior a essa para mover valores", vbCritical
     IsMoverInvalido = True
     Exit Function
   End If
-  'Testa se a planilha destino está aberta
+  'Testa se a planilha destino estÃ¡ aberta
   If Not IsPlanilhaAberta(Worksheets(lngIndPlan + 1).Range(RANGE_SITUAC_PLANILHA)) Then
-    MsgBox "A planilha destino está Fechada para alterações", vbCritical
+    MsgBox "A planilha destino estÃ¡ Fechada para alteraÃ§Ãµes", vbCritical
     IsMoverInvalido = True
     Exit Function
   End If
-  'Testa se está dentro do lançamento do cartão
+  'Testa se estÃ¡ dentro do lanÃ§amento do cartÃ£o
   Dim rgSelecao As Range
   Set rgSelecao = Selection
   If (Application.Intersect(rgSelecao, Range(RANGE_TAB_CARTOES)) Is Nothing) Then
@@ -92,7 +89,7 @@ Private Function IsMoverInvalido(lngIndPlan As Long, lngLinhaAtual As Long) As B
   Dim intColunaInicioCartao As Integer
   intColunaInicioCartao = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
   If IsEmpty(Cells(lngLinhaAtual, intColunaInicioCartao)) Then
-    MsgBox "Você não se posicionou em uma célula com dados", vbCritical
+    MsgBox "VocÃª nÃ£o se posicionou em uma cÃ©lula com dados", vbCritical
     IsMoverInvalido = True
     Exit Function
   End If
@@ -117,9 +114,9 @@ Private Function RetornarDadosMovCartao(lngLinhaAtual As Long) As MovimentoCarta
 End Function
 
 Private Sub JogarValoresCartaoNaPlanilha(lngIndPlanDestino As Long, udtMovimentoCartao As MovimentoCartao)
-  ' Se posiciona na próxima planilha
+  ' Se posiciona na prÃ³xima planilha
   Worksheets(lngIndPlanDestino).Activate
-  ' Joga valores na próxima planilha
+  ' Joga valores na prÃ³xima planilha
   Dim lngLinhaDest As Long
   Dim intColunaDestino As Integer
   lngLinhaDest = RetornarUltimaLinhaCartao + 1

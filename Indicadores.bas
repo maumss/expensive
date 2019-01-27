@@ -1,5 +1,4 @@
-Attribute VB_Name = "Indicadores"
-' Módulo de funções para atualização dos indicadores
+' MÃ³dulo de funÃ§Ãµes para atualizaÃ§Ã£o dos indicadores
 Option Explicit
 
 Sub AtualizarDadosPlanAtual()
@@ -34,8 +33,8 @@ Sub BuscarIndicadores()
   Set wsPlanilhaAtual = ActiveSheet
   
   If HasValorMes(wsPlanilhaAtual) Then
-    'Pede confirmação
-    If MsgBox("Essa planilha já possui dados nos indicadores. Deseja sobreescrever?", _
+    'Pede confirmaÃ§Ã£o
+    If MsgBox("Essa planilha jÃ¡ possui dados nos indicadores. Deseja sobreescrever?", _
         vbYesNo + vbQuestion, "Busca indicadores") = vbNo Then
         Exit Sub
     End If
@@ -53,7 +52,7 @@ End Sub
 Private Function HasValorMes(wsPlanilha As Worksheet) As Boolean
   '
   ' Function HasValorMes
-  ' verifica se existem valores já digitados no mês do indicador
+  ' verifica se existem valores jÃ¡ digitados no mÃªs do indicador
   '
   On Error GoTo ErroHasValorMes
   
@@ -76,7 +75,7 @@ End Function
 Sub AtualizarFonteDeDadosPlanilha(wsPlanilha As Worksheet)
   '
   ' AtualizarFonteDeDadosPlanilha    Data: 30/04/16
-  ' Atualiza funções da planilha
+  ' Atualiza funÃ§Ãµes da planilha
   '
   On Error GoTo ErroAtualizarFonteDeDadosPlanilha
   
@@ -103,7 +102,7 @@ End Sub
 Private Sub PercorrerIndicadores(wsPlanilha As Worksheet, wsIndicadores As Worksheet)
   '
   ' PercorrerIndicadores
-  ' verifica cada descrição de indicador
+  ' verifica cada descriÃ§Ã£o de indicador
   '
   On Error GoTo ErroPercorrerIndicadores
     
@@ -120,7 +119,7 @@ Private Sub PercorrerIndicadores(wsPlanilha As Worksheet, wsIndicadores As Works
       Set rgCelulaAtual = rgCell
       Call TransfereDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
     End If
-    If (strIndicador = "Dólar Comercial") Then
+    If (strIndicador = "DÃ³lar Comercial") Then
       Dim rgDolarAtual As Range
       Set rgDolarAtual = BuscarDolarComercialAtual(wsIndicadores)
       If Not rgDolarAtual Is Nothing Then
@@ -138,7 +137,7 @@ End Sub
 Private Sub TransfereDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
   ' PercorrerIndicadores
-  ' verifica cada descrição de indicador
+  ' verifica cada descriÃ§Ã£o de indicador
   '
   On Error GoTo ErroTransfereDadosIndicador
   
@@ -171,7 +170,7 @@ End Sub
 Private Function GetRangeMesIndicador(rgCell As Range) As Range
   '
   ' Function GetRangeMesIndicador
-  ' busca os dados do mês do indicador atual
+  ' busca os dados do mÃªs do indicador atual
   '
   On Error GoTo ErroGetRangeMesIndicador
   
@@ -205,7 +204,7 @@ End Function
 Private Function GetRangeDozeMesesIndicador(rgCell As Range) As Range
   '
   ' Function GetRangeDozeMesesIndicador
-  ' busca os dados dos últimos doze meses do indicador atual
+  ' busca os dados dos Ãºltimos doze meses do indicador atual
   '
   On Error GoTo ErroGetRangeDozeMesesIndicador
   
@@ -222,7 +221,7 @@ End Function
 Private Function BuscarDolarComercialAtual(wsIndicadores As Worksheet) As Range
   On Error GoTo ErroBuscarDolarComercialAtual
   Dim rgTabDolar As Range
-  Set rgTabDolar = wsIndicadores.UsedRange.Find(What:="Dólar & Euro")
+  Set rgTabDolar = wsIndicadores.UsedRange.Find(What:="DÃ³lar & Euro")
   If Not rgTabDolar Is Nothing Then
     Set BuscarDolarComercialAtual = Cells(rgTabDolar.Row + 2, rgTabDolar.Column + 2)
     Exit Function
@@ -237,7 +236,7 @@ End Function
 Private Sub TransfereValorDolar(rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
   ' TransfereValorDolar
-  ' transfere o valor do dólar atual para planilha corrente
+  ' transfere o valor do dÃ³lar atual para planilha corrente
   '
   On Error GoTo ErroTransfereValorDolar
   

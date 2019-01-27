@@ -1,6 +1,5 @@
-Attribute VB_Name = "FechaMes"
 Option Explicit
-'Módulo de fechamento do mês
+'MÃ³dulo de fechamento do mÃªs
 
 Private Type infoInvest
   strAtivo As String
@@ -10,27 +9,25 @@ Private Type infoInvest
 End Type
 
 Sub ProtegerPlanilha()
-Attribute ProtegerPlanilha.VB_Description = "Protege ou desprotege a planilha do mês."
-Attribute ProtegerPlanilha.VB_ProcData.VB_Invoke_Func = "p\n14"
   '
   ' Protege Macro
-  ' Protege ou desprotege a planilha do mês.
+  ' Protege ou desprotege a planilha do mÃªs.
   '
   ' Atalho do teclado: Ctrl+p
   '
   On Error GoTo erroProtege
-  ' Verifica se é uma planilha de movimentação
+  ' Verifica se Ã© uma planilha de movimentaÃ§Ã£o
   If (Range(RANGE_SITUAC_PLANILHA).Value <> SITUAC_ABERTO) And _
      (Range(RANGE_SITUAC_PLANILHA).Value <> SITUAC_FECHADO) Then
     Exit Sub
   End If
   CongelarCalculosPlanilha (True)
   If ActiveSheet.ProtectContents Then
-    'MsgBox "Essa planilha será desprotegida...", vbInformation
+    'MsgBox "Essa planilha serÃ¡ desprotegida...", vbInformation
     ActiveSheet.Unprotect
     AlterarSituacaoPlanilha (SITUAC_ABERTO)
   Else
-    'MsgBox "Essa planilha será protegida...", vbInformation
+    'MsgBox "Essa planilha serÃ¡ protegida...", vbInformation
     AlterarSituacaoPlanilha (SITUAC_FECHADO)
     CopiarSaldos
     ActiveSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
@@ -90,19 +87,19 @@ End Sub
 Private Sub CopiarSaldos()
   '
   ' Sub copiarSaldos        De: 17/01/04
-  ' Copia os saldos dos investimentos de um mês p/ o próximo
+  ' Copia os saldos dos investimentos de um mÃªs p/ o prÃ³ximo
   '
   On Error GoTo errocopiarSaldos
     
   Dim lngIndPlan As Long
   lngIndPlan = Worksheets(ActiveSheet.Name).Index
-  'Testa se a planilha destino está aberta
+  'Testa se a planilha destino estÃ¡ aberta
   Dim wsProxPlanilha As Worksheet
   Set wsProxPlanilha = Worksheets(lngIndPlan + 1)
   If Not IsPlanilhaAberta(wsProxPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
   End If
-  ' Verifica se existe saldo final preenchido no próximo mês do resumo de investimentos
+  ' Verifica se existe saldo final preenchido no prÃ³ximo mÃªs do resumo de investimentos
   If HasSaldosCarteira(wsProxPlanilha) Then
     Exit Sub
   End If
@@ -112,13 +109,13 @@ Private Sub CopiarSaldos()
   If Not (HasDadosCarteira(wsPlanilhaAtual)) Then
     Exit Sub
   End If
-  'Pede confirmação
-  If MsgBox("Você deseja montar o Resumo Mensal de Carteiras do próximo mês?", _
+  'Pede confirmaÃ§Ã£o
+  If MsgBox("VocÃª deseja montar o Resumo Mensal de Carteiras do prÃ³ximo mÃªs?", _
         vbYesNo + vbQuestion, "Copiar Resumo Mensal") = vbNo Then
     Exit Sub
   End If
   
-  ' Reproduz o Resumo de Investimento Atual no próximo mês
+  ' Reproduz o Resumo de Investimento Atual no prÃ³ximo mÃªs
   Call CopiarSaldosCarteiraAdHoc(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraConsolidada(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraAcoes(wsPlanilhaAtual, wsProxPlanilha)
@@ -136,7 +133,7 @@ End Sub
 Private Function HasSaldosCarteira(wsProxPlanilha As Worksheet) As Boolean
   '
   ' Function HasSaldosCarteira
-  ' verifica se existem saldos no próximo mês
+  ' verifica se existem saldos no prÃ³ximo mÃªs
   '
   Dim blnExisteDados As Boolean
   blnExisteDados = False
@@ -228,7 +225,7 @@ End Function
 Private Sub CopiarSaldosCarteiraAdHoc(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteiraAdHoc
-  ' copiar saldos e descrições da carteira 1
+  ' copiar saldos e descriÃ§Ãµes da carteira 1
   '
   Dim intPrimeiraLinhaResumo As Integer, intUltimaLinhaResumo As Integer
   Dim intColunaDescricao As Integer, intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
@@ -250,7 +247,7 @@ End Sub
 Private Sub CopiarSaldosCarteiraConsolidada(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteiraConsolidada
-  ' copiar saldos e descrições da carteira 2
+  ' copiar saldos e descriÃ§Ãµes da carteira 2
   '
   Dim intPrimeiraLinhaResumo As Integer, intUltimaLinhaResumo As Integer
   Dim intColunaDescricao As Integer, intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
@@ -274,7 +271,7 @@ Private Sub CopiarSaldosCarteira(intPrimeiraLinhaResumo As Integer, intUltimaLin
    wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteira
-  ' copiar saldos e descrições da carteira
+  ' copiar saldos e descriÃ§Ãµes da carteira
   '
   ' Retirar colunas intColunaQtdeInicial e intColunaQtdeFinal
   On Error GoTo ErrorCopiarSaldosCarteira
@@ -326,7 +323,7 @@ End Sub
 Private Sub CopiarSaldosCarteiraAcoes(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteiraAcoes
-  ' copiar saldos, quantidades e descrições da carteira 3
+  ' copiar saldos, quantidades e descriÃ§Ãµes da carteira 3
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
@@ -363,7 +360,7 @@ End Sub
 Private Sub CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteiraOpcoes
-  ' copiar saldos, quantidades e descrições da carteira opcoes
+  ' copiar saldos, quantidades e descriÃ§Ãµes da carteira opcoes
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
@@ -400,7 +397,7 @@ End Sub
 Private Sub CopiarSaldosCarteiraFii(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteiraFii
-  ' copiar saldos, quantidades e descrições da carteira 4
+  ' copiar saldos, quantidades e descriÃ§Ãµes da carteira 4
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
@@ -437,7 +434,7 @@ End Sub
 Private Sub CopiarSaldosCarteiraTesouroRF(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteiraTesouroRF
-  ' copiar saldos, quantidades e descrições da carteira 5
+  ' copiar saldos, quantidades e descriÃ§Ãµes da carteira 5
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
@@ -473,7 +470,7 @@ End Sub
 Private Sub CopiarSaldosCarteiraTesouroSelic(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteiraTesouroSelic
-  ' copiar saldos, quantidades e descrições da carteira 6
+  ' copiar saldos, quantidades e descriÃ§Ãµes da carteira 6
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
@@ -519,7 +516,7 @@ Private Sub ColetarInformacoes(intPrimeiraLinha As Integer, intUltimaLinha As In
         Dim intPosAtivo As Integer
         intPosAtivo = GetPosAtivoDoArray(infoInvests, wsPlanilhaAtual.Cells(intCont, intColunaAtivo).Value)
         If (intPosAtivo < 0) Then
-          ' Se ainda não existe a entrada, cria uma nova entrada no array
+          ' Se ainda nÃ£o existe a entrada, cria uma nova entrada no array
           Dim infoInvest As infoInvest
           infoInvest.strAtivo = wsPlanilhaAtual.Cells(intCont, intColunaAtivo).Value
           infoInvest.intQuantidade = wsPlanilhaAtual.Cells(intCont, intColunaQtde).Value
@@ -532,7 +529,7 @@ Private Sub ColetarInformacoes(intPrimeiraLinha As Integer, intUltimaLinha As In
           ReDim Preserve infoInvests(1 To intPosArray)
           infoInvests(intPosArray) = infoInvest
         Else
-          ' se já existe, atualiza a qtdade e o custo médio
+          ' se jÃ¡ existe, atualiza a qtdade e o custo mÃ©dio
           If (intColunaCustoMedio > 0) Then
             infoInvests(intPosAtivo).dblCustoAnterior = wsPlanilhaAtual.Cells(intCont, intColunaCustoMedio).Value
           End If
@@ -570,10 +567,10 @@ End Function
 
 
 Private Function IsArrayEmpty(infoInvests() As infoInvest) As Boolean
-   ' Determina se um array contém algum elemento
+   ' Determina se um array contÃ©m algum elemento
    Dim lngUBound As Long
    On Error Resume Next
-   ' Se o array estiver vazio, um erro ocorrerá quando checar os limites do array
+   ' Se o array estiver vazio, um erro ocorrerÃ¡ quando checar os limites do array
    lngUBound = UBound(infoInvests)
    If Err.Number <> 0 Then
       IsArrayEmpty = True
@@ -588,7 +585,7 @@ Private Sub CopiarRendaVariavel(intPrimeiraLinha As Integer, intUltimaLinha As I
     wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet, infoInvests() As infoInvest)
   '
   ' Sub CopiarRendaVariavel
-  ' copiar saldos e descrições da carteira de renda variável
+  ' copiar saldos e descriÃ§Ãµes da carteira de renda variÃ¡vel
   '
   On Error GoTo ErrorCopiarRendaVariavel
   
@@ -616,7 +613,7 @@ Private Function GetPrimeiraLinhaLivreDaCarteira(intPrimeiraLinhaResumo As Integ
     intColunaDescricao As Integer, wsPlanilha As Worksheet) As Integer
   '
   ' Function GetPrimeiraLinhaLivreDaCarteira
-  ' busca a primeira linha sem dados na carteira da próxima planilha
+  ' busca a primeira linha sem dados na carteira da prÃ³xima planilha
   '
   On Error GoTo ErrorGetPrimeiraLinhaLivreDaCarteira
   Dim intCont As Integer
@@ -636,7 +633,7 @@ End Function
 Private Sub CopiarSaldosContaCorretora(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosContaCorretora
-  ' copiar saldos e descrições da carteira
+  ' copiar saldos e descriÃ§Ãµes da carteira
   '
   On Error GoTo ErrorCopiarSaldosContaCorretora
     

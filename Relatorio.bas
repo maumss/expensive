@@ -1,4 +1,3 @@
-Attribute VB_Name = "Relatorio"
 ' Módulo de funções sobre a geração de relatório
 Option Explicit
 
@@ -159,10 +158,15 @@ Sub GerarRelatRetrato()
   Dim dirFile As String
   Dim uniqueName As Boolean
   Dim userAnswer As VbMsgBoxResult
+  Dim monthNumber As String
   Const XL_PORTRAIT As Integer = 1 ' retrato
   ' define o nome do PDF
   'MsgBox RetornarFileName()
-  fileName = RetornarFileName() & "-" & Range("planFechada").Value & ".pdf"
+  monthNumber = Month(DateValue("Fevereiro" & " 1"))
+  If (Len(monthNumber) < 2) Then
+    monthNumber = "0" & monthNumber
+  End If
+  fileName = RetornarFileName() & "-" & "snapshot" & monthNumber & ".pdf"
   dirFile = RetornarCurrentFolder() & fileName
   Do While uniqueName = False
     If Len(Dir(dirFile)) <> 0 Then

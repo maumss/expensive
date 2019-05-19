@@ -289,7 +289,8 @@ Private Sub CopiarSaldosCarteira(intPrimeiraLinhaResumo As Integer, intUltimaLin
           End If
           .Cells(intLinhaDestino, intColunaDescricao).Value = wsPlanilhaAtual.Cells(intCont, intColunaDescricao).Value
           If wsPlanilhaAtual.Cells(intCont, intColunaSaldoFinal).HasFormula And _
-             wsPlanilhaAtual.Cells(intCont, intColunaSaldoInicial).HasFormula Then
+             wsPlanilhaAtual.Cells(intCont, intColunaSaldoInicial).HasFormula And _
+             InStr(wsPlanilhaAtual.Cells(intCont, intColunaSaldoInicial).Formula, "D") > 0 Then
             If (intLinhaDestino = intCont) Then
               .Cells(intLinhaDestino, intColunaSaldoInicial).Formula = wsPlanilhaAtual.Cells(intCont, intColunaSaldoInicial).Formula
             Else

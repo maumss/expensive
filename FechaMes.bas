@@ -119,10 +119,12 @@ Private Sub CopiarSaldos()
   Call CopiarSaldosCarteiraAdHoc(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraConsolidada(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraAcoes(wsPlanilhaAtual, wsProxPlanilha)
-  Call CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraFii(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraTesouroRF(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraTesouroSelic(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraEtf(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraExterior(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosContaCorretora(wsPlanilhaAtual, wsProxPlanilha)
   Exit Sub
   
@@ -356,6 +358,80 @@ Private Sub CopiarSaldosCarteiraAcoes(wsPlanilhaAtual As Worksheet, wsProxPlanil
     
 ErrorCopiarSaldosCarteiraAcoes:
   MostrarMsgErro ("CopiarSaldosCarteiraAcoes")
+End Sub
+
+Private Sub CopiarSaldosCarteiraEtf(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+  '
+  ' Sub CopiarSaldosCarteiraEtf
+  ' copiar saldos, quantidades e descrições da carteira etf
+  '
+  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
+  Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
+  Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
+  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim infoInvests() As infoInvest
+  On Error GoTo ErrorCopiarSaldosCarteiraEtf
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETF))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ETF))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_ETF))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ETF))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ETF))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ETF))
+  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ETF))
+  
+  Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
+   intColunaAtivo, intColunaSaldoFinal, _
+   intColunaQtde, _
+   intColunaCustoMedio, _
+   wsPlanilhaAtual, infoInvests)
+  If (IsArrayEmpty(infoInvests) = True) Then
+    Exit Sub
+  End If
+  Call CopiarRendaVariavel(intPrimeiraLinha, intUltimaLinha, _
+    intColunaAtivo, intColunaSaldoInicial, intColunaSaldoFinal, _
+    intColunaQtde, _
+    wsPlanilhaAtual, wsProxPlanilha, infoInvests)
+  Exit Sub
+    
+ErrorCopiarSaldosCarteiraEtf:
+  MostrarMsgErro ("CopiarSaldosCarteiraEtf")
+End Sub
+
+Private Sub CopiarSaldosCarteiraExterior(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+  '
+  ' Sub CopiarSaldosCarteiraExterior
+  ' copiar saldos, quantidades e descrições da carteira etf
+  '
+  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
+  Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
+  Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
+  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim infoInvests() As infoInvest
+  On Error GoTo ErrorCopiarSaldosCarteiraExterior
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_EXTERIOR))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_EXTERIOR))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_EXTERIOR))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_EXTERIOR))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_EXTERIOR))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_EXTERIOR))
+  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_EXTERIOR))
+  
+  Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
+   intColunaAtivo, intColunaSaldoFinal, _
+   intColunaQtde, _
+   intColunaCustoMedio, _
+   wsPlanilhaAtual, infoInvests)
+  If (IsArrayEmpty(infoInvests) = True) Then
+    Exit Sub
+  End If
+  Call CopiarRendaVariavel(intPrimeiraLinha, intUltimaLinha, _
+    intColunaAtivo, intColunaSaldoInicial, intColunaSaldoFinal, _
+    intColunaQtde, _
+    wsPlanilhaAtual, wsProxPlanilha, infoInvests)
+  Exit Sub
+    
+ErrorCopiarSaldosCarteiraExterior:
+  MostrarMsgErro ("CopiarSaldosCarteiraExterior")
 End Sub
 
 Private Sub CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)

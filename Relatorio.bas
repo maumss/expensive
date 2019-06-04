@@ -162,7 +162,7 @@ Sub GerarRelatRetrato()
   Const XL_PORTRAIT As Integer = 1 ' retrato
   ' define o nome do PDF
   'MsgBox RetornarFileName()
-  monthNumber = Month(DateValue("Fevereiro" & " 1"))
+  monthNumber = Month(DateValue(Range("planFechada").Value & " 1"))
   If (Len(monthNumber) < 2) Then
     monthNumber = "0" & monthNumber
   End If

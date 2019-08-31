@@ -77,12 +77,14 @@ Sub PuxarDataAtual()
     If (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_MOVIMENTACOES)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CARTOES)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_ACOES)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_OPCOES)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_FII)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_RF)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_SELIC)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_ETF)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_EXTERIOR)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_RF)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_SELIC)) Is Nothing) Then
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_BILL)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_COMMODITY)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_OPCOES)) Is Nothing) Then
       rgAlvo.Value = Date
     End If
   End If

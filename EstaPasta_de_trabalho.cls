@@ -106,7 +106,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
       If IsGerouImpostoNoMes(Target) Then
         Beep
         Beep
-        MsgBox "Atenção! Você tem imposto a pagar este mês.", vbExclamation
+        MsgBox "Atenção! Você gerou imposto a pagar no próximo mês.", vbExclamation
       End If
     End If
   End If

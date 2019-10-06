@@ -21,9 +21,9 @@ Sub BaixarCotacoes()
     dsDataSheet.Unprotect
   End If
   'Apaga a região onde os dados serão atualizados
-  Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).CurrentRegion.ClearContents
-  intLinha = Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).Row
-  intColunaSimbolo = Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLO).Column
+  range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).CurrentRegion.ClearContents
+  intLinha = range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).Row
+  intColunaSimbolo = range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLO).Column
   'Cria uma url no formato <http://download.finance.yahoo.com/d/quotes.csv?s=^BVSP+^GSPC+PETR4.SA+VALE5.SA&f=snd1t1c1ol1ghv&e=.csv>
   strUrl = YAHOO_FINANCE_URL + Cells(intLinha, intColunaSimbolo)
   intLinha = intLinha + 1
@@ -33,17 +33,17 @@ Sub BaixarCotacoes()
   Wend
   strUrl = strUrl + "&f=" + YAHOO_TAG_DADOS + "&e=" + YAHOO_TAG_FORMATO
   'Cria uma QueryTable para conter os dados de retorno da URL
-  intTamanhoOriginal = Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).ColumnWidth
-  With ActiveSheet.QueryTables.Add(Connection:="URL;" & strUrl, Destination:=dsDataSheet.Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO))
+  intTamanhoOriginal = range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).ColumnWidth
+  With ActiveSheet.QueryTables.Add(Connection:="URL;" & strUrl, Destination:=dsDataSheet.range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO))
     .BackgroundQuery = True
     .TablesOnlyFromHTML = False
     .Refresh BackgroundQuery:=False
     .SaveData = True
   End With
-  Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).CurrentRegion.TextToColumns Destination:=Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO), DataType:=xlDelimited, _
+  range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).CurrentRegion.TextToColumns Destination:=range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO), DataType:=xlDelimited, _
     TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=True, _
     Semicolon:=False, Comma:=True, Space:=False, other:=False
-  Columns(Range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).Column).ColumnWidth = intTamanhoOriginal
+  Columns(range(RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO).Column).ColumnWidth = intTamanhoOriginal
     
   dsDataSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
   Set dsDataSheet = Nothing
@@ -56,4 +56,3 @@ ErroBaixarCotacoes:
   MostrarMsgErro ("BaixarCotacoes")
   Resume EndMacro
 End Sub
-

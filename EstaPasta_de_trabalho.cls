@@ -14,10 +14,10 @@ Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, cancel As Boolean)
     Application.EnableEvents = False
     Application.ScreenUpdating = False
     Worksheets("Intro").Unprotect
-    Worksheets("Intro").Range(RANGE_DATA_ULTIMA_ATUALIZ).Value = _
+    Worksheets("Intro").range(RANGE_DATA_ULTIMA_ATUALIZ).Value = _
       Format(Now, "dddd, dd mmmm yyyy") & " às " & _
       Format(Now, "hh:mm:ss")
-    Range(RANGE_POSICAO).Value = Now
+    range(RANGE_POSICAO).Value = Now
     Worksheets("Intro").Protect
     blnAtualizouArquivo = False
   End If
@@ -43,7 +43,7 @@ erroWorkbook_Open:
   MostrarMsgErro ("Workbook_Open")
 End Sub
 
-Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
+Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As range)
   '
   ' Sub Workbook_SheetChange
   ' verifica se atualizou alguma planilha ou se está digitando a descrição
@@ -56,7 +56,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   blnIsCriticouDescInvest = False
   ' ajusta variável para avisar que houve mudanças
   blnAtualizouArquivo = True
-  If Not IsPlanilhaAberta(Sh.Range(RANGE_SITUAC_PLANILHA)) Then
+  If Not IsPlanilhaAberta(Sh.range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
   End If
   
@@ -64,7 +64,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   Application.EnableEvents = False
   
   ' testa se alterou os valores de movimentações
-  If Not Application.Intersect(Target, Range(RANGE_COL_VALOR_MOVIMENTACOES)) Is Nothing Then
+  If Not Application.Intersect(Target, range(RANGE_COL_VALOR_MOVIMENTACOES)) Is Nothing Then
     ' testa saldo da planilha atual
     If Target.Count = 1 And Not IsEmpty(Target) Then
       If IsAlcancouValorCriticoNoMes(Worksheets(Sh.Name).Index, Target.Value) Then
@@ -75,7 +75,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
     End If
   End If
   ' testa se alterou os valores de cartão
-  If Not Application.Intersect(Target, Range(RANGE_COL_VALOR_CARTOES)) Is Nothing Then
+  If Not Application.Intersect(Target, range(RANGE_COL_VALOR_CARTOES)) Is Nothing Then
     ' testa saldo da próxima planilha
     If Target.Count = 1 And Not IsEmpty(Target) Then
       If IsAlcancouValorCriticoNoMes(Worksheets(Sh.Name).Index + 1, Target.Value) Then
@@ -86,27 +86,31 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
     End If
   End If
   ' critica a descrição dos investimentos digitados
-  If Cells(Target.Row, Range(RANGE_HEADER_TIPO_MOVIMENTACAO).Column).Value = TIPO_LANCAMENTO_INVESTIMENTOS Then
+  If Cells(Target.Row, range(RANGE_HEADER_TIPO_MOVIMENTACAO).Column).Value = TIPO_LANCAMENTO_INVESTIMENTOS Then
     ' testa se alterou os valores dos créditos
-    If Not Application.Intersect(Target, Range(RANGE_COL_VALOR_MOVIMENTACOES)) Is Nothing And Not IsEmpty(Target) Then
+    If Not Application.Intersect(Target, range(RANGE_COL_VALOR_MOVIMENTACOES)) Is Nothing And Not IsEmpty(Target) Then
       ' critica a descrição do investimento
       blnIsCriticouDescInvest = True
       Application.ScreenUpdating = False
-      Call CriticarInvestimento(Cells(Target.Row, Range(RANGE_HEADER_DESC_MOVIMENTACAO).Column))
+      Call CriticarInvestimento(Cells(Target.Row, range(RANGE_HEADER_DESC_MOVIMENTACAO).Column))
     End If
   End If
   ' testa se alterou os valores finais de ações, opções ou fii's
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_EXTERIOR)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
+  If Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Or _
+     Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES)) Is Nothing Or _
+     Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Or _
+     Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Or _
+     Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
     ' testa se gerou imposto a pagar
     If Target.Count = 1 And Not IsEmpty(Target) Then
       If IsGerouImpostoNoMes(Target) Then
         Beep
         Beep
-        MsgBox "Atenção! Você gerou imposto a pagar no próximo mês.", vbExclamation
+        If MsgBox("Atenção! Você gerou imposto a pagar para o próximo mês." & vbLf & _
+             "Deseja criar um agendamento para este pagamento?", _
+             vbYesNo + vbQuestion, "Agendar Darf") = vbYes Then
+          Call AgendarLembreteOutlook
+        End If
       End If
     End If
   End If
@@ -136,12 +140,12 @@ Private Function IsAlcancouValorCriticoNoMes(intPlanilha As Integer, valor As Do
   On Error GoTo erroIsAlcancouValorCriticoNoMes
   'Testa se a próxima planilha está aberta e é mensal
   'este teste é necessário caso esteja se vendo a planilha do próximo mês
-  If Not IsPlanilhaAberta(Worksheets(intPlanilha).Range(RANGE_SITUAC_PLANILHA)) Then
+  If Not IsPlanilhaAberta(Worksheets(intPlanilha).range(RANGE_SITUAC_PLANILHA)) Then
     IsAlcancouValorCriticoNoMes = False
     Exit Function
   End If
-  dblValorTolerancia = Range(RANGE_TOLERANCIA).Value
-  dblSaldoAtual = Sheets(intPlanilha).Range(RANGE_SALDO_MES).Value
+  dblValorTolerancia = range(RANGE_TOLERANCIA).Value
+  dblSaldoAtual = Sheets(intPlanilha).range(RANGE_SALDO_MES).Value
   If (dblSaldoAtual < dblValorTolerancia) And _
      ((dblSaldoAtual + valor) >= dblValorTolerancia) Then
     IsAlcancouValorCriticoNoMes = True
@@ -154,7 +158,7 @@ erroIsAlcancouValorCriticoNoMes:
   MostrarMsgErro ("IsAlcancouValorCriticoNoMes")
 End Function
 
-Private Function IsGerouImpostoNoMes(ByVal Target As Range) As Boolean
+Private Function IsGerouImpostoNoMes(ByVal Target As range) As Boolean
   '
   ' Function IsGerouImpostoNoMes
   ' verifica se gerou imposto a pagar
@@ -165,46 +169,47 @@ Private Function IsGerouImpostoNoMes(ByVal Target As Range) As Boolean
   ' principal
   On Error GoTo erroIsGerouImpostoNoMes
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Then
-    boolTributavel = Range(RANGE_CELULA_TRIBUTAL_ACOES).Value
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_ACOES).Column).Value > 0)
-    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_ACOES).Column).Value > 0)
+  If Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Then
+    boolTributavel = range(RANGE_CELULA_TRIBUTAL_ACOES).Value
+    boolImpostoComum = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_COMUM_ACOES).Column).Value > 0)
+    boolImpostoDaytrade = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_DAYTRADE_ACOES).Column).Value > 0)
     If boolTributavel And (boolImpostoComum Or boolImpostoDaytrade) Then
       IsGerouImpostoNoMes = True
       Exit Function
     End If
   End If
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES)) Is Nothing Then
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_OPCOES).Column).Value > 0)
-    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_OPCOES).Column).Value > 0)
+  If Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES)) Is Nothing Then
+    boolImpostoComum = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_COMUM_OPCOES).Column).Value > 0)
+    boolImpostoDaytrade = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_DAYTRADE_OPCOES).Column).Value > 0)
     If boolImpostoComum Or boolImpostoDaytrade Then
       IsGerouImpostoNoMes = True
       Exit Function
     End If
   End If
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_FII).Column).Value > 0)
-    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_FII).Column).Value > 0)
+  If Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
+    boolImpostoComum = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_COMUM_FII).Column).Value > 0)
+    boolImpostoDaytrade = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_DAYTRADE_FII).Column).Value > 0)
     If boolImpostoComum Or boolImpostoDaytrade Then
       IsGerouImpostoNoMes = True
       Exit Function
     End If
   End If
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Then
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_ETF).Column).Value > 0)
-    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_ETF).Column).Value > 0)
+  If Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Then
+    boolImpostoComum = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_COMUM_ETF).Column).Value > 0)
+    boolImpostoDaytrade = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_DAYTRADE_ETF).Column).Value > 0)
     If boolImpostoComum Or boolImpostoDaytrade Then
       IsGerouImpostoNoMes = True
       Exit Function
     End If
   End If
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_EXTERIOR)) Is Nothing Then
-    boolTributavel = Range(RANGE_CELULA_TRIBUTAL_EXTERIOR).Value
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_EXTERIOR).Column).Value > 0)
+  ' cosidera a soma de Stock, Reit, Treasures e Commodities
+  If Not Application.Intersect(Target, range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Then
+    boolTributavel = range(RANGE_CELULA_TRIBUTAL_STOCK).Value
+    boolImpostoComum = (Cells(Target.Row, range(RANGE_COLUNA_RESULTADO_COMUM_STOCK).Column).Value > 0)
     If boolTributavel And boolImpostoComum Then
       IsGerouImpostoNoMes = True
       Exit Function

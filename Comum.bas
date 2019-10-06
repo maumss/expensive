@@ -2,7 +2,7 @@
 ' Convenções VB: http://support.microsoft.com/kb/110264
 Option Explicit
 
-Function IsPlanilhaAberta(rgPos As Range) As Boolean
+Function IsPlanilhaAberta(rgPos As range) As Boolean
   IsPlanilhaAberta = (rgPos.Value = SITUAC_ABERTO)
 End Function
 
@@ -12,16 +12,16 @@ Sub MostrarMsgErro(strOrigem As String)
     & "Descrição: " & Err.Description, vbCritical
 End Sub
 
-Function RetornarUltimaCelulaMovimentacoes() As Range
+Function RetornarUltimaCelulaMovimentacoes() As range
   Dim intColunaDataMovimentacoes As Integer
-  intColunaDataMovimentacoes = Range(RANGE_HEADER_DATA_MOVIMENTACOES).Column
+  intColunaDataMovimentacoes = range(RANGE_HEADER_DATA_MOVIMENTACOES).Column
   Set RetornarUltimaCelulaMovimentacoes = Cells((RetornarUltimaLinhaMovimentacoes + 1), intColunaDataMovimentacoes)
 End Function
 
 Function RetornarUltimaLinhaMovimentacoes() As Long
   ' procura a última linha de Movimento preenchida
   On Error GoTo ErroUltLinhaD
-  RetornarUltimaLinhaMovimentacoes = Range(RANGE_HEADER_MOVIMENTACOES).End(xlDown).Row
+  RetornarUltimaLinhaMovimentacoes = range(RANGE_HEADER_MOVIMENTACOES).End(xlDown).Row
   Exit Function
   
 ErroUltLinhaD:
@@ -30,7 +30,7 @@ End Function
 
 Function RetornarUltimaLinhaCartao() As Long
   On Error GoTo ErroRetornarUltimaLinhaCartao
-  RetornarUltimaLinhaCartao = Range(RANGE_HEADER_CARTOES).End(xlDown).Row
+  RetornarUltimaLinhaCartao = range(RANGE_HEADER_CARTOES).End(xlDown).Row
   Exit Function
   
 ErroRetornarUltimaLinhaCartao:
@@ -51,19 +51,19 @@ Sub CongelarCalculosPlanilha(blnValor As Boolean)
   Application.DisplayAlerts = True
 End Sub
 
-Function RetornarPrimeiraLinha(rgRange As Range) As Long
+Function RetornarPrimeiraLinha(rgRange As range) As Long
   RetornarPrimeiraLinha = rgRange.Cells(1, 1).Row
 End Function
 
-Function RetornarUltimaLinha(rgRange As Range) As Long
+Function RetornarUltimaLinha(rgRange As range) As Long
   RetornarUltimaLinha = rgRange(rgRange.Count).Row
 End Function
 
-Function RetornarPrimeiraColuna(rgRange As Range) As Long
+Function RetornarPrimeiraColuna(rgRange As range) As Long
   RetornarPrimeiraColuna = rgRange.Cells(1, 1).Column
 End Function
 
-Function RetornarUltimaColuna(rgRange As Range) As Long
+Function RetornarUltimaColuna(rgRange As range) As Long
   RetornarUltimaColuna = rgRange(rgRange.Count).Column
 End Function
 
@@ -84,8 +84,8 @@ erroposicionarTopo:
   MostrarMsgErro ("PosicionarTopo")
 End Sub
 
-Function MaxDrawdown(rgArray As Range) As Double
-  Dim rgMyCell As Range
+Function MaxDrawdown(rgArray As range) As Double
+  Dim rgMyCell As range
   Dim dblCurValue As Double, dblMaxValue As Double, dblCurDd As Double, dblMaxDd As Double
   Dim blnNumeric As Boolean
   
@@ -122,8 +122,8 @@ NextInteration:
   MaxDrawdown = dblMaxDd
 End Function
 
-Function TotalReturn(rgArray As Range) As Double
-  Dim rgMyCell As Range
+Function TotalReturn(rgArray As range) As Double
+  Dim rgMyCell As range
   Dim dblCurValue As Double
     
   dblCurValue = 1000
@@ -134,3 +134,44 @@ Function TotalReturn(rgArray As Range) As Double
   
   TotalReturn = dblCurValue / 1000 - 1
 End Function
+
+Sub PuxarDataAtual()
+  '
+  ' dataAtual Macro
+  ' Traz a data atual para a coluna de movimentos ou cartão.
+  '
+  ' Atalho do teclado: Ctrl+d
+  ' Criado por: Mauricio SS  Em: 14/02/04
+  '
+  If Not IsPlanilhaAberta(range(RANGE_SITUAC_PLANILHA)) Then
+    Exit Sub
+  End If
+  ' variáveis
+  Dim rgAlvo As range
+  Dim wsPlanilha As Worksheet
+  ' principal
+  On Error GoTo ErroData
+  Set wsPlanilha = ActiveSheet
+  Set rgAlvo = Selection
+  If IsEmpty(rgAlvo) Then
+    If (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_MOVIMENTACOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_CARTOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_ACOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_FII)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_RF)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_SELIC)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_ETF)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_STOCK)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_REIT)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_CART_BILL)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_CART_COMMODITY)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, range(RANGE_COL_DATA_CART_OPCOES)) Is Nothing) Then
+      rgAlvo.Value = Date
+    End If
+  End If
+  Exit Sub
+  
+ErroData:
+  MostrarMsgErro ("PuxarDataAtual")
+End Sub
+

@@ -40,9 +40,9 @@ Public Sub MoverCartao()
   udtMovimentoCartao = RetornarDadosMovCartao(lngLinhaAtual)
   ' Apaga linha selecionada
   Dim intColunaInicioCartao As Integer, intColunaFinalCartao As Integer
-  intColunaInicioCartao = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
-  intColunaFinalCartao = Range(RANGE_ULTIMO_VALOR_CARTAO).Column
-  Range(Cells(lngLinhaAtual, intColunaInicioCartao), Cells(lngLinhaAtual, intColunaFinalCartao)).Select
+  intColunaInicioCartao = range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+  intColunaFinalCartao = range(RANGE_ULTIMO_VALOR_CARTAO).Column
+  range(Cells(lngLinhaAtual, intColunaInicioCartao), Cells(lngLinhaAtual, intColunaFinalCartao)).Select
   Selection.ClearContents
   ' Habilita os eventos p/ marcar que houve mudança
   Application.EnableEvents = True
@@ -62,7 +62,7 @@ End Sub
 
 Private Function IsMoverInvalido(lngIndPlan As Long, lngLinhaAtual As Long) As Boolean
   'Testa se é planilha mensal válida e se está aberta
-  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
+  If Not IsPlanilhaAberta(range(RANGE_SITUAC_PLANILHA)) Then
     IsMoverInvalido = True
     Exit Function
   End If
@@ -73,21 +73,21 @@ Private Function IsMoverInvalido(lngIndPlan As Long, lngLinhaAtual As Long) As B
     Exit Function
   End If
   'Testa se a planilha destino está aberta
-  If Not IsPlanilhaAberta(Worksheets(lngIndPlan + 1).Range(RANGE_SITUAC_PLANILHA)) Then
+  If Not IsPlanilhaAberta(Worksheets(lngIndPlan + 1).range(RANGE_SITUAC_PLANILHA)) Then
     MsgBox "A planilha destino está Fechada para alterações", vbCritical
     IsMoverInvalido = True
     Exit Function
   End If
   'Testa se está dentro do lançamento do cartão
-  Dim rgSelecao As Range
+  Dim rgSelecao As range
   Set rgSelecao = Selection
-  If (Application.Intersect(rgSelecao, Range(RANGE_TAB_CARTOES)) Is Nothing) Then
+  If (Application.Intersect(rgSelecao, range(RANGE_TAB_CARTOES)) Is Nothing) Then
     IsMoverInvalido = True
     Exit Function
   End If
   'Verifica se existe algo para mover
   Dim intColunaInicioCartao As Integer
-  intColunaInicioCartao = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+  intColunaInicioCartao = range(RANGE_PRIMEIRA_DATA_CARTOES).Column
   If IsEmpty(Cells(lngLinhaAtual, intColunaInicioCartao)) Then
     MsgBox "Você não se posicionou em uma célula com dados", vbCritical
     IsMoverInvalido = True
@@ -99,7 +99,7 @@ End Function
 Private Function RetornarDadosMovCartao(lngLinhaAtual As Long) As MovimentoCartao
   Dim udtMovimentoCartao As MovimentoCartao
   Dim intColunaInicioCartao As Integer
-  intColunaInicioCartao = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+  intColunaInicioCartao = range(RANGE_PRIMEIRA_DATA_CARTOES).Column
   udtMovimentoCartao.datDataCartao = Cells(lngLinhaAtual, intColunaInicioCartao).Value
   udtMovimentoCartao.strDescCartao = Cells(lngLinhaAtual, intColunaInicioCartao + 1).Value
   udtMovimentoCartao.strTipoCartao = Cells(lngLinhaAtual, intColunaInicioCartao + 2).Value
@@ -120,7 +120,7 @@ Private Sub JogarValoresCartaoNaPlanilha(lngIndPlanDestino As Long, udtMovimento
   Dim lngLinhaDest As Long
   Dim intColunaDestino As Integer
   lngLinhaDest = RetornarUltimaLinhaCartao + 1
-  intColunaDestino = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+  intColunaDestino = range(RANGE_PRIMEIRA_DATA_CARTOES).Column
   Cells(lngLinhaDest, intColunaDestino).Value = udtMovimentoCartao.datDataCartao
   Cells(lngLinhaDest, intColunaDestino + 1).Value = udtMovimentoCartao.strDescCartao
   Cells(lngLinhaDest, intColunaDestino + 2).Value = udtMovimentoCartao.strTipoCartao

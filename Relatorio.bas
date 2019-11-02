@@ -52,7 +52,7 @@ Sub GerarRelatRend()
       .PrintNotes = False
       .CenterHorizontally = True
       .CenterVertically = False
-      .Orientation = RetornarOrientacao(range(RANGE_AREA_RELATORIO)) ' Paisagem ou retrato
+      .Orientation = RetornarOrientacao(Range(RANGE_AREA_RELATORIO)) ' Paisagem ou retrato
       .Draft = False
       .PaperSize = xlPaperA4
       .FirstPageNumber = xlAutomatic
@@ -75,7 +75,7 @@ erroRelatRend:
   Resume fimRelat
 End Sub
 
-Private Function RetornarOrientacao(rgAreaRelatorio As range) As Integer
+Private Function RetornarOrientacao(rgAreaRelatorio As Range) As Integer
   Const XL_PORTRAIT As Integer = 1 ' retrato
   Const XL_LANDSCAPE As Integer = 2 ' paisagem
   Dim intPageSettg, intLastCol As Integer
@@ -135,7 +135,7 @@ Private Function RetornarRodape() As Rodape
   strNmPlan = Left(strNmPlan, (intPos - 1))
   strNmPlan = UCase(Left(strNmPlan, 1)) & LCase(Mid(strNmPlan, 2, (Len(strNmPlan) - 1)))
   udtRodape.strFooterEsquerdo = "&8" & strNmPlan & Chr(10) & _
-                   "Última atualização em: " & range(RANGE_DATA_POSICAO).Value & Chr(10) & _
+                   "Última atualização em: " & Range(RANGE_DATA_POSICAO).Value & Chr(10) & _
                    Chr(169) & Year(Now()) & _
                    " Propriedade Confidencial de Mauricio Soares"
   udtRodape.strFooterCentro = "Página &P de &N"
@@ -162,7 +162,7 @@ Sub GerarRelatRetrato()
   Const XL_PORTRAIT As Integer = 1 ' retrato
   ' define o nome do PDF
   'MsgBox RetornarFileName()
-  monthNumber = Month(DateValue(range("planFechada").Value & " 1"))
+  monthNumber = Month(DateValue(Range("planFechada").Value & " 1"))
   If (Len(monthNumber) < 2) Then
     monthNumber = "0" & monthNumber
   End If

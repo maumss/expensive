@@ -162,10 +162,3 @@ Public Const RANGE_COL_DESC_CONTA_CORRETORA As String = "D375:D377"
 Public Const RANGE_COL_SALDO_CONTA_CORRETORA As String = "F375:F377"
 Public Const RANGE_COL_BLOQUEADO_CONTA_CORRETORA As String = "G375:G377"
 
-' Planilha Mercado
-Public Const RANGE_CELULA_INICIO_QUOTACAO_SIMBOLO As String = "B40"
-Public Const RANGE_CELULA_INICIO_QUOTACAO_SIMBOLOATIVO As String = "D40"
-Public Const YAHOO_FINANCE_URL As String = "http://download.finance.yahoo.com/d/quotes.csv?s="
-Public Const YAHOO_TAG_DADOS As String = "snd1t1c1ol1ghv"
-Public Const YAHOO_TAG_FORMATO As String = ".csv"
-

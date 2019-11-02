@@ -9,20 +9,20 @@ Sub OrdenarMovimentos()
   ' Atalho do teclado: Ctrl+o
   '
   On Error GoTo ErroOrdena
-  If Not IsPlanilhaAberta(range(RANGE_SITUAC_PLANILHA)) Then
+  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
   End If
   Application.ScreenUpdating = False
   Application.EnableEvents = False
-  range(RANGE_TAB_MOVIMENTACOES).Select
+  Range(RANGE_TAB_MOVIMENTACOES).Select
   'Selection.Sort Key1:=Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES), Order1:=xlAscending, Header:=xlGuess, _
   '      OrderCustom:=1, MatchCase:=False, Orientation:=xlTopToBottom, _
   '      DataOption1:=xlSortNormal
   ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=range(RANGE_COL_DATA_MOVIMENTACOES), _
+  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COL_DATA_MOVIMENTACOES), _
         SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
   With ActiveSheet.Sort
-      .SetRange range(RANGE_TAB_MOVIMENTACOES)
+      .SetRange Range(RANGE_TAB_MOVIMENTACOES)
       .Header = xlGuess
       .MatchCase = False
       .Orientation = xlTopToBottom
@@ -30,12 +30,12 @@ Sub OrdenarMovimentos()
       .Apply
   End With
   
-  range(RANGE_TAB_CARTOES).Select
+  Range(RANGE_TAB_CARTOES).Select
   ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=range(RANGE_COL_DATA_CARTOES), _
+  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COL_DATA_CARTOES), _
         SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
   With ActiveSheet.Sort
-      .SetRange range(RANGE_TAB_CARTOES)
+      .SetRange Range(RANGE_TAB_CARTOES)
       .Header = xlGuess
       .MatchCase = False
       .Orientation = xlTopToBottom
@@ -54,6 +54,4 @@ ErroOrdena:
   MostrarMsgErro ("OrdenarMovimentos")
   Resume FimOrdena
 End Sub
-
-
 

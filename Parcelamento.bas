@@ -27,7 +27,7 @@ Sub MontarParcelamento()
    On Error GoTo ErroCriarParcelamento
    Dim strTextoOriginal As String
    'Testa se é planilha mensal válida e se está aberta
-   If Not IsPlanilhaAberta(range(RANGE_SITUAC_PLANILHA)) Then
+   If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
      Exit Sub
    End If
    'Testa se já está na planilha de Dezembro
@@ -36,7 +36,7 @@ Sub MontarParcelamento()
     Exit Sub
    End If
    Dim wsPlanilha As Worksheet
-   Dim rgAlvo As range
+   Dim rgAlvo As Range
    Set wsPlanilha = ActiveSheet
    Set rgAlvo = Selection
    If IsLocalIvalido(rgAlvo) Then
@@ -86,22 +86,22 @@ ErroCriarParcelamento:
   MostrarMsgErro ("MontarParcelamento")
 End Sub
 
-Private Function IsLocalIvalido(rgAlvo As range) As Boolean
-  IsLocalIvalido = (Application.Intersect(rgAlvo, range(RANGE_TAB_MOVIMENTACOES)) Is Nothing) And _
-       (Application.Intersect(rgAlvo, range(RANGE_TAB_CARTOES)) Is Nothing)
+Private Function IsLocalIvalido(rgAlvo As Range) As Boolean
+  IsLocalIvalido = (Application.Intersect(rgAlvo, Range(RANGE_TAB_MOVIMENTACOES)) Is Nothing) And _
+       (Application.Intersect(rgAlvo, Range(RANGE_TAB_CARTOES)) Is Nothing)
 End Function
 
-Private Function RetornarMovimentacao(rgAlvo As range) As Movimentacao
+Private Function RetornarMovimentacao(rgAlvo As Range) As Movimentacao
   Dim intLinhaAtual As Integer, intColunaInicial As Integer, intColunaInicioCartao As Integer
   intLinhaAtual = rgAlvo.Row
   Dim udtMovimentacao As Movimentacao
   If IsMovimentoCartao(rgAlvo) Then
-    intColunaInicial = range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+    intColunaInicial = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
     udtMovimentacao.strNomeCartao = Cells(intLinhaAtual, intColunaInicial + 3).Value
     udtMovimentacao.dblValorMov = Cells(intLinhaAtual, intColunaInicial + 4).Value
     udtMovimentacao.blnMovCartao = True
   Else
-    intColunaInicial = range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
+    intColunaInicial = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
     udtMovimentacao.dblValorMov = Cells(intLinhaAtual, intColunaInicial + 3).Value
     udtMovimentacao.blnMovCartao = False
   End If
@@ -111,8 +111,8 @@ Private Function RetornarMovimentacao(rgAlvo As range) As Movimentacao
   RetornarMovimentacao = udtMovimentacao
 End Function
 
-Private Function IsMovimentoCartao(rgAlvo As range) As Boolean
-  IsMovimentoCartao = (Not Application.Intersect(rgAlvo, range(RANGE_TAB_CARTOES)) Is Nothing)
+Private Function IsMovimentoCartao(rgAlvo As Range) As Boolean
+  IsMovimentoCartao = (Not Application.Intersect(rgAlvo, Range(RANGE_TAB_CARTOES)) Is Nothing)
 End Function
 
 'Verifica o formato de parcelas dizendo a posição na string que os separadores ocupam
@@ -243,15 +243,15 @@ Private Function IsArrayEmpty(varArray As Variant) As Boolean
 End Function
 
 'Caso não for pre-parcelado, deve mudar o texto atual para conter a parcela 1/x
-Private Sub AlterarTextoAtual(rgAlvo As range, udtInfoParcelamento As InfoParcelamento, udtMovimentacao As Movimentacao)
+Private Sub AlterarTextoAtual(rgAlvo As Range, udtInfoParcelamento As InfoParcelamento, udtMovimentacao As Movimentacao)
   Dim lngLinhaDest As Long
   Dim intColunaDestino As Integer, intColunaValor As Integer
   lngLinhaDest = rgAlvo.Row
   If (udtMovimentacao.blnMovCartao) Then
-    intColunaDestino = range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+    intColunaDestino = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
     intColunaValor = intColunaDestino + 4
   Else
-    intColunaDestino = range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
+    intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
     intColunaValor = intColunaDestino + 3
   End If
   Cells(lngLinhaDest, intColunaDestino + 1).Value = udtMovimentacao.strDescMov & " (1/" & _
@@ -266,7 +266,7 @@ Private Sub CriarEntradaNaPlanilha(lngIndPlanDestino As Long, ByVal strTexto As 
    On Error GoTo EndMacro:
    ' Se posiciona na próxima planilha
    Worksheets(lngIndPlanDestino).Activate
-   If Not IsPlanilhaAberta(range(RANGE_SITUAC_PLANILHA)) Then
+   If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
      Exit Sub
    End If
    Dim lngLinhaDest As Long
@@ -275,10 +275,10 @@ Private Sub CriarEntradaNaPlanilha(lngIndPlanDestino As Long, ByVal strTexto As 
    datDataParcela = udtMovimentacao.datDataMov
    If (udtMovimentacao.blnMovCartao) Then
      lngLinhaDest = RetornarUltimaLinhaCartao + 1
-     intColunaDestino = range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+     intColunaDestino = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
    Else
      lngLinhaDest = RetornarUltimaLinhaMovimentacoes + 1
-     intColunaDestino = range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
+     intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
      datDataParcela = DateAdd("m", intParcela, datDataParcela)
    End If
    Cells(lngLinhaDest, intColunaDestino).Value = datDataParcela

@@ -1,7 +1,7 @@
 ' Módulo de funções sobre o controle de Investimentos
 Option Explicit
 
-Function CalcularSaldoAtual(rgDescInvest As range) As Double
+Function CalcularSaldoAtual(rgDescInvest As Range) As Double
   '
   ' Função saldoAtual   Data: 13/01/04
   ' Determina o saldo atual do investimento de acordo com
@@ -14,28 +14,28 @@ Function CalcularSaldoAtual(rgDescInvest As range) As Double
   On Error GoTo ErroSaldoAtual
   For Each wsPlanilha In Worksheets
      ' A primeira planilha aberta que achar é a válida
-     If IsPlanilhaAberta(wsPlanilha.range(RANGE_SITUAC_PLANILHA)) Then
-       CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
-             rgDescInvest, wsPlanilha.range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
+     If IsPlanilhaAberta(wsPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
+       CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
+             rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
        Exit Function
      End If
   Next wsPlanilha
   ' Se todas as planilhas estão fechadas, pega a de Dezembro
-  CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
-       rgDescInvest, Worksheets("Dez.").range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
+  CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
+       rgDescInvest, Worksheets("Dez.").Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
   Exit Function
   
 ErroSaldoAtual:
   MostrarMsgErro ("CalcularSaldoAtual")
 End Function
 
-Function CalcularRendAtivo(rgColDescAtivo As range, _
-                        rgColSaldoInicialAtivo As range, _
-                        rgColAplicacaoAtivo As range, _
-                        rgColRetornoAtivo As range, _
-                        rgColResgateAtivo As range, _
-                        rgColSaldoFinalAtivo As range, _
-                        rgCelDescRentabilidade As range) As Double
+Function CalcularRendAtivo(rgColDescAtivo As Range, _
+                        rgColSaldoInicialAtivo As Range, _
+                        rgColAplicacaoAtivo As Range, _
+                        rgColRetornoAtivo As Range, _
+                        rgColResgateAtivo As Range, _
+                        rgColSaldoFinalAtivo As Range, _
+                        rgCelDescRentabilidade As Range) As Double
   '
   ' Função CalcularRendAtivo   Data: 29/04/16
   ' Retorna o valor percentual do rendimento líquedo da aplicação
@@ -67,7 +67,7 @@ ErroCalcularRendAtivo:
 End Function
 
 
-Sub CriticarInvestimento(ByVal rgAlvo As range)
+Sub CriticarInvestimento(ByVal rgAlvo As Range)
   '
   ' Sub CriticarInvestimento    Criado por: MSS  Em: 31.01.04
   ' critica o investimento digitado
@@ -108,11 +108,11 @@ Private Function HasCarteira(strDescricao As String) As Boolean
   Dim intInicioLinhaCarteira1 As Integer, intFinalLinhaCarteira1 As Integer, _
       intInicioLinhaCarteira2 As Integer, intFinalLinhaCarteira2 As Integer, _
       intColunaCarteira As Integer
-  intInicioLinhaCarteira1 = range(RANGE_CELULA_INICIO_ADHOC).Row
-  intFinalLinhaCarteira1 = range(RANGE_CELULA_FIM_ADHOC).Row
-  intInicioLinhaCarteira2 = range(RANGE_CELULA_INICIO_CONSOLIDADA).Row
-  intFinalLinhaCarteira2 = range(RANGE_CELULA_FIM_CONSOLIDADA).Row
-  intColunaCarteira = range(RANGE_CELULA_INICIO_ADHOC).Column
+  intInicioLinhaCarteira1 = Range(RANGE_CELULA_INICIO_ADHOC).Row
+  intFinalLinhaCarteira1 = Range(RANGE_CELULA_FIM_ADHOC).Row
+  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_CONSOLIDADA).Row
+  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_CONSOLIDADA).Row
+  intColunaCarteira = Range(RANGE_CELULA_INICIO_ADHOC).Column
   Dim blnAchou As Boolean
   Dim intLinha As Integer
   ' principal
@@ -154,11 +154,11 @@ Private Function RetornarParteNomeCarteira(strDescricao As String) As String
   Dim intInicioLinhaCarteira1 As Integer, intFinalLinhaCarteira1 As Integer, _
       intInicioLinhaCarteira2 As Integer, intFinalLinhaCarteira2 As Integer, _
       intColunaCarteira As Integer
-  intInicioLinhaCarteira1 = range(RANGE_CELULA_INICIO_ADHOC).Row
-  intFinalLinhaCarteira1 = range(RANGE_CELULA_FIM_ADHOC).Row
-  intInicioLinhaCarteira2 = range(RANGE_CELULA_INICIO_CONSOLIDADA).Row
-  intFinalLinhaCarteira2 = range(RANGE_CELULA_FIM_CONSOLIDADA).Row
-  intColunaCarteira = range(RANGE_CELULA_INICIO_ADHOC).Column
+  intInicioLinhaCarteira1 = Range(RANGE_CELULA_INICIO_ADHOC).Row
+  intFinalLinhaCarteira1 = Range(RANGE_CELULA_FIM_ADHOC).Row
+  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_CONSOLIDADA).Row
+  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_CONSOLIDADA).Row
+  intColunaCarteira = Range(RANGE_CELULA_INICIO_ADHOC).Column
   Dim blnAchou As Boolean
   Dim strEncontrado As String
   Dim intLinha As Integer

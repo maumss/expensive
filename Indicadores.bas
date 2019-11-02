@@ -26,7 +26,7 @@ Sub BuscarIndicadores()
   '
   On Error GoTo ErroBuscarIndicadores
   
-  If (range(RANGE_SITUAC_PLANILHA).Value <> SITUAC_ABERTO) Then
+  If (Range(RANGE_SITUAC_PLANILHA).Value <> SITUAC_ABERTO) Then
     Exit Sub
   End If
   Dim wsPlanilhaAtual As Worksheet
@@ -58,8 +58,8 @@ Private Function HasValorMes(wsPlanilha As Worksheet) As Boolean
   
   Dim blnExisteDados As Boolean
   blnExisteDados = False
-  Dim rgCell As range
-  For Each rgCell In wsPlanilha.range(RANGE_COLUNA_MES_INDICADORES)
+  Dim rgCell As Range
+  For Each rgCell In wsPlanilha.Range(RANGE_COLUNA_MES_INDICADORES)
     If rgCell.Value > 0 Then
       blnExisteDados = True
       Exit For
@@ -106,21 +106,21 @@ Private Sub PercorrerIndicadores(wsPlanilha As Worksheet, wsIndicadores As Works
   '
   On Error GoTo ErroPercorrerIndicadores
     
-  Dim rgCell, rgFound As range
+  Dim rgCell, rgFound As Range
   Dim strIndicador As String
-  For Each rgCell In wsPlanilha.range(RANGE_COLUNA_DESCR_INDICADORES)
+  For Each rgCell In wsPlanilha.Range(RANGE_COLUNA_DESCR_INDICADORES)
     strIndicador = rgCell.Value
     'If (strIndicador = "IPCA") Then
     '   strIndicador = "IPCA (5)"
     'End If
     Set rgFound = wsIndicadores.UsedRange.Find(What:=strIndicador)
     If Not rgFound Is Nothing Then
-      Dim rgCelulaAtual As range
+      Dim rgCelulaAtual As Range
       Set rgCelulaAtual = rgCell
       Call TransfereDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
     End If
     If (strIndicador = "Dólar Comercial") Then
-      Dim rgDolarAtual As range
+      Dim rgDolarAtual As Range
       Set rgDolarAtual = BuscarDolarComercialAtual(wsIndicadores)
       If Not rgDolarAtual Is Nothing Then
         Call TransfereValorDolar(rgDolarAtual, wsIndicadores)
@@ -134,7 +134,7 @@ ErroPercorrerIndicadores:
   MostrarMsgErro ("PercorrerIndicadores")
 End Sub
 
-Private Sub TransfereDadosIndicador(rgIndicadorAtual As range, rgIndicadorWeb As range, wsIndicadores As Worksheet)
+Private Sub TransfereDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
   ' PercorrerIndicadores
   ' verifica cada descrição de indicador
@@ -143,7 +143,7 @@ Private Sub TransfereDadosIndicador(rgIndicadorAtual As range, rgIndicadorWeb As
   
   Dim wsPlanilha As Worksheet
   Set wsPlanilha = ActiveSheet
-  Dim rgIndicadorMesAtual, rgIndicadorAnoAtual, rgIndicadorDozeMesesAtual As range
+  Dim rgIndicadorMesAtual, rgIndicadorAnoAtual, rgIndicadorDozeMesesAtual As Range
   Set rgIndicadorMesAtual = GetRangeMesIndicador(rgIndicadorAtual)
   If IsEmpty(wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column + 1)) Then
     Exit Sub
@@ -167,7 +167,7 @@ ErroTransfereDadosIndicador:
   MostrarMsgErro ("TransfereDadosIndicador")
 End Sub
 
-Private Function GetRangeMesIndicador(rgCell As range) As range
+Private Function GetRangeMesIndicador(rgCell As Range) As Range
   '
   ' Function GetRangeMesIndicador
   ' busca os dados do mês do indicador atual
@@ -176,7 +176,7 @@ Private Function GetRangeMesIndicador(rgCell As range) As range
   
   Dim intLinhaIndicador, intColunaIndicador As Integer
   intLinhaIndicador = rgCell.Row
-  intColunaIndicador = RetornarPrimeiraColuna(range(RANGE_COLUNA_MES_INDICADORES))
+  intColunaIndicador = RetornarPrimeiraColuna(Range(RANGE_COLUNA_MES_INDICADORES))
   Set GetRangeMesIndicador = Cells(intLinhaIndicador, intColunaIndicador)
   Exit Function
   
@@ -184,7 +184,7 @@ ErroGetRangeMesIndicador:
   MostrarMsgErro ("GetRangeMesIndicador")
 End Function
 
-Private Function GetRangeAnoIndicador(rgCell As range) As range
+Private Function GetRangeAnoIndicador(rgCell As Range) As Range
   '
   ' Function GetRangeAnoIndicador
   ' busca os dados do ano do indicador atual
@@ -193,7 +193,7 @@ Private Function GetRangeAnoIndicador(rgCell As range) As range
   
   Dim intLinhaIndicador, intColunaIndicador As Integer
   intLinhaIndicador = rgCell.Row
-  intColunaIndicador = RetornarPrimeiraColuna(range(RANGE_COLUNA_ANO_INDICADORES))
+  intColunaIndicador = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ANO_INDICADORES))
   Set GetRangeAnoIndicador = Cells(intLinhaIndicador, intColunaIndicador)
   Exit Function
   
@@ -201,7 +201,7 @@ ErroGetRangeAnoIndicador:
   MostrarMsgErro ("GetRangeAnoIndicador")
 End Function
 
-Private Function GetRangeDozeMesesIndicador(rgCell As range) As range
+Private Function GetRangeDozeMesesIndicador(rgCell As Range) As Range
   '
   ' Function GetRangeDozeMesesIndicador
   ' busca os dados dos últimos doze meses do indicador atual
@@ -210,7 +210,7 @@ Private Function GetRangeDozeMesesIndicador(rgCell As range) As range
   
   Dim intLinhaIndicador, intColunaIndicador As Integer
   intLinhaIndicador = rgCell.Row
-  intColunaIndicador = RetornarPrimeiraColuna(range(RANGE_COLUNA_DOZE_MESES_INDICADORES))
+  intColunaIndicador = RetornarPrimeiraColuna(Range(RANGE_COLUNA_DOZE_MESES_INDICADORES))
   Set GetRangeDozeMesesIndicador = Cells(intLinhaIndicador, intColunaIndicador)
   Exit Function
   
@@ -218,9 +218,9 @@ ErroGetRangeDozeMesesIndicador:
   MostrarMsgErro ("GetRangeDozeMesesIndicador")
 End Function
 
-Private Function BuscarDolarComercialAtual(wsIndicadores As Worksheet) As range
+Private Function BuscarDolarComercialAtual(wsIndicadores As Worksheet) As Range
   On Error GoTo ErroBuscarDolarComercialAtual
-  Dim rgTabDolar As range
+  Dim rgTabDolar As Range
   Set rgTabDolar = wsIndicadores.UsedRange.Find(What:="Dólar & Euro")
   If Not rgTabDolar Is Nothing Then
     Set BuscarDolarComercialAtual = Cells(rgTabDolar.Row + 2, rgTabDolar.Column + 2)
@@ -233,7 +233,7 @@ ErroBuscarDolarComercialAtual:
   MostrarMsgErro ("BuscarDolarComercialAtual")
 End Function
 
-Private Sub TransfereValorDolar(rgIndicadorWeb As range, wsIndicadores As Worksheet)
+Private Sub TransfereValorDolar(rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
   ' TransfereValorDolar
   ' transfere o valor do dólar atual para planilha corrente
@@ -242,8 +242,8 @@ Private Sub TransfereValorDolar(rgIndicadorWeb As range, wsIndicadores As Worksh
   
   Dim wsPlanilha As Worksheet
   Set wsPlanilha = ActiveSheet
-  Dim rgIndicadorValorFinalMesAtual As range
-  Set rgIndicadorValorFinalMesAtual = range(RANGE_CELULA_DOLAR_FINAL_MES)
+  Dim rgIndicadorValorFinalMesAtual As Range
+  Set rgIndicadorValorFinalMesAtual = Range(RANGE_CELULA_DOLAR_FINAL_MES)
   If IsEmpty(wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column)) Then
     Exit Sub
   End If

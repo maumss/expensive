@@ -15,17 +15,13 @@ Function CalcularSaldoAtual(rgDescInvest As Range) As Double
   For Each wsPlanilha In Worksheets
      ' A primeira planilha aberta que achar é a válida
      If IsPlanilhaAberta(wsPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
-       CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_ADHOC), _
-             rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_ADHOC)) + _
-          Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
+       CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
              rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
        Exit Function
      End If
   Next wsPlanilha
   ' Se todas as planilhas estão fechadas, pega a de Dezembro
-  CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_ADHOC), _
-     rgDescInvest, Worksheets("Dez.").Range(RANGE_COLUNA_SALDO_FINAL_ADHOC)) + _
-     Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_ADHOC), _
+  CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
        rgDescInvest, Worksheets("Dez.").Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
   Exit Function
   
@@ -220,3 +216,61 @@ ErroIsReserva:
   MostrarMsgErro ("IsReserva")
 End Function
   
+Sub AgendarLembreteOutlook()
+  '
+  ' Sub AgendarLembreteOutlook    Criado por: MSS  Em: 06.10.19
+  ' cria um lembrete no calendário do Outlook
+  '
+  ' variáveis
+  Dim objOutlook As Object
+  Dim objAppointmentItem As Object
+  Const APPOINTMENT As Integer = 1 '1 = Appointment
+  Const OCUPADO As Integer = 2 '1 = Provisório, 2 = Ocupado, 3 = Ausente, 4 = Trabalhando em outro lugar, 5 = Disponível
+  Const ONE_DAY As Integer = 1440
+  ' principal
+  On Error GoTo ErroAgendarLembreteOutlook
+  Set objOutlook = CreateObject("Outlook.Application")
+  Set objAppointmentItem = objOutlook.createitem(APPOINTMENT)
+  With objAppointmentItem
+    .Subject = "Pagar Darf"
+    .Body = "Pagar imposto com código 6015, Ganhos líquidos em operações em bolsa."
+    .Location = ""
+    .Start = BuscarUltimoDiaUtilProxMes() + TimeValue("10:00:00") '#10/28/2019 10:00:00 AM#
+    '.End = BuscarUltimoDiaUtilProxMes() + TimeValue("10:30:00") '#10/28/2019 10:30:00 AM#
+    .Duration = 30 'duração em minutos
+    .BusyStatus = OCUPADO
+    .ReminderSet = True
+    .ReminderMinutesBeforeStart = ONE_DAY
+    .Save
+  End With
+  Debug.Print objAppointmentItem.Subject & " : " & objAppointmentItem.Start 'escreve na janela de verificação imediata
+  Set objAppointmentItem = Nothing
+  Set objOutlook = Nothing
+  Exit Sub
+  
+ErroAgendarLembreteOutlook:
+  MostrarMsgErro ("AgendarLembreteOutlook")
+End Sub
+
+Private Function BuscarUltimoDiaUtilProxMes() As Date
+  Dim intAno, intMes, intDiaSemana As Integer
+  Dim dtData As Date
+  Const SABADO As Integer = 7
+  Const DOMINGO As Integer = 1
+  On Error GoTo ErroBuscarUltimoDiaUtilProxMesMenos3
+  intAno = Year(Now)
+  intMes = Month(Now)
+  dtData = DateAdd("m", 1, DateSerial(intAno, intMes + 1, 0))
+  intDiaSemana = Weekday(dtData)
+  If (intDiaSemana = DOMINGO) Then
+    dtData = dtData - 2
+  ElseIf (intDiaSemana = SABADO) Then
+    dtData = dtData - 1
+  End If
+  BuscarUltimoDiaUtilProxMes = dtData
+  Exit Function
+  
+ErroBuscarUltimoDiaUtilProxMesMenos3:
+  MostrarMsgErro ("BuscarUltimoDiaUtilProxMes")
+End Function
+

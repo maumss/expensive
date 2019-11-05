@@ -99,14 +99,18 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_EXTERIOR)) Is Nothing Or _
+     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
     ' testa se gerou imposto a pagar
     If Target.Count = 1 And Not IsEmpty(Target) Then
       If IsGerouImpostoNoMes(Target) Then
         Beep
         Beep
-        MsgBox "Atenção! Você gerou imposto a pagar no próximo mês.", vbExclamation
+        If MsgBox("Atenção! Você gerou imposto a pagar para o próximo mês." & vbLf & _
+             "Deseja criar um agendamento para este pagamento?", _
+             vbYesNo + vbQuestion, "Agendar Darf") = vbYes Then
+          Call AgendarLembreteOutlook
+        End If
       End If
     End If
   End If
@@ -202,9 +206,10 @@ Private Function IsGerouImpostoNoMes(ByVal Target As Range) As Boolean
     End If
   End If
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_EXTERIOR)) Is Nothing Then
-    boolTributavel = Range(RANGE_CELULA_TRIBUTAL_EXTERIOR).Value
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_EXTERIOR).Column).Value > 0)
+  ' cosidera a soma de Stock, Reit, Treasures e Commodities
+  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Then
+    boolTributavel = Range(RANGE_CELULA_TRIBUTAL_STOCK).Value
+    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_STOCK).Column).Value > 0)
     If boolTributavel And boolImpostoComum Then
       IsGerouImpostoNoMes = True
       Exit Function

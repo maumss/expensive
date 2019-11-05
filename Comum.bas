@@ -134,3 +134,74 @@ Function TotalReturn(rgArray As Range) As Double
   
   TotalReturn = dblCurValue / 1000 - 1
 End Function
+
+Sub PuxarDataAtual()
+  '
+  ' dataAtual Macro
+  ' Traz a data atual para a coluna de movimentos ou cartão.
+  '
+  ' Atalho do teclado: Ctrl+d
+  ' Criado por: Mauricio SS  Em: 14/02/04
+  '
+  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
+    Exit Sub
+  End If
+  ' variáveis
+  Dim rgAlvo As Range
+  Dim wsPlanilha As Worksheet
+  ' principal
+  On Error GoTo ErroData
+  Set wsPlanilha = ActiveSheet
+  Set rgAlvo = Selection
+  If IsEmpty(rgAlvo) Then
+    If (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_MOVIMENTACOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CARTOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_ACOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_FII)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_RF)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_SELIC)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_ETF)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_STOCK)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_REIT)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_BILL)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_COMMODITY)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_OPCOES)) Is Nothing) Then
+      rgAlvo.Value = Date
+    End If
+  End If
+  Exit Sub
+  
+ErroData:
+  MostrarMsgErro ("PuxarDataAtual")
+End Sub
+
+Sub LimparCelulasNomeadas()
+  '
+  ' LimparCelulasNomeadas
+  ' Apaga células nomeadas não utilizadas
+  '
+  ' Criado por: Mauricio SS  Em: 21/10/19
+  '
+  Dim nmName As Name
+  Dim stMsg As String
+  On Error Resume Next
+  stMsg = ""
+  For Each nmName In Names
+    If Cells.Find(What:=nmName.Name, _
+                  After:=ActiveCell, _
+                  LookIn:=xlFormulas, _
+                  LookAt:=xlPart, _
+                  SearchOrder:=xlByRows, _
+                  SearchDirection:=xlNext, _
+                  MatchCase:=False, _
+                  SearchFormat:=False).Activate = False Then
+       stMsg = stMsg & nmName.Name & vbCr
+       'ActiveWorkbook.Names(nmName.Name).Delete
+    End If
+  Next nmName
+  If stMsg = "" Then
+    MsgBox "Nenhum nome não utilizado no workbook"
+  Else
+    MsgBox "Nomes Apagados:" & vbCr & stMsg
+  End If
+End Sub

@@ -100,6 +100,9 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Or _
+     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_REIT)) Is Nothing Or _
+     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_BILL)) Is Nothing Or _
+     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_COMMODITY)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
     ' testa se gerou imposto a pagar
     If Target.Count = 1 And Not IsEmpty(Target) Then
@@ -207,9 +210,15 @@ Private Function IsGerouImpostoNoMes(ByVal Target As Range) As Boolean
   End If
   
   ' cosidera a soma de Stock, Reit, Treasures e Commodities
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Then
+  If (Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing) Or _
+     (Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_REIT)) Is Nothing) Or _
+     (Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_BILL)) Is Nothing) Or _
+     (Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_COMMODITY)) Is Nothing) Then
     boolTributavel = Range(RANGE_CELULA_TRIBUTAL_STOCK).Value
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_STOCK).Column).Value > 0)
+    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_STOCK).Column).Value > 0) Or _
+                       (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_REIT).Column).Value > 0) Or _
+                       (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_BILL).Column).Value > 0) Or _
+                       (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_COMMODITY).Column).Value > 0)
     If boolTributavel And boolImpostoComum Then
       IsGerouImpostoNoMes = True
       Exit Function

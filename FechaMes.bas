@@ -116,15 +116,15 @@ Private Sub CopiarSaldos()
   End If
   
   ' Reproduz o Resumo de Investimento Atual no próximo mês
-  Call CopiarSaldosCarteiraConsolidada(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosPortfolio(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraAcoes(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraFii(wsPlanilhaAtual, wsProxPlanilha)
-  Call CopiarSaldosCarteiraTesouroRF(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraTesouroDireto(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraTesouroSelic(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraEtf(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraStock(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraReit(wsPlanilhaAtual, wsProxPlanilha)
-  Call CopiarSaldosCarteiraBill(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraTreasury(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraCommodity(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosContaCorretora(wsPlanilhaAtual, wsProxPlanilha)
@@ -144,7 +144,7 @@ Private Function HasSaldosCarteira(wsProxPlanilha As Worksheet) As Boolean
   Dim rgCell As Range
   On Error GoTo ErrorHasSaldosCarteira
   
-  For Each rgCell In wsProxPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA)
+  For Each rgCell In wsProxPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO)
     If rgCell.Value > 0 Then
       blnExisteDados = True
       Exit For
@@ -168,7 +168,7 @@ Private Function HasDadosCarteira(wsPlanilhaAtual As Worksheet) As Boolean
   Dim rgCell As Range
   On Error GoTo ErrorHasDadosCarteira
   If Not blnExisteDados Then
-    For Each rgCell In wsPlanilhaAtual.Range(RANGE_COLUNA_ATIVO_CONSOLIDADA)
+    For Each rgCell In wsPlanilhaAtual.Range(RANGE_COLUNA_ATIVO_PORTFOLIO)
       If Not IsEmpty(rgCell) Then
         blnExisteDados = True
         Exit For
@@ -192,7 +192,7 @@ Private Function HasDadosCarteira(wsPlanilhaAtual As Worksheet) As Boolean
     Next rgCell
   End If
   If Not blnExisteDados Then
-    For Each rgCell In wsPlanilhaAtual.Range(RANGE_COLUNA_ATIVO_RF)
+    For Each rgCell In wsPlanilhaAtual.Range(RANGE_COLUNA_ATIVO_TESOURO_DIRETO)
       If Not IsEmpty(rgCell) Then
         blnExisteDados = True
         Exit For
@@ -200,7 +200,7 @@ Private Function HasDadosCarteira(wsPlanilhaAtual As Worksheet) As Boolean
     Next rgCell
   End If
   If Not blnExisteDados Then
-    For Each rgCell In wsPlanilhaAtual.Range(RANGE_COLUNA_ATIVO_SELIC)
+    For Each rgCell In wsPlanilhaAtual.Range(RANGE_COLUNA_ATIVO_TESOURO_SELIC)
       If Not IsEmpty(rgCell) Then
         blnExisteDados = True
         Exit For
@@ -215,26 +215,26 @@ ErrorHasDadosCarteira:
 End Function
 
 
-Private Sub CopiarSaldosCarteiraConsolidada(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+Private Sub CopiarSaldosPortfolio(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
-  ' Sub CopiarSaldosCarteiraConsolidada
+  ' Sub CopiarSaldosPortfolio
   ' copiar saldos e descrições da carteira 2
   '
   Dim intPrimeiraLinhaResumo As Integer, intUltimaLinhaResumo As Integer
   Dim intColunaDescricao As Integer, intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  On Error GoTo ErrorCopiarSaldosCarteiraConsolidada
-  intPrimeiraLinhaResumo = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_CONSOLIDADA))
-  intUltimaLinhaResumo = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_CONSOLIDADA))
-  intColunaDescricao = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_CONSOLIDADA))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_CONSOLIDADA))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
+  On Error GoTo ErrorCopiarSaldosPortfolio
+  intPrimeiraLinhaResumo = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_PORTFOLIO))
+  intUltimaLinhaResumo = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_PORTFOLIO))
+  intColunaDescricao = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_PORTFOLIO))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_PORTFOLIO))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO))
   Call CopiarSaldosCarteira(intPrimeiraLinhaResumo, intUltimaLinhaResumo, _
     intColunaDescricao, intColunaSaldoInicial, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsProxPlanilha)
   Exit Sub
     
-ErrorCopiarSaldosCarteiraConsolidada:
-  MostrarMsgErro ("CopiarSaldosCarteiraConsolidada")
+ErrorCopiarSaldosPortfolio:
+  MostrarMsgErro ("CopiarSaldosPortfolio")
 End Sub
 
 Private Sub CopiarSaldosCarteira(intPrimeiraLinhaResumo As Integer, intUltimaLinhaResumo As Integer, _
@@ -440,9 +440,9 @@ ErrorCopiarSaldosCarteiraReit:
   MostrarMsgErro ("CopiarSaldosCarteiraReit")
 End Sub
 
-Private Sub CopiarSaldosCarteiraBill(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+Private Sub CopiarSaldosCarteiraTreasury(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
-  ' Sub CopiarSaldosCarteiraBill
+  ' Sub CopiarSaldosCarteiraTreasury
   ' copiar saldos, quantidades e descrições da carteira de renda fixa no exterior
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
@@ -450,14 +450,14 @@ Private Sub CopiarSaldosCarteiraBill(wsPlanilhaAtual As Worksheet, wsProxPlanilh
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
   Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
   Dim infoInvests() As infoInvest
-  On Error GoTo ErrorCopiarSaldosCarteiraBill
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_CART_BILL))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_CART_BILL))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_CART_BILL))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_CART_BILL))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_CART_BILL))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_CART_BILL))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_CART_BILL))
+  On Error GoTo ErrorCopiarSaldosCarteiraTreasury
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_CART_TREASURY))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_CART_TREASURY))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_CART_TREASURY))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_CART_TREASURY))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_CART_TREASURY))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_CART_TREASURY))
+  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_CART_TREASURY))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -473,8 +473,8 @@ Private Sub CopiarSaldosCarteiraBill(wsPlanilhaAtual As Worksheet, wsProxPlanilh
     wsPlanilhaAtual, wsProxPlanilha, infoInvests)
   Exit Sub
     
-ErrorCopiarSaldosCarteiraBill:
-  MostrarMsgErro ("CopiarSaldosCarteiraBill")
+ErrorCopiarSaldosCarteiraTreasury:
+  MostrarMsgErro ("CopiarSaldosCarteiraTreasury")
 End Sub
 
 Private Sub CopiarSaldosCarteiraCommodity(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
@@ -488,13 +488,13 @@ Private Sub CopiarSaldosCarteiraCommodity(wsPlanilhaAtual As Worksheet, wsProxPl
   Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraCommodity
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_CART_COMMODITY))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_CART_COMMODITY))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_CART_COMMODITY))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_CART_COMMODITY))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_CART_COMMODITY))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_CART_COMMODITY))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_CART_COMMODITY))
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_COMMODITY))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_COMMODITY))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_COMMODITY))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_COMMODITY))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_COMMODITY))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_COMMODITY))
+  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_COMMODITY))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -525,13 +525,13 @@ Private Sub CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual As Worksheet, wsProxPlani
   Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraOpcoes
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_CART_OPCOES))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_CART_OPCOES))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_CART_OPCOES))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_CART_OPCOES))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_CART_OPCOES))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_CART_OPCOES))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_CART_OPCOES))
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_OPCOES))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_OPCOES))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_OPCOES))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_OPCOES))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_OPCOES))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_OPCOES))
+  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_OPCOES))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -588,9 +588,9 @@ ErrorCopiarSaldosCarteiraFii:
   MostrarMsgErro ("CopiarSaldosCarteiraFii")
 End Sub
 
-Private Sub CopiarSaldosCarteiraTesouroRF(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+Private Sub CopiarSaldosCarteiraTesouroDireto(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
-  ' Sub CopiarSaldosCarteiraTesouroRF
+  ' Sub CopiarSaldosCarteiraTesouroDireto
   ' copiar saldos, quantidades e descrições da carteira 5
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
@@ -598,13 +598,13 @@ Private Sub CopiarSaldosCarteiraTesouroRF(wsPlanilhaAtual As Worksheet, wsProxPl
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
   Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
-  On Error GoTo ErrorCopiarSaldosCarteiraTesouroRF
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_RF))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_RF))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_RF))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_RF))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_RF))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_RF))
+  On Error GoTo ErrorCopiarSaldosCarteiraTesouroDireto
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_DIRETO))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_DIRETO))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_TESOURO_DIRETO))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_TESOURO_DIRETO))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_TESOURO_DIRETO))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_TESOURO_DIRETO))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -620,8 +620,8 @@ Private Sub CopiarSaldosCarteiraTesouroRF(wsPlanilhaAtual As Worksheet, wsProxPl
     wsPlanilhaAtual, wsProxPlanilha, infoInvests)
   Exit Sub
     
-ErrorCopiarSaldosCarteiraTesouroRF:
-  MostrarMsgErro ("CopiarSaldosCarteiraTesouroRF")
+ErrorCopiarSaldosCarteiraTesouroDireto:
+  MostrarMsgErro ("CopiarSaldosCarteiraTesouroDireto")
 End Sub
 
 Private Sub CopiarSaldosCarteiraTesouroSelic(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
@@ -635,12 +635,12 @@ Private Sub CopiarSaldosCarteiraTesouroSelic(wsPlanilhaAtual As Worksheet, wsPro
   Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraTesouroSelic
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_SELIC))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_SELIC))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_SELIC))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_SELIC))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_SELIC))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_SELIC))
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_SELIC))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_SELIC))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_TESOURO_SELIC))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_TESOURO_SELIC))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_TESOURO_SELIC))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_TESOURO_SELIC))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -796,13 +796,13 @@ Private Sub CopiarSaldosContaCorretora(wsPlanilhaAtual As Worksheet, wsProxPlani
     
   Dim intCount As Integer, intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaDescricao As Integer, intColunaDisponivel As Integer, intColunaBloqueado As Integer
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COL_DESC_CONTA_CORRETORA))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COL_DESC_CONTA_CORRETORA))
-  intColunaDescricao = RetornarPrimeiraColuna(Range(RANGE_COL_DESC_CONTA_CORRETORA))
-  intColunaDisponivel = RetornarPrimeiraColuna(Range(RANGE_COL_SALDO_CONTA_CORRETORA))
-  intColunaBloqueado = RetornarPrimeiraColuna(Range(RANGE_COL_BLOQUEADO_CONTA_CORRETORA))
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_DESC_CONTA_CORRETORA))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_DESC_CONTA_CORRETORA))
+  intColunaDescricao = RetornarPrimeiraColuna(Range(RANGE_COLUNA_DESC_CONTA_CORRETORA))
+  intColunaDisponivel = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_CONTA_CORRETORA))
+  intColunaBloqueado = RetornarPrimeiraColuna(Range(RANGE_COLUNA_BLOQUEADO_CONTA_CORRETORA))
   For intCount = intPrimeiraLinha To intUltimaLinha
-    If (Not IsEmpty(wsPlanilhaAtual.Cells(intCount, RetornarPrimeiraColuna(Range(RANGE_COL_SALDO_CONTA_CORRETORA))))) Then
+    If (Not IsEmpty(wsPlanilhaAtual.Cells(intCount, RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_CONTA_CORRETORA))))) Then
       With wsProxPlanilha
         .Cells(intCount, intColunaDescricao).Value = wsPlanilhaAtual.Cells(intCount, intColunaDescricao).Value
         .Cells(intCount, intColunaDisponivel).Value = wsPlanilhaAtual.Cells(intCount, intColunaDisponivel).Value

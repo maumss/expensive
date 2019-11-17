@@ -87,7 +87,7 @@ ErroCriarParcelamento:
 End Sub
 
 Private Function IsLocalIvalido(rgAlvo As Range) As Boolean
-  IsLocalIvalido = (Application.Intersect(rgAlvo, Range(RANGE_TAB_MOVIMENTACOES)) Is Nothing) And _
+  IsLocalIvalido = (Application.Intersect(rgAlvo, Range(RANGE_TAB_MOVIMENTACAO)) Is Nothing) And _
        (Application.Intersect(rgAlvo, Range(RANGE_TAB_CARTOES)) Is Nothing)
 End Function
 
@@ -101,7 +101,7 @@ Private Function RetornarMovimentacao(rgAlvo As Range) As Movimentacao
     udtMovimentacao.dblValorMov = Cells(intLinhaAtual, intColunaInicial + 4).Value
     udtMovimentacao.blnMovCartao = True
   Else
-    intColunaInicial = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
+    intColunaInicial = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
     udtMovimentacao.dblValorMov = Cells(intLinhaAtual, intColunaInicial + 3).Value
     udtMovimentacao.blnMovCartao = False
   End If
@@ -251,7 +251,7 @@ Private Sub AlterarTextoAtual(rgAlvo As Range, udtInfoParcelamento As InfoParcel
     intColunaDestino = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
     intColunaValor = intColunaDestino + 4
   Else
-    intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
+    intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
     intColunaValor = intColunaDestino + 3
   End If
   Cells(lngLinhaDest, intColunaDestino + 1).Value = udtMovimentacao.strDescMov & " (1/" & _
@@ -278,7 +278,7 @@ Private Sub CriarEntradaNaPlanilha(lngIndPlanDestino As Long, ByVal strTexto As 
      intColunaDestino = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
    Else
      lngLinhaDest = RetornarUltimaLinhaMovimentacoes + 1
-     intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES).Column
+     intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
      datDataParcela = DateAdd("m", intParcela, datDataParcela)
    End If
    Cells(lngLinhaDest, intColunaDestino).Value = datDataParcela

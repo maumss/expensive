@@ -14,15 +14,15 @@ Sub OrdenarMovimentos()
   End If
   Application.ScreenUpdating = False
   Application.EnableEvents = False
-  Range(RANGE_TAB_MOVIMENTACOES).Select
-  'Selection.Sort Key1:=Range(RANGE_PRIMEIRA_DATA_MOVIMENTACOES), Order1:=xlAscending, Header:=xlGuess, _
+  Range(RANGE_TAB_MOVIMENTACAO).Select
+  'Selection.Sort Key1:=Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO), Order1:=xlAscending, Header:=xlGuess, _
   '      OrderCustom:=1, MatchCase:=False, Orientation:=xlTopToBottom, _
   '      DataOption1:=xlSortNormal
   ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COL_DATA_MOVIMENTACOES), _
+  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_MOVIMENTACAO), _
         SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
   With ActiveSheet.Sort
-      .SetRange Range(RANGE_TAB_MOVIMENTACOES)
+      .SetRange Range(RANGE_TAB_MOVIMENTACAO)
       .Header = xlGuess
       .MatchCase = False
       .Orientation = xlTopToBottom
@@ -32,7 +32,7 @@ Sub OrdenarMovimentos()
   
   Range(RANGE_TAB_CARTOES).Select
   ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COL_DATA_CARTOES), _
+  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_CARTOES), _
         SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
   With ActiveSheet.Sort
       .SetRange Range(RANGE_TAB_CARTOES)

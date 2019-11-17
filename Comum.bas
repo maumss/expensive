@@ -14,14 +14,14 @@ End Sub
 
 Function RetornarUltimaCelulaMovimentacoes() As Range
   Dim intColunaDataMovimentacoes As Integer
-  intColunaDataMovimentacoes = Range(RANGE_HEADER_DATA_MOVIMENTACOES).Column
+  intColunaDataMovimentacoes = Range(RANGE_HEADER_DATA_MOVIMENTACAO).Column
   Set RetornarUltimaCelulaMovimentacoes = Cells((RetornarUltimaLinhaMovimentacoes + 1), intColunaDataMovimentacoes)
 End Function
 
 Function RetornarUltimaLinhaMovimentacoes() As Long
   ' procura a última linha de Movimento preenchida
   On Error GoTo ErroUltLinhaD
-  RetornarUltimaLinhaMovimentacoes = Range(RANGE_HEADER_MOVIMENTACOES).End(xlDown).Row
+  RetornarUltimaLinhaMovimentacoes = Range(RANGE_HEADER_MOVIMENTACAO).End(xlDown).Row
   Exit Function
   
 ErroUltLinhaD:
@@ -154,18 +154,18 @@ Sub PuxarDataAtual()
   Set wsPlanilha = ActiveSheet
   Set rgAlvo = Selection
   If IsEmpty(rgAlvo) Then
-    If (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_MOVIMENTACOES)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CARTOES)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_ACOES)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_FII)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_RF)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_SELIC)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_ETF)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_STOCK)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_REIT)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_BILL)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_COMMODITY)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COL_DATA_CART_OPCOES)) Is Nothing) Then
+    If (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_MOVIMENTACAO)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CARTOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ACOES)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_FII)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TESOURO_DIRETO)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TESOURO_SELIC)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ETF)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_STOCK)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_REIT)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CART_TREASURY)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_COMMODITY)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_OPCOES)) Is Nothing) Then
       rgAlvo.Value = Date
     End If
   End If

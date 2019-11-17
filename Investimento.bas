@@ -15,14 +15,14 @@ Function CalcularSaldoAtual(rgDescInvest As Range) As Double
   For Each wsPlanilha In Worksheets
      ' A primeira planilha aberta que achar é a válida
      If IsPlanilhaAberta(wsPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
-       CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
-             rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
+       CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_PORTFOLIO), _
+             rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO))
        Exit Function
      End If
   Next wsPlanilha
   ' Se todas as planilhas estão fechadas, pega a de Dezembro
-  CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_CONSOLIDADA), _
-       rgDescInvest, Worksheets("Dez.").Range(RANGE_COLUNA_SALDO_FINAL_CONSOLIDADA))
+  CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_PORTFOLIO), _
+       rgDescInvest, Worksheets("Dez.").Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO))
   Exit Function
   
 ErroSaldoAtual:
@@ -110,8 +110,8 @@ Private Function HasCarteira(strDescricao As String) As Boolean
       intColunaCarteira As Integer
   intInicioLinhaCarteira1 = Range(RANGE_CELULA_INICIO_ADHOC).Row
   intFinalLinhaCarteira1 = Range(RANGE_CELULA_FIM_ADHOC).Row
-  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_CONSOLIDADA).Row
-  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_CONSOLIDADA).Row
+  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_PORTFOLIO).Row
+  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_PORTFOLIO).Row
   intColunaCarteira = Range(RANGE_CELULA_INICIO_ADHOC).Column
   Dim blnAchou As Boolean
   Dim intLinha As Integer
@@ -156,8 +156,8 @@ Private Function RetornarParteNomeCarteira(strDescricao As String) As String
       intColunaCarteira As Integer
   intInicioLinhaCarteira1 = Range(RANGE_CELULA_INICIO_ADHOC).Row
   intFinalLinhaCarteira1 = Range(RANGE_CELULA_FIM_ADHOC).Row
-  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_CONSOLIDADA).Row
-  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_CONSOLIDADA).Row
+  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_PORTFOLIO).Row
+  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_PORTFOLIO).Row
   intColunaCarteira = Range(RANGE_CELULA_INICIO_ADHOC).Column
   Dim blnAchou As Boolean
   Dim strEncontrado As String

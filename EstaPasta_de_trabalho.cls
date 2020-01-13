@@ -98,7 +98,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   ' testa se alterou os valores finais de ações, opções ou fii's
   If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_OPCOES)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Or _
+     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETFBR)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_REIT)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_TREASURY)) Is Nothing Or _
@@ -200,9 +200,9 @@ Private Function IsGerouImpostoNoMes(ByVal Target As Range) As Boolean
     End If
   End If
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Then
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_ETF).Column).Value > 0)
-    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_ETF).Column).Value > 0)
+  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETFBR)) Is Nothing Then
+    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_ETFBR).Column).Value > 0)
+    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_ETFBR).Column).Value > 0)
     If boolImpostoComum Or boolImpostoDaytrade Then
       IsGerouImpostoNoMes = True
       Exit Function

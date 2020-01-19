@@ -28,6 +28,12 @@ Public Const SITUAC_FECHADO As String = "Fechado"
 Public Const RANGE_SALDO_MES As String = "B2"
 Public Const NOME_PLAN_DEZ As String = "Dez"
 
+' Planilhas Jan. a Dez - Conta corretora
+Public Const RANGE_SALDO_CONTA_XP As String = "B22"
+Public Const RANGE_SALDO_CONTA_AVENUE_USD_TOTAL As String = "B26"
+Public Const RANGE_SALDO_CONTA_AVENUE_USD_DO_BRASIL As String = "B28"
+Public Const RANGE_SALDO_CONTA_AVENUE_BR As String = "B30"
+
 ' Planilhas Jan. a Dez - movimentações
 Public Const RANGE_HEADER_MOVIMENTACAO As String = "D14"
 Public Const RANGE_HEADER_DATA_MOVIMENTACAO As String = "D15"
@@ -167,7 +173,3 @@ Public Const RANGE_COLUNA_DOZE_MESES_INDICADORES As String = "I371:I380"
 Public Const RANGE_CELULA_DOLAR_FINAL_MES As String = "G377"
 Public Const SP500 As String = "S&P 500"
 
-' Planilhas Jan. a Dez - Conta corretora
-Public Const RANGE_COLUNA_DESC_CONTA_CORRETORA As String = "D388:D390"
-Public Const RANGE_COLUNA_SALDO_CONTA_CORRETORA As String = "F388:F390"
-Public Const RANGE_COLUNA_BLOQUEADO_CONTA_CORRETORA As String = "G388:G390"

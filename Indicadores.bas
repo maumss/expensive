@@ -43,6 +43,14 @@ Sub BuscarIndicadores()
   Set wsIndicadores = Worksheets("Indicadores")
   Call AtualizarFonteDeDadosPlanilha(wsIndicadores)
   Call PercorrerIndicadores(wsPlanilhaAtual, wsIndicadores)
+  
+  Dim wsProxPlanilha As Worksheet
+  Dim lngIndPlan As Long
+  lngIndPlan = Worksheets(ActiveSheet.Name).Index
+  Set wsProxPlanilha = Worksheets(lngIndPlan + 1)
+  If IsPlanilhaAberta(wsProxPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
+    Call TransferirDolarBacen(wsProxPlanilha, wsIndicadores)
+  End If
   Exit Sub
     
 ErroBuscarIndicadores:
@@ -117,13 +125,13 @@ Private Sub PercorrerIndicadores(wsPlanilha As Worksheet, wsIndicadores As Works
     If Not rgFound Is Nothing Then
       Dim rgCelulaAtual As Range
       Set rgCelulaAtual = rgCell
-      Call TransfereDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
+      Call TransferirDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
     End If
     If (strIndicador = "Dólar Comercial") Then
       Dim rgDolarAtual As Range
       Set rgDolarAtual = BuscarDolarComercialAtual(wsIndicadores)
       If Not rgDolarAtual Is Nothing Then
-        Call TransfereValorDolar(rgDolarAtual, wsIndicadores)
+        Call TransferirDolarComercial(rgDolarAtual, wsIndicadores)
       End If
     End If
     
@@ -134,12 +142,12 @@ ErroPercorrerIndicadores:
   MostrarMsgErro ("PercorrerIndicadores")
 End Sub
 
-Private Sub TransfereDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As Range, wsIndicadores As Worksheet)
+Private Sub TransferirDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
   ' PercorrerIndicadores
   ' verifica cada descrição de indicador
   '
-  On Error GoTo ErroTransfereDadosIndicador
+  On Error GoTo ErroTransferirDadosIndicador
   
   Dim wsPlanilha As Worksheet
   Set wsPlanilha = ActiveSheet
@@ -150,6 +158,7 @@ Private Sub TransfereDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As
   End If
   Set rgIndicadorAnoAtual = GetRangeAnoIndicador(rgIndicadorAtual)
   Set rgIndicadorDozeMesesAtual = GetRangeDozeMesesIndicador(rgIndicadorAtual)
+  CongelarCalculosPlanilha (True)
   With wsPlanilha
     If (rgIndicadorAtual.Value = SP500) Then
       .Cells(rgIndicadorMesAtual.Row, rgIndicadorMesAtual.Column).Value = wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column + 4).Value
@@ -161,10 +170,12 @@ Private Sub TransfereDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As
     .Cells(rgIndicadorAnoAtual.Row, rgIndicadorAnoAtual.Column).Value = wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column + 7).Value
     .Cells(rgIndicadorDozeMesesAtual.Row, rgIndicadorDozeMesesAtual.Column).Value = wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column + 8).Value
   End With
+  CongelarCalculosPlanilha (False)
   Exit Sub
   
-ErroTransfereDadosIndicador:
-  MostrarMsgErro ("TransfereDadosIndicador")
+ErroTransferirDadosIndicador:
+  CongelarCalculosPlanilha (False)
+  MostrarMsgErro ("TransferirDadosIndicador")
 End Sub
 
 Private Function GetRangeMesIndicador(rgCell As Range) As Range
@@ -221,9 +232,9 @@ End Function
 Private Function BuscarDolarComercialAtual(wsIndicadores As Worksheet) As Range
   On Error GoTo ErroBuscarDolarComercialAtual
   Dim rgTabDolar As Range
-  Set rgTabDolar = wsIndicadores.UsedRange.Find(What:="Dólar & Euro")
+  Set rgTabDolar = wsIndicadores.UsedRange.Find(What:="Moeda")
   If Not rgTabDolar Is Nothing Then
-    Set BuscarDolarComercialAtual = Cells(rgTabDolar.Row + 2, rgTabDolar.Column + 2)
+    Set BuscarDolarComercialAtual = Cells(rgTabDolar.Row + 1, rgTabDolar.Column + 1)
     Exit Function
   End If
   Set BuscarDolarComercialAtual = Nothing
@@ -233,12 +244,12 @@ ErroBuscarDolarComercialAtual:
   MostrarMsgErro ("BuscarDolarComercialAtual")
 End Function
 
-Private Sub TransfereValorDolar(rgIndicadorWeb As Range, wsIndicadores As Worksheet)
+Private Sub TransferirDolarComercial(rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
-  ' TransfereValorDolar
+  ' TransferirDolarComercial
   ' transfere o valor do dólar atual para planilha corrente
   '
-  On Error GoTo ErroTransfereValorDolar
+  On Error GoTo ErroTransferirDolarComercial
   
   Dim wsPlanilha As Worksheet
   Set wsPlanilha = ActiveSheet
@@ -247,9 +258,69 @@ Private Sub TransfereValorDolar(rgIndicadorWeb As Range, wsIndicadores As Worksh
   If IsEmpty(wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column)) Then
     Exit Sub
   End If
+  CongelarCalculosPlanilha (True)
   wsPlanilha.Cells(rgIndicadorValorFinalMesAtual.Row, rgIndicadorValorFinalMesAtual.Column).Value = wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column).Value
+  CongelarCalculosPlanilha (False)
   Exit Sub
   
-ErroTransfereValorDolar:
-  MostrarMsgErro ("TransfereValorDolar")
+ErroTransferirDolarComercial:
+  CongelarCalculosPlanilha (False)
+  MostrarMsgErro ("ErroTransferirDolarComercial")
 End Sub
+
+Private Sub TransferirDolarBacen(wsProxPlanilha As Worksheet, wsIndicadores As Worksheet)
+  On Error GoTo ErroTransferirDolarBacen
+
+  Dim rgTabBacen As Range
+  Set rgTabBacen = wsIndicadores.UsedRange.Find(What:="Mês de recebimento")
+  If rgTabBacen Is Nothing Then
+    Exit Sub
+  End If
+  CongelarCalculosPlanilha (True)
+  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_COMPRA) = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 1)
+  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_VENDA) = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 2)
+  CongelarCalculosPlanilha (False)
+  Exit Sub
+
+ErroTransferirDolarBacen:
+  CongelarCalculosPlanilha (False)
+  MostrarMsgErro ("TransferirDolarBacen")
+End Sub
+
+Private Function GetLinhaMes(wsProxPlanilha As Worksheet) As Integer
+  On Error GoTo ErroGetLinhaMes
+  Dim strNomePlanilha As String
+
+  strNomePlanilha = wsProxPlanilha.Name
+  Select Case strNomePlanilha
+    Case "Jan"
+      GetLinhaMes = 1
+    Case "Fev"
+      GetLinhaMes = 2
+    Case "Mar"
+      GetLinhaMes = 3
+    Case "Abr"
+      GetLinhaMes = 4
+    Case "Mai"
+      GetLinhaMes = 5
+    Case "Jun"
+      GetLinhaMes = 6
+    Case "Jul"
+      GetLinhaMes = 7
+    Case "Ago"
+      GetLinhaMes = 8
+    Case "Set"
+      GetLinhaMes = 9
+    Case "Out"
+      GetLinhaMes = 10
+    Case "Nov"
+      GetLinhaMes = 11
+    Case Else
+      GetLinhaMes = 12
+  End Select
+  Exit Function
+  
+ErroGetLinhaMes:
+  MostrarMsgErro ("GetLinhaMes")
+End Function
+

@@ -7,15 +7,29 @@ Sub AtualizarDadosPlanAtual()
   ' Atualiza tabela com fonte de dados na web
   '
   On Error GoTo ErroAtualizarDadosPlanAtual
-  
+    
   Dim wsPlanilha As Worksheet
+  Dim blnOldStatusBar As Boolean
+  Dim intPercentual As Integer
+  blnOldStatusBar = Application.DisplayStatusBar
+  intPercentual = 0
+  Application.DisplayStatusBar = True
+  Application.StatusBar = "Importando valores.. " & intPercentual & "% Completado."
+  CongelarCalculosPlanilha (True)
   Set wsPlanilha = ActiveSheet
-  Call AtualizarFonteDeDadosPlanilha(wsPlanilha)
+  Call AtualizarFonteDeDadosPlanilha(wsPlanilha, 100)
+  intPercentual = 100
+  Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
+FimAtualizarDadosPlanAtual:
+  CongelarCalculosPlanilha (False)
+  Application.StatusBar = False
+  Application.DisplayStatusBar = blnOldStatusBar
   Set wsPlanilha = Nothing
   Exit Sub
    
 ErroAtualizarDadosPlanAtual:
   MostrarMsgErro ("AtualizarDadosPlanAtual")
+  Resume FimAtualizarDadosPlanAtual
 End Sub
 
 
@@ -40,13 +54,41 @@ Sub BuscarIndicadores()
     End If
   End If
   Dim wsIndicadores As Worksheet
-  Set wsIndicadores = Worksheets("Indicadores")
-  Call AtualizarFonteDeDadosPlanilha(wsIndicadores)
+  Dim blnOldStatusBar As Boolean
+  Dim intPercentual As Integer
+  blnOldStatusBar = Application.DisplayStatusBar
+  intPercentual = 0
+  Application.DisplayStatusBar = True
+  Application.StatusBar = "Importando valores.. " & intPercentual & "% Completado."
+  CongelarCalculosPlanilha (True)
+  Set wsIndicadores = Worksheets("Web")
+  intPercentual = 90
+  Call AtualizarFonteDeDadosPlanilha(wsIndicadores, intPercentual)
+  Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
   Call PercorrerIndicadores(wsPlanilhaAtual, wsIndicadores)
+  intPercentual = 95
+  
+  Dim wsProxPlanilha As Worksheet
+  Dim lngIndPlan As Long
+  lngIndPlan = Worksheets(ActiveSheet.Name).Index
+  Set wsProxPlanilha = Worksheets(lngIndPlan + 1)
+  If IsPlanilhaAberta(wsProxPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
+    Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
+    Call TransferirDolarBacen(wsProxPlanilha, wsIndicadores)
+  End If
+  intPercentual = 100
+  Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
+FimBuscarIndicadores:
+  CongelarCalculosPlanilha (False)
+  Application.StatusBar = False
+  Application.DisplayStatusBar = blnOldStatusBar
+  Set wsPlanilhaAtual = Nothing
+  Set wsProxPlanilha = Nothing
   Exit Sub
     
 ErroBuscarIndicadores:
   MostrarMsgErro ("BuscarIndicadores")
+  Resume FimBuscarIndicadores
 End Sub
 
 Private Function HasValorMes(wsPlanilha As Worksheet) As Boolean
@@ -72,32 +114,77 @@ ErroHasValorMes:
   MostrarMsgErro ("HasValorMes")
 End Function
 
-Sub AtualizarFonteDeDadosPlanilha(wsPlanilha As Worksheet)
+Private Sub AtualizarFonteDeDadosPlanilha(wsPlanilha As Worksheet, intTotalPercentual As Integer)
   '
   ' AtualizarFonteDeDadosPlanilha    Data: 30/04/16
   ' Atualiza funções da planilha
   '
   On Error GoTo ErroAtualizarFonteDeDadosPlanilha
   
-  CongelarCalculosPlanilha (True)
-  
   If wsPlanilha.ProtectContents Then
     wsPlanilha.Unprotect
   End If
     
+  Dim intPercentualAtual As Integer
+  intPercentualAtual = 0
+  Dim lngTotalConexoes As Long
+  lngTotalConexoes = ContarConexoes(wsPlanilha)
+  Dim intAcrescimo As Integer
+  intAcrescimo = intTotalPercentual / lngTotalConexoes
+  'Atualizar queryTables
   Dim qtDados As QueryTable
+  Dim tmTempo As Double
   For Each qtDados In wsPlanilha.QueryTables
+    Debug.Print "Intervalo de dados [" & qtDados.Name & "]"
+    Application.StatusBar = "Importando consulta " & qtDados.Name & ".. " & intPercentualAtual & "% Completado."
+    tmTempo = Timer
     qtDados.Refresh
+    Debug.Print "Tempo de processamento: " & Round(Timer - tmTempo, 4) & " seg."
+    intPercentualAtual = intPercentualAtual + intAcrescimo
+    If intPercentualAtual > intTotalPercentual Then
+      intPercentualAtual = intTotalPercentual
+    End If
   Next
+  'Atualizar consultas
+  Dim lstObjetos As ListObject
+  For Each lstObjetos In wsPlanilha.ListObjects
+    If lstObjetos.SourceType = xlSrcQuery Then
+      Debug.Print "Consulta [" & lstObjetos.Name & "]"
+      Application.StatusBar = "Importando consulta " & lstObjetos.Name & ".. " & intPercentualAtual & "% Completado."
+      tmTempo = Timer
+      lstObjetos.Refresh
+      Debug.Print "Tempo de processamento: " & Round(Timer - tmTempo, 4) & " seg."
+      intPercentualAtual = intPercentualAtual + intAcrescimo
+      If intPercentualAtual > intTotalPercentual Then
+        intPercentualAtual = intTotalPercentual
+      End If
+    End If
+  Next lstObjetos
   
-  wsPlanilha.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
-  CongelarCalculosPlanilha (False)
+  'wsPlanilha.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
   Exit Sub
    
 ErroAtualizarFonteDeDadosPlanilha:
-  CongelarCalculosPlanilha (False)
   MostrarMsgErro ("AtualizarFonteDeDadosPlanilha")
 End Sub
+
+Private Function ContarConexoes(wsPlanilha As Worksheet) As Long
+  On Error GoTo ErroContarConexoes
+  Dim lngConexoes As Long
+  Dim lstObjetos As ListObject
+  lngConexoes = 0
+  For Each lstObjetos In wsPlanilha.ListObjects
+    Debug.Print "Conexão [" & lstObjetos.Name & "(SourceType " & lstObjetos.SourceType & ")]"
+    If lstObjetos.SourceType = xlSrcQuery Then
+        lngConexoes = lngConexoes + 1
+    End If
+  Next lstObjetos
+  ContarConexoes = lngConexoes + wsPlanilha.QueryTables.Count
+  Exit Function
+  
+ErroContarConexoes:
+  MostrarMsgErro ("ContarConexoes")
+End Function
 
 Private Sub PercorrerIndicadores(wsPlanilha As Worksheet, wsIndicadores As Worksheet)
   '
@@ -117,13 +204,13 @@ Private Sub PercorrerIndicadores(wsPlanilha As Worksheet, wsIndicadores As Works
     If Not rgFound Is Nothing Then
       Dim rgCelulaAtual As Range
       Set rgCelulaAtual = rgCell
-      Call TransfereDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
+      Call TransferirDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
     End If
     If (strIndicador = "Dólar Comercial") Then
       Dim rgDolarAtual As Range
       Set rgDolarAtual = BuscarDolarComercialAtual(wsIndicadores)
       If Not rgDolarAtual Is Nothing Then
-        Call TransfereValorDolar(rgDolarAtual, wsIndicadores)
+        Call TransferirDolarComercial(rgDolarAtual, wsIndicadores)
       End If
     End If
     
@@ -134,12 +221,12 @@ ErroPercorrerIndicadores:
   MostrarMsgErro ("PercorrerIndicadores")
 End Sub
 
-Private Sub TransfereDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As Range, wsIndicadores As Worksheet)
+Private Sub TransferirDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
   ' PercorrerIndicadores
   ' verifica cada descrição de indicador
   '
-  On Error GoTo ErroTransfereDadosIndicador
+  On Error GoTo ErroTransferirDadosIndicador
   
   Dim wsPlanilha As Worksheet
   Set wsPlanilha = ActiveSheet
@@ -163,8 +250,8 @@ Private Sub TransfereDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As
   End With
   Exit Sub
   
-ErroTransfereDadosIndicador:
-  MostrarMsgErro ("TransfereDadosIndicador")
+ErroTransferirDadosIndicador:
+  MostrarMsgErro ("TransferirDadosIndicador")
 End Sub
 
 Private Function GetRangeMesIndicador(rgCell As Range) As Range
@@ -221,9 +308,9 @@ End Function
 Private Function BuscarDolarComercialAtual(wsIndicadores As Worksheet) As Range
   On Error GoTo ErroBuscarDolarComercialAtual
   Dim rgTabDolar As Range
-  Set rgTabDolar = wsIndicadores.UsedRange.Find(What:="Dólar & Euro")
+  Set rgTabDolar = wsIndicadores.UsedRange.Find(What:="Moeda")
   If Not rgTabDolar Is Nothing Then
-    Set BuscarDolarComercialAtual = Cells(rgTabDolar.Row + 2, rgTabDolar.Column + 2)
+    Set BuscarDolarComercialAtual = Cells(rgTabDolar.Row + 1, rgTabDolar.Column + 1)
     Exit Function
   End If
   Set BuscarDolarComercialAtual = Nothing
@@ -233,12 +320,12 @@ ErroBuscarDolarComercialAtual:
   MostrarMsgErro ("BuscarDolarComercialAtual")
 End Function
 
-Private Sub TransfereValorDolar(rgIndicadorWeb As Range, wsIndicadores As Worksheet)
+Private Sub TransferirDolarComercial(rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
-  ' TransfereValorDolar
+  ' TransferirDolarComercial
   ' transfere o valor do dólar atual para planilha corrente
   '
-  On Error GoTo ErroTransfereValorDolar
+  On Error GoTo ErroTransferirDolarComercial
   
   Dim wsPlanilha As Worksheet
   Set wsPlanilha = ActiveSheet
@@ -250,6 +337,60 @@ Private Sub TransfereValorDolar(rgIndicadorWeb As Range, wsIndicadores As Worksh
   wsPlanilha.Cells(rgIndicadorValorFinalMesAtual.Row, rgIndicadorValorFinalMesAtual.Column).Value = wsIndicadores.Cells(rgIndicadorWeb.Row, rgIndicadorWeb.Column).Value
   Exit Sub
   
-ErroTransfereValorDolar:
-  MostrarMsgErro ("TransfereValorDolar")
+ErroTransferirDolarComercial:
+  MostrarMsgErro ("ErroTransferirDolarComercial")
 End Sub
+
+Private Sub TransferirDolarBacen(wsProxPlanilha As Worksheet, wsIndicadores As Worksheet)
+  On Error GoTo ErroTransferirDolarBacen
+
+  Dim rgTabBacen As Range
+  Set rgTabBacen = wsIndicadores.UsedRange.Find(What:="Mês de recebimento")
+  If rgTabBacen Is Nothing Then
+    Exit Sub
+  End If
+  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_COMPRA) = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 1)
+  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_VENDA) = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 2)
+  Exit Sub
+
+ErroTransferirDolarBacen:
+  MostrarMsgErro ("TransferirDolarBacen")
+End Sub
+
+Private Function GetLinhaMes(wsProxPlanilha As Worksheet) As Integer
+  On Error GoTo ErroGetLinhaMes
+  Dim strNomePlanilha As String
+
+  strNomePlanilha = wsProxPlanilha.Name
+  Select Case strNomePlanilha
+    Case "Jan"
+      GetLinhaMes = 1
+    Case "Fev"
+      GetLinhaMes = 2
+    Case "Mar"
+      GetLinhaMes = 3
+    Case "Abr"
+      GetLinhaMes = 4
+    Case "Mai"
+      GetLinhaMes = 5
+    Case "Jun"
+      GetLinhaMes = 6
+    Case "Jul"
+      GetLinhaMes = 7
+    Case "Ago"
+      GetLinhaMes = 8
+    Case "Set"
+      GetLinhaMes = 9
+    Case "Out"
+      GetLinhaMes = 10
+    Case "Nov"
+      GetLinhaMes = 11
+    Case Else
+      GetLinhaMes = 12
+  End Select
+  Exit Function
+  
+ErroGetLinhaMes:
+  MostrarMsgErro ("GetLinhaMes")
+End Function
+

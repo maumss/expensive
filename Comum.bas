@@ -39,12 +39,14 @@ End Function
 
 Sub CongelarCalculosPlanilha(blnValor As Boolean)
   If blnValor Then
+    Application.Cursor = xlWait
     Application.ScreenUpdating = False
     Application.Calculation = xlCalculationManual
     Application.EnableEvents = False
     Application.DisplayAlerts = False
     Exit Sub
   End If
+  Application.Cursor = xlDefault
   Application.ScreenUpdating = True
   Application.Calculation = xlCalculationAutomatic
   Application.EnableEvents = True

@@ -831,23 +831,20 @@ Private Sub CopiarSaldosContaCorretora(wsPlanilhaAtual As Worksheet, wsProxPlani
   ' copiar saldos e descrições da carteira
   '
   On Error GoTo ErrorCopiarSaldosContaCorretora
-    
-  Dim intCount As Integer, intPrimeiraLinha As Integer, intUltimaLinha As Integer
-  Dim intColunaDescricao As Integer, intColunaDisponivel As Integer, intColunaBloqueado As Integer
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_DESC_CONTA_CORRETORA))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_DESC_CONTA_CORRETORA))
-  intColunaDescricao = RetornarPrimeiraColuna(Range(RANGE_COLUNA_DESC_CONTA_CORRETORA))
-  intColunaDisponivel = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_CONTA_CORRETORA))
-  intColunaBloqueado = RetornarPrimeiraColuna(Range(RANGE_COLUNA_BLOQUEADO_CONTA_CORRETORA))
-  For intCount = intPrimeiraLinha To intUltimaLinha
-    If (Not IsEmpty(wsPlanilhaAtual.Cells(intCount, RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_CONTA_CORRETORA))))) Then
-      With wsProxPlanilha
-        .Cells(intCount, intColunaDescricao).Value = wsPlanilhaAtual.Cells(intCount, intColunaDescricao).Value
-        .Cells(intCount, intColunaDisponivel).Value = wsPlanilhaAtual.Cells(intCount, intColunaDisponivel).Value
-        .Cells(intCount, intColunaBloqueado).Value = wsPlanilhaAtual.Cells(intCount, intColunaBloqueado).Value
-      End With
-    End If
-  Next intCount
+  
+  
+  If (Not IsEmpty(wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_XP))) Then
+    wsProxPlanilha.Range(RANGE_SALDO_CONTA_XP).Value = wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_XP).Value
+  End If
+  If (Not IsEmpty(wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_AVENUE_USD_TOTAL))) Then
+    wsProxPlanilha.Range(RANGE_SALDO_CONTA_AVENUE_USD_TOTAL).Value = wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_AVENUE_USD_TOTAL).Value
+  End If
+  If (Not IsEmpty(wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_AVENUE_USD_DO_BRASIL))) Then
+    wsProxPlanilha.Range(RANGE_SALDO_CONTA_AVENUE_USD_DO_BRASIL).Value = wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_AVENUE_USD_DO_BRASIL).Value
+  End If
+  If (Not IsEmpty(wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_AVENUE_BR))) Then
+    wsProxPlanilha.Range(RANGE_SALDO_CONTA_AVENUE_BR).Value = wsPlanilhaAtual.Range(RANGE_SALDO_CONTA_AVENUE_BR).Value
+  End If
   Exit Sub
   
 ErrorCopiarSaldosContaCorretora:

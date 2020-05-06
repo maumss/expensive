@@ -43,9 +43,12 @@ Sub BuscarIndicadores()
   If (Range(RANGE_SITUAC_PLANILHA).Value <> SITUAC_ABERTO) Then
     Exit Sub
   End If
-  Dim wsPlanilhaAtual As Worksheet
-  Set wsPlanilhaAtual = ActiveSheet
+  Dim wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet, wsIndicadores As Worksheet
+  Dim blnOldStatusBar As Boolean
+  Dim intPercentual As Integer
+  Dim lngIndPlan As Long
   
+  Set wsPlanilhaAtual = ActiveSheet
   If HasValorMes(wsPlanilhaAtual) Then
     'Pede confirmação
     If MsgBox("Essa planilha já possui dados nos indicadores. Deseja sobreescrever?", _
@@ -53,31 +56,30 @@ Sub BuscarIndicadores()
         Exit Sub
     End If
   End If
-  Dim wsIndicadores As Worksheet
-  Dim blnOldStatusBar As Boolean
-  Dim intPercentual As Integer
+  
   blnOldStatusBar = Application.DisplayStatusBar
   intPercentual = 0
   Application.DisplayStatusBar = True
   Application.StatusBar = "Importando valores.. " & intPercentual & "% Completado."
   CongelarCalculosPlanilha (True)
   Set wsIndicadores = Worksheets("Web")
-  intPercentual = 90
   Call AtualizarFonteDeDadosPlanilha(wsIndicadores, intPercentual)
+  intPercentual = 90
   Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
-  Call PercorrerIndicadores(wsPlanilhaAtual, wsIndicadores)
-  intPercentual = 95
   
-  Dim wsProxPlanilha As Worksheet
-  Dim lngIndPlan As Long
   lngIndPlan = Worksheets(ActiveSheet.Name).Index
   Set wsProxPlanilha = Worksheets(lngIndPlan + 1)
   If IsPlanilhaAberta(wsProxPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
     Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
     Call TransferirDolarBacen(wsProxPlanilha, wsIndicadores)
   End If
+  intPercentual = 95
+  Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
+  
+  Call PercorrerIndicadores(wsPlanilhaAtual, wsIndicadores)
   intPercentual = 100
   Application.StatusBar = "Atualizando valores.. " & intPercentual & "% Completado."
+      
 FimBuscarIndicadores:
   CongelarCalculosPlanilha (False)
   Application.StatusBar = False
@@ -197,14 +199,11 @@ Private Sub PercorrerIndicadores(wsPlanilha As Worksheet, wsIndicadores As Works
   Dim strIndicador As String
   For Each rgCell In wsPlanilha.Range(RANGE_COLUNA_DESCR_INDICADORES)
     strIndicador = rgCell.Value
-    'If (strIndicador = "IPCA") Then
-    '   strIndicador = "IPCA (5)"
-    'End If
     Set rgFound = wsIndicadores.UsedRange.Find(What:=strIndicador)
     If Not rgFound Is Nothing Then
       Dim rgCelulaAtual As Range
       Set rgCelulaAtual = rgCell
-      Call TransferirDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
+      'Call TransferirDadosIndicador(rgCelulaAtual, rgFound, wsIndicadores)
     End If
     If (strIndicador = "Dólar Comercial") Then
       Dim rgDolarAtual As Range
@@ -223,7 +222,8 @@ End Sub
 
 Private Sub TransferirDadosIndicador(rgIndicadorAtual As Range, rgIndicadorWeb As Range, wsIndicadores As Worksheet)
   '
-  ' PercorrerIndicadores
+  ' ============== Esta consulta foi removida ======================
+  ' TransferirDadosIndicador
   ' verifica cada descrição de indicador
   '
   On Error GoTo ErroTransferirDadosIndicador
@@ -347,10 +347,12 @@ Private Sub TransferirDolarBacen(wsProxPlanilha As Worksheet, wsIndicadores As W
   Dim rgTabBacen As Range
   Set rgTabBacen = wsIndicadores.UsedRange.Find(What:="Mês de recebimento")
   If rgTabBacen Is Nothing Then
+    Debug.Print "Nenhum valor de dólar do Bacen foi encontrado."
     Exit Sub
   End If
-  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_COMPRA) = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 1)
-  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_VENDA) = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 2)
+  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_COMPRA).Value = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 1).Value
+  Debug.Print "Dólar de compra [" & wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 1).Value & "]"
+  wsProxPlanilha.Range(RANGE_CELULA_DOLAR_BACEN_VENDA).Value = wsIndicadores.Cells(rgTabBacen.Row + GetLinhaMes(wsProxPlanilha), rgTabBacen.Column + 2).Value
   Exit Sub
 
 ErroTransferirDolarBacen:

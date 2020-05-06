@@ -222,15 +222,16 @@ Private Sub CopiarSaldosPortfolio(wsPlanilhaAtual As Worksheet, wsProxPlanilha A
   ' copiar saldos e descrições da carteira 2
   '
   Dim intPrimeiraLinhaResumo As Integer, intUltimaLinhaResumo As Integer
-  Dim intColunaDescricao As Integer, intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
+  Dim intColunaDescricao As Integer, intColunaSaldoInicial As Integer, intColunaAuxiliarRend As Integer, intColunaSaldoFinal As Integer
   On Error GoTo ErrorCopiarSaldosPortfolio
   intPrimeiraLinhaResumo = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_PORTFOLIO))
   intUltimaLinhaResumo = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_PORTFOLIO))
   intColunaDescricao = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_PORTFOLIO))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_PORTFOLIO))
+  intColunaAuxiliarRend = RetornarPrimeiraColuna(Range(RANGE_COLUNA_AUXILIAR_REND_PORTFOLIO))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO))
   Call CopiarSaldosCarteira(intPrimeiraLinhaResumo, intUltimaLinhaResumo, _
-    intColunaDescricao, intColunaSaldoInicial, intColunaSaldoFinal, _
+    intColunaDescricao, intColunaSaldoInicial, intColunaAuxiliarRend, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsProxPlanilha)
   Exit Sub
     
@@ -239,7 +240,8 @@ ErrorCopiarSaldosPortfolio:
 End Sub
 
 Private Sub CopiarSaldosCarteira(intPrimeiraLinhaResumo As Integer, intUltimaLinhaResumo As Integer, _
-   intColunaDescricao As Integer, intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer, _
+   intColunaDescricao As Integer, intColunaSaldoInicial As Integer, intColunaAuxiliarRend As Integer, _
+   intColunaSaldoFinal As Integer, _
    wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
   ' Sub CopiarSaldosCarteira
@@ -273,6 +275,7 @@ Private Sub CopiarSaldosCarteira(intPrimeiraLinhaResumo As Integer, intUltimaLin
           Else
             .Cells(intLinhaDestino, intColunaSaldoInicial).Value = wsPlanilhaAtual.Cells(intCont, intColunaSaldoFinal).Value
           End If
+          .Cells(intLinhaDestino, intColunaAuxiliarRend).Value = wsPlanilhaAtual.Cells(intCont, intColunaAuxiliarRend).Value
           If wsPlanilhaAtual.Cells(intCont, intColunaSaldoFinal).HasFormula Then
             If (intLinhaDestino = intCont) Then
               .Cells(intLinhaDestino, intColunaSaldoFinal).Formula = wsPlanilhaAtual.Cells(intCont, intColunaSaldoFinal).Formula

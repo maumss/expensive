@@ -129,6 +129,12 @@ Private Sub CopiarSaldos()
   Call CopiarSaldosCarteiraCommodity(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosContaCorretora(wsPlanilhaAtual, wsProxPlanilha)
+  
+  ' Ordena ativos de ações e fii
+  wsProxPlanilha.Activate
+  Call OrdenarAcoesFii
+  wsPlanilhaAtual.Activate
+  
   Exit Sub
   
 errocopiarSaldos:

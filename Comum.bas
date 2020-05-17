@@ -208,3 +208,40 @@ Sub LimparCelulasNomeadas()
     MsgBox "Nomes Apagados:" & vbCr & stMsg
   End If
 End Sub
+
+Function SheetOffSet(lngOffset As Long, Optional rgCell As Range) As Variant
+  '
+  ' SheetOffSet
+  ' Retorna conteúdo de células de uma referência, em planilhas offset
+  ' Ex.: =SheetOffSet(-1;M284)
+  '      =PROC(2;1/(SheetOffSet(-1;$E$284:$E$313)=E284);SheetOffSet(-1;$Z$284:$Z$313))
+  '
+  ' Criado por: Mauricio SS  Em: 14/05/20
+  ' Fonte: https://answers.microsoft.com/en-us/msoffice/forum/all/the-advanced-sheetoffset-function/cdf3077e-7b35-41c9-ac74-5175163c856d
+  '
+  Dim lngWksNum As Long
+  Dim wsWks As Worksheet
+  On Error GoTo ErroSheetOffSet
+
+  Application.Volatile 'força o recalculo sempre que houver uma mudança na pasta
+  If IsMissing(rgCell) Then Set rgCell = Application.Caller
+    lngWksNum = 1
+    For Each wsWks In Application.Caller.Parent.Parent.Worksheets
+      If Application.Caller.Parent.Name = wsWks.Name Then
+        'SheetOffSet = Worksheets(lngWksNum + lngOffset).Range(rgCell(1).Address)
+        'Exit Function
+        Select Case lngWksNum + lngOffset
+          Case 1 To Application.Caller.Parent.Parent.Worksheets.Count
+            Set SheetOffSet = Worksheets(lngWksNum + lngOffset).Range(rgCell.Address)
+            Exit Function
+          Case Else
+            SheetOffSet = CVErr(xlErrRef)
+        End Select
+      Else
+        lngWksNum = lngWksNum + 1
+      End If
+    Next wsWks
+    Exit Function
+ErroSheetOffSet:
+  Resume Next
+End Function

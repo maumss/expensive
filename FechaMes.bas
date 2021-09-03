@@ -121,8 +121,8 @@ Private Sub CopiarSaldos()
   Call CopiarSaldosCarteiraFii(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraTesouroDireto(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraTesouroSelic(wsPlanilhaAtual, wsProxPlanilha)
-  Call CopiarSaldosCarteiraEtfBr(wsPlanilhaAtual, wsProxPlanilha)
-  Call CopiarSaldosCarteiraEtfUsd(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraEtf1(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraEtf2(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraStock(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraReit(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraTreasury(wsPlanilhaAtual, wsProxPlanilha)
@@ -339,9 +339,9 @@ ErrorCopiarSaldosCarteiraAcoes:
   MostrarMsgErro ("CopiarSaldosCarteiraAcoes")
 End Sub
 
-Private Sub CopiarSaldosCarteiraEtfBr(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+Private Sub CopiarSaldosCarteiraEtf1(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
-  ' Sub CopiarSaldosCarteiraEtfBr
+  ' Sub CopiarSaldosCarteiraEtf1
   ' copiar saldos, quantidades e descrições da carteira etf
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
@@ -349,14 +349,14 @@ Private Sub CopiarSaldosCarteiraEtfBr(wsPlanilhaAtual As Worksheet, wsProxPlanil
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
   Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
   Dim infoInvests() As infoInvest
-  On Error GoTo ErrorCopiarSaldosCarteiraEtfBr
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETFBR))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ETFBR))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_ETFBR))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ETFBR))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ETFBR))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ETFBR))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ETFBR))
+  On Error GoTo ErrorCopiarSaldosCarteiraEtf1
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETF1))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ETF1))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_ETF1))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ETF1))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ETF1))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ETF1))
+  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ETF1))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -372,13 +372,13 @@ Private Sub CopiarSaldosCarteiraEtfBr(wsPlanilhaAtual As Worksheet, wsProxPlanil
     wsPlanilhaAtual, wsProxPlanilha, infoInvests)
   Exit Sub
     
-ErrorCopiarSaldosCarteiraEtfBr:
-  MostrarMsgErro ("CopiarSaldosCarteiraEtfBr")
+ErrorCopiarSaldosCarteiraEtf1:
+  MostrarMsgErro ("CopiarSaldosCarteiraEtf1")
 End Sub
 
-Private Sub CopiarSaldosCarteiraEtfUsd(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+Private Sub CopiarSaldosCarteiraEtf2(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
-  ' Sub CopiarSaldosCarteiraEtfUsd
+  ' Sub CopiarSaldosCarteiraEtf2
   ' copiar saldos, quantidades e descrições da carteira etf
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
@@ -386,14 +386,14 @@ Private Sub CopiarSaldosCarteiraEtfUsd(wsPlanilhaAtual As Worksheet, wsProxPlani
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
   Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
   Dim infoInvests() As infoInvest
-  On Error GoTo ErrorCopiarSaldosCarteiraEtfUsd
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETFUSD))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ETFUSD))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_ETFUSD))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ETFUSD))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ETFUSD))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ETFUSD))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ETFUSD))
+  On Error GoTo ErrorCopiarSaldosCarteiraEtf2
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETF2))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ETF2))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_ETF2))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ETF2))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ETF2))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ETF2))
+  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ETF2))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -409,8 +409,8 @@ Private Sub CopiarSaldosCarteiraEtfUsd(wsPlanilhaAtual As Worksheet, wsProxPlani
     wsPlanilhaAtual, wsProxPlanilha, infoInvests)
   Exit Sub
     
-ErrorCopiarSaldosCarteiraEtfUsd:
-  MostrarMsgErro ("CopiarSaldosCarteiraEtfUsd")
+ErrorCopiarSaldosCarteiraEtf2:
+  MostrarMsgErro ("CopiarSaldosCarteiraEtf2")
 End Sub
 
 Private Sub CopiarSaldosCarteiraStock(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)

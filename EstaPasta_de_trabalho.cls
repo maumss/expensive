@@ -50,7 +50,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   ' de um investimento nas planilhas mensais
   '
   ' variaveis
-  Dim blnIsCriticouDescInvest As Boolean
+  Dim blnIsCriticouDescInvest, boolIgnoraAgenda As Boolean
   ' principal
   On Error GoTo erroSheetChange
   blnIsCriticouDescInvest = False
@@ -106,7 +106,8 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Then
     ' testa se gerou imposto a pagar
     If Target.Count = 1 And Not IsEmpty(Target) Then
-      If IsGerouImpostoNoMes(Target) Then
+      boolIgnoraAgenda = Range(RANGE_CELULA_IGNORA_AGENDA_OPCOES).Value
+      If Not boolIgnoraAgenda And IsGerouImpostoNoMes(Target) Then
         Beep
         Beep
         If MsgBox("Atenção! Você gerou imposto a pagar para o próximo mês." & vbLf & _
@@ -114,6 +115,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
              vbYesNo + vbQuestion, "Agendar Darf") = vbYes Then
           Call AgendarLembreteOutlook
         End If
+        Range(RANGE_CELULA_IGNORA_AGENDA_OPCOES).Value = True
       End If
     End If
   End If

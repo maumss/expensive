@@ -4,7 +4,6 @@ Option Explicit
 Private Type infoInvest
   strAtivo As String
   intQuantidade As Double
-  dblCustoAnterior As Double
   dblSaldo As Double
 End Type
 
@@ -310,7 +309,7 @@ Private Sub CopiarSaldosCarteiraAcoes(wsPlanilhaAtual As Worksheet, wsProxPlanil
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraAcoes
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ACOES))
@@ -319,12 +318,10 @@ Private Sub CopiarSaldosCarteiraAcoes(wsPlanilhaAtual As Worksheet, wsProxPlanil
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ACOES))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ACOES))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ACOES))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ACOES))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -347,7 +344,7 @@ Private Sub CopiarSaldosCarteiraEtf1(wsPlanilhaAtual As Worksheet, wsProxPlanilh
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraEtf1
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETF1))
@@ -356,12 +353,10 @@ Private Sub CopiarSaldosCarteiraEtf1(wsPlanilhaAtual As Worksheet, wsProxPlanilh
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ETF1))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ETF1))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ETF1))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ETF1))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -384,7 +379,7 @@ Private Sub CopiarSaldosCarteiraEtf2(wsPlanilhaAtual As Worksheet, wsProxPlanilh
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraEtf2
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETF2))
@@ -393,12 +388,10 @@ Private Sub CopiarSaldosCarteiraEtf2(wsPlanilhaAtual As Worksheet, wsProxPlanilh
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ETF2))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ETF2))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ETF2))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_ETF2))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -421,7 +414,7 @@ Private Sub CopiarSaldosCarteiraStock(wsPlanilhaAtual As Worksheet, wsProxPlanil
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraStock
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_STOCK))
@@ -430,12 +423,10 @@ Private Sub CopiarSaldosCarteiraStock(wsPlanilhaAtual As Worksheet, wsProxPlanil
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_STOCK))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_STOCK))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_STOCK))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_STOCK))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -458,7 +449,7 @@ Private Sub CopiarSaldosCarteiraReit(wsPlanilhaAtual As Worksheet, wsProxPlanilh
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraReit
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_REIT))
@@ -467,12 +458,10 @@ Private Sub CopiarSaldosCarteiraReit(wsPlanilhaAtual As Worksheet, wsProxPlanilh
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_REIT))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_REIT))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_REIT))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_REIT))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -495,7 +484,7 @@ Private Sub CopiarSaldosCarteiraTreasury(wsPlanilhaAtual As Worksheet, wsProxPla
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraTreasury
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_CART_TREASURY))
@@ -504,12 +493,10 @@ Private Sub CopiarSaldosCarteiraTreasury(wsPlanilhaAtual As Worksheet, wsProxPla
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_CART_TREASURY))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_CART_TREASURY))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_CART_TREASURY))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_CART_TREASURY))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -532,7 +519,7 @@ Private Sub CopiarSaldosCarteiraCommodity(wsPlanilhaAtual As Worksheet, wsProxPl
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraCommodity
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_COMMODITY))
@@ -541,12 +528,10 @@ Private Sub CopiarSaldosCarteiraCommodity(wsPlanilhaAtual As Worksheet, wsProxPl
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_COMMODITY))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_COMMODITY))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_COMMODITY))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_COMMODITY))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -569,7 +554,7 @@ Private Sub CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual As Worksheet, wsProxPlani
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraOpcoes
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_OPCOES))
@@ -578,12 +563,10 @@ Private Sub CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual As Worksheet, wsProxPlani
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_OPCOES))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_OPCOES))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_OPCOES))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_OPCOES))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -606,7 +589,7 @@ Private Sub CopiarSaldosCarteiraFii(wsPlanilhaAtual As Worksheet, wsProxPlanilha
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer, intColunaCustoAnterior As Integer
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
-  Dim intColunaOperacao As Integer, intColunaCustoMedio As Integer
+  Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraFii
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_FII))
@@ -615,12 +598,10 @@ Private Sub CopiarSaldosCarteiraFii(wsPlanilhaAtual As Worksheet, wsProxPlanilha
   intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_FII))
   intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_FII))
   intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_FII))
-  intColunaCustoMedio = RetornarPrimeiraColuna(Range(RANGE_COLUNA_CUSTO_MEDIO_FII))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   intColunaCustoMedio, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -656,7 +637,6 @@ Private Sub CopiarSaldosCarteiraTesouroDireto(wsPlanilhaAtual As Worksheet, wsPr
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   0, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -692,7 +672,6 @@ Private Sub CopiarSaldosCarteiraTesouroSelic(wsPlanilhaAtual As Worksheet, wsPro
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
    intColunaQtde, _
-   0, _
    wsPlanilhaAtual, infoInvests)
   If (IsArrayEmpty(infoInvests) = True) Then
     Exit Sub
@@ -710,7 +689,6 @@ End Sub
 Private Sub ColetarInformacoes(intPrimeiraLinha As Integer, intUltimaLinha As Integer, _
    intColunaAtivo As Integer, intColunaSaldoFinal As Integer, _
    intColunaQtde As Integer, _
-   intColunaCustoMedio As Integer, _
    wsPlanilhaAtual As Worksheet, ByRef infoInvests() As infoInvest)
    On Error GoTo ErrorColetarInformacoes
    Dim intPosArray As Integer, intCont As Integer
@@ -724,19 +702,13 @@ Private Sub ColetarInformacoes(intPrimeiraLinha As Integer, intUltimaLinha As In
           Dim infoInvest As infoInvest
           infoInvest.strAtivo = wsPlanilhaAtual.Cells(intCont, intColunaAtivo).Value
           infoInvest.intQuantidade = wsPlanilhaAtual.Cells(intCont, intColunaQtde).Value
-          If (intColunaCustoMedio > 0) Then
-            infoInvest.dblCustoAnterior = wsPlanilhaAtual.Cells(intCont, intColunaCustoMedio).Value
-          End If
           infoInvest.dblSaldo = wsPlanilhaAtual.Cells(intCont, intColunaSaldoFinal).Value
           
           intPosArray = intPosArray + 1
           ReDim Preserve infoInvests(1 To intPosArray)
           infoInvests(intPosArray) = infoInvest
         Else
-          ' se já existe, atualiza a qtdade e o custo médio
-          If (intColunaCustoMedio > 0) Then
-            infoInvests(intPosAtivo).dblCustoAnterior = wsPlanilhaAtual.Cells(intCont, intColunaCustoMedio).Value
-          End If
+          ' se já existe, atualiza a qtdade
           infoInvests(intPosAtivo).intQuantidade = infoInvests(intPosAtivo).intQuantidade + wsPlanilhaAtual.Cells(intCont, intColunaQtde).Value
         End If
       End If

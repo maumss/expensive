@@ -521,12 +521,12 @@ Private Sub CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual As Worksheet, wsProxPlani
   Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
   On Error GoTo ErrorCopiarSaldosCarteiraOpcoes
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_OPCOES))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_OPCOES))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_OPCOES))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_OPCOES))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_OPCOES))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_OPCOES))
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ALTERNATIVO))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ALTERNATIVO))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_ALTERNATIVO))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_ALTERNATIVO))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_ALTERNATIVO))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_ALTERNATIVO))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -795,4 +795,5 @@ Private Sub CopiarSaldosContaCorretora(wsPlanilhaAtual As Worksheet, wsProxPlani
 ErrorCopiarSaldosContaCorretora:
   MostrarMsgErro ("CopiarSaldosContaCorretora")
 End Sub
+
 

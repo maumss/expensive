@@ -103,10 +103,10 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_REIT)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CART_TREASURY)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_COMMODITY)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_OPCOES)) Is Nothing Then
+     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ALTERNATIVO)) Is Nothing Then
     ' testa se gerou imposto a pagar
     If Target.Count = 1 And Not IsEmpty(Target) Then
-      boolIgnoraAgenda = Range(RANGE_CELULA_IGNORA_AGENDA_OPCOES).Value
+      boolIgnoraAgenda = Range(RANGE_CELULA_IGNORA_AGENDA_ALTERNATIVO).Value
       If Not boolIgnoraAgenda And IsGerouImpostoNoMes(Target) Then
         Beep
         Beep
@@ -115,7 +115,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
              vbYesNo + vbQuestion, "Agendar Darf") = vbYes Then
           Call AgendarLembreteOutlook
         End If
-        Range(RANGE_CELULA_IGNORA_AGENDA_OPCOES).Value = True
+        Range(RANGE_CELULA_IGNORA_AGENDA_ALTERNATIVO).Value = True
       End If
     End If
   End If
@@ -218,9 +218,9 @@ Private Function IsGerouImpostoNoMes(ByVal Target As Range) As Boolean
     End If
   End If
   
-  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_OPCOES)) Is Nothing Then
-    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_OPCOES).Column).Value > 0)
-    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_OPCOES).Column).Value > 0)
+  If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ALTERNATIVO)) Is Nothing Then
+    boolImpostoComum = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_COMUM_ALTERNATIVO).Column).Value > 0)
+    boolImpostoDaytrade = (Cells(Target.Row, Range(RANGE_COLUNA_RESULTADO_DAYTRADE_ALTERNATIVO).Column).Value > 0)
     If boolImpostoComum Or boolImpostoDaytrade Then
       IsGerouImpostoNoMes = True
       Exit Function
@@ -252,4 +252,5 @@ Private Sub Workbook_BeforeClose(cancel As Boolean)
   wsPlanilhaAtual.Activate
   Application.ScreenUpdating = True
 End Sub
+
 

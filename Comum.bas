@@ -155,6 +155,7 @@ Sub PuxarDataAtual()
   On Error GoTo ErroData
   Set wsPlanilha = ActiveSheet
   Set rgAlvo = Selection
+  Debug.Print "PuxarDataAtual: " & Date
   If IsEmpty(rgAlvo) Then
     If (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_MOVIMENTACAO)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CARTOES)) Is Nothing) Or _
@@ -162,8 +163,7 @@ Sub PuxarDataAtual()
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_FII)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TESOURO_DIRETO)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TESOURO_SELIC)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ETF1)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ETF2)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ETF)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_STOCK)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_REIT)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CART_TREASURY)) Is Nothing) Or _
@@ -245,3 +245,5 @@ Function SheetOffSet(lngOffset As Long, Optional rgCell As Range) As Variant
 ErroSheetOffSet:
   Resume Next
 End Function
+
+

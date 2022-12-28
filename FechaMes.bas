@@ -124,7 +124,7 @@ Private Sub CopiarSaldos()
   Call CopiarSaldosCarteiraStock(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraReit(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraTreasury(wsPlanilhaAtual, wsProxPlanilha)
-  Call CopiarSaldosCarteiraCommodity(wsPlanilhaAtual, wsProxPlanilha)
+  Call CopiarSaldosCarteiraOuro(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual, wsProxPlanilha)
   Call CopiarSaldosContaCorretora(wsPlanilhaAtual, wsProxPlanilha)
   
@@ -475,9 +475,9 @@ ErrorCopiarSaldosCarteiraTreasury:
   MostrarMsgErro ("CopiarSaldosCarteiraTreasury")
 End Sub
 
-Private Sub CopiarSaldosCarteiraCommodity(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
+Private Sub CopiarSaldosCarteiraOuro(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)
   '
-  ' Sub CopiarSaldosCarteiraCommodity
+  ' Sub CopiarSaldosCarteiraOuro
   ' copiar saldos, quantidades e descrições da carteira de metais no exterior
   '
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
@@ -485,13 +485,13 @@ Private Sub CopiarSaldosCarteiraCommodity(wsPlanilhaAtual As Worksheet, wsProxPl
   Dim intColunaSaldoInicial As Integer, intColunaSaldoFinal As Integer
   Dim intColunaOperacao As Integer
   Dim infoInvests() As infoInvest
-  On Error GoTo ErrorCopiarSaldosCarteiraCommodity
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_COMMODITY))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_COMMODITY))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_COMMODITY))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_COMMODITY))
-  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_COMMODITY))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_COMMODITY))
+  On Error GoTo ErrorCopiarSaldosCarteiraOuro
+  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_OURO))
+  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_OURO))
+  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_OURO))
+  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_OURO))
+  intColunaSaldoInicial = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_INICIAL_OURO))
+  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_OURO))
   
   Call ColetarInformacoes(intPrimeiraLinha, intUltimaLinha, _
    intColunaAtivo, intColunaSaldoFinal, _
@@ -506,8 +506,8 @@ Private Sub CopiarSaldosCarteiraCommodity(wsPlanilhaAtual As Worksheet, wsProxPl
     wsPlanilhaAtual, wsProxPlanilha, infoInvests)
   Exit Sub
     
-ErrorCopiarSaldosCarteiraCommodity:
-  MostrarMsgErro ("CopiarSaldosCarteiraCommodity")
+ErrorCopiarSaldosCarteiraOuro:
+  MostrarMsgErro ("CopiarSaldosCarteiraOuro")
 End Sub
 
 Private Sub CopiarSaldosCarteiraOpcoes(wsPlanilhaAtual As Worksheet, wsProxPlanilha As Worksheet)

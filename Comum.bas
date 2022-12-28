@@ -167,7 +167,7 @@ Sub PuxarDataAtual()
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_STOCK)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_REIT)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CART_TREASURY)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_COMMODITY)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_OURO)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ALTERNATIVO)) Is Nothing) Then
       rgAlvo.Value = Date
     End If

@@ -5,10 +5,10 @@ Public Const RESERVA_ESTRATEGICA As String = "Reserva estratégica"
 
 ' Planilha Intro
 Public Const RANGE_DATA_ULTIMA_ATUALIZ As String = "E12"
-Public Const RANGE_POSICAO = "posicao"
+Public Const RANGE_POSICAO = "intPosicao"
 
 ' Planilha Orcamento
-Public Const RANGE_TOLERANCIA As String = "tolerancia"
+Public Const RANGE_TOLERANCIA As String = "orcTolerancia"
 Public Const TIPO_LANCAMENTO_INVESTIMENTOS As String = "investimentos"
 
 ' Planilha Alocacao
@@ -160,4 +160,3 @@ Public Const RANGE_CELULA_DOLAR_FINAL_MES As String = "G364"
 Public Const SP500 As String = "S&P 500"
 Public Const RANGE_CELULA_DOLAR_BACEN_COMPRA As String = "F371"
 Public Const RANGE_CELULA_DOLAR_BACEN_VENDA As String = "G371"
-

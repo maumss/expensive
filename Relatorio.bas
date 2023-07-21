@@ -162,7 +162,7 @@ Sub GerarRelatRetrato()
   Const XL_PORTRAIT As Integer = 1 ' retrato
   ' define o nome do PDF
   'MsgBox RetornarFileName()
-  monthNumber = Month(DateValue(Range("planFechada").Value & " 1"))
+  monthNumber = Month(DateValue(Range(RANGE_PLAN_FECHADA).Value & " 1"))
   If (Len(monthNumber) < 2) Then
     monthNumber = "0" & monthNumber
   End If
@@ -281,4 +281,3 @@ InvalidFileName:
   'O nome do arquivo é inválido
   ValidFileName = False
 End Function
-

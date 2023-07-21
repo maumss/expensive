@@ -17,6 +17,9 @@ Public Const RANGE_CELULA_FIM_ADHOC As String = "C91"
 Public Const RANGE_CELULA_INICIO_PORTFOLIO As String = "C38"
 Public Const RANGE_CELULA_FIM_PORTFOLIO As String = "C77"
 
+' Planilha Retorno
+Public Const RANGE_PLAN_FECHADA = "retPlanFechada"
+
 ' Planilha Retrato
 Public Const RANGE_RELAT_RETRAT = "$A$1:$Q$175"
 
@@ -141,7 +144,7 @@ Public Const RANGE_COLUNA_SALDO_INICIAL_OURO As String = "F323:F332"
 Public Const RANGE_COLUNA_SALDO_FINAL_OURO As String = "N323:N332"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_OURO As String = "X323:X332"
 
-' Carteira Alternativo
+' Carteira Cripto
 Public Const RANGE_COLUNA_DATA_ALTERNATIVO As String = "D339:D348"
 Public Const RANGE_COLUNA_ATIVO_ALTERNATIVO As String = "E339:E348"
 Public Const RANGE_COLUNA_QTDE_ALTERNATIVO As String = "G339:G348"

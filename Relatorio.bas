@@ -154,15 +154,14 @@ Sub GerarRelatRetrato()
   '
   On Error GoTo erroRelatRetrato
   
-  Dim fileName As String
-  Dim dirFile As String
+  Dim fileName As String, dirFile As String, monthNumber As String, mesFechado As String
   Dim uniqueName As Boolean
   Dim userAnswer As VbMsgBoxResult
-  Dim monthNumber As String
   Const XL_PORTRAIT As Integer = 1 ' retrato
   ' define o nome do PDF
   'MsgBox RetornarFileName()
-  monthNumber = Month(DateValue(Range(RANGE_PLAN_FECHADA).Value & " 1"))
+  mesFechado = Range(RANGE_PLAN_FECHADA).Value
+  monthNumber = Month(DateValue(mesFechado & " 1"))
   If (Len(monthNumber) < 2) Then
     monthNumber = "0" & monthNumber
   End If

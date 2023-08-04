@@ -273,4 +273,3 @@ Private Function BuscarUltimoDiaUtilProxMes() As Date
 ErroBuscarUltimoDiaUtilProxMesMenos3:
   MostrarMsgErro ("BuscarUltimoDiaUtilProxMes")
 End Function
-

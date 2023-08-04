@@ -166,9 +166,9 @@ Sub PuxarDataAtual()
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ETF)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_STOCK)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_REIT)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CART_TREASURY)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TREASURY)) Is Nothing) Or _
        (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_OURO)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ALTERNATIVO)) Is Nothing) Then
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CRIPTO)) Is Nothing) Then
       rgAlvo.Value = Date
     End If
   End If
@@ -245,5 +245,3 @@ Function SheetOffSet(lngOffset As Long, Optional rgCell As Range) As Variant
 ErroSheetOffSet:
   Resume Next
 End Function
-
-

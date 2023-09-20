@@ -178,37 +178,6 @@ ErroData:
   MostrarMsgErro ("PuxarDataAtual")
 End Sub
 
-Sub LimparCelulasNomeadas()
-  '
-  ' LimparCelulasNomeadas
-  ' Apaga células nomeadas não utilizadas
-  '
-  ' Criado por: Mauricio SS  Em: 21/10/19
-  '
-  Dim nmName As Name
-  Dim stMsg As String
-  On Error Resume Next
-  stMsg = ""
-  For Each nmName In Names
-    If Cells.Find(What:=nmName.Name, _
-                  After:=ActiveCell, _
-                  LookIn:=xlFormulas, _
-                  LookAt:=xlPart, _
-                  SearchOrder:=xlByRows, _
-                  SearchDirection:=xlNext, _
-                  MatchCase:=False, _
-                  SearchFormat:=False).Activate = False Then
-       stMsg = stMsg & nmName.Name & vbCr
-       'ActiveWorkbook.Names(nmName.Name).Delete
-    End If
-  Next nmName
-  If stMsg = "" Then
-    MsgBox "Nenhum nome não utilizado no workbook"
-  Else
-    MsgBox "Nomes Apagados:" & vbCr & stMsg
-  End If
-End Sub
-
 Function SheetOffSet(lngOffset As Long, Optional rgCell As Range) As Variant
   '
   ' SheetOffSet
@@ -245,3 +214,35 @@ Function SheetOffSet(lngOffset As Long, Optional rgCell As Range) As Variant
 ErroSheetOffSet:
   Resume Next
 End Function
+
+Sub ReduzirTotalParaUnitario()
+  '
+  ' ReduzirTotalParaUnitario
+  ' Considera o valor digitado como total e divide pela quantidade para obter o utitário.
+  '
+  ' Atalho do teclado: Ctrl+u
+  ' Criado por: Mauricio SS  Em: 03/08/23
+  '
+  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
+    Exit Sub
+  End If
+  ' variáveis
+  Dim rgAlvo As Range
+  Dim wsPlanilha As Worksheet
+  Dim dblQtde As Double
+  ' principal
+  On Error GoTo ErroData
+  Set wsPlanilha = ActiveSheet
+  Set rgAlvo = Selection
+  If rgAlvo.Value > 0 Then
+    If (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_SALDO_FINAL_TESOURO_DIRETO)) Is Nothing) Or _
+       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_SALDO_FINAL_TESOURO_SELIC)) Is Nothing) Then
+      dblQtde = wsPlanilha.Cells(rgAlvo.Row, RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_TESOURO_DIRETO))).Value
+      rgAlvo.Value = rgAlvo.Value / dblQtde
+    End If
+  End If
+  Exit Sub
+  
+ErroData:
+  MostrarMsgErro ("ReduzirTotalParaUnitario")
+End Sub

@@ -131,4 +131,3 @@ Private Sub JogarValoresCartaoNaPlanilha(lngIndPlanDestino As Long, udtMovimento
     Cells(lngLinhaDest, intColunaDestino + 4).Value = udtMovimentoCartao.dblValorCartao
   End If
 End Sub
-

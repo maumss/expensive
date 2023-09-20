@@ -19,6 +19,7 @@ Sub AtualizarDadosWeb()
   Dim wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, wsPlanilhaTesouroDireto As Worksheet
   Dim blnOldStatusBar As Boolean
   Dim intPercentual As Integer
+  Dim strAtivosNaoEncontrados As String
   blnOldStatusBar = Application.DisplayStatusBar
   Application.DisplayStatusBar = True
   CongelarCalculosPlanilha (True)
@@ -27,6 +28,7 @@ Sub AtualizarDadosWeb()
   Set wsPlanilhaTesouroDireto = Worksheets("TesouroDireto")
   wsPlanilhaAcoes.Visible = xlSheetVisible
   wsPlanilhaTesouroDireto.Visible = xlSheetVisible
+  strAtivosNaoEncontrados = ""
   
   intPercentual = 0
   Application.StatusBar = "Buscando cotações das bolsas de valores... " & intPercentual & "% completo."
@@ -41,12 +43,12 @@ Sub AtualizarDadosWeb()
   intPercentual = 10
   Application.StatusBar = "Transferindo dados de Ações Brasil... " & intPercentual & "% completo."
   Debug.Print "Transferindo ações Brasil..."
-  Call AtualizarCotacaoAcoes(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoAcoes(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 20
   Application.StatusBar = "Transferindo dados de FII... " & intPercentual & "% completo."
   Debug.Print "Transferindo FII..."
-  Call AtualizarCotacaoFii(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoFii(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 30
   Application.StatusBar = "Transferindo dados de Tesouro Direto pré e indexado... " & intPercentual & "% completo."
@@ -61,35 +63,35 @@ Sub AtualizarDadosWeb()
   intPercentual = 50
   Application.StatusBar = "Transferindo dados de ETF... " & intPercentual & "% completo."
   Debug.Print "Transferindo ETF Brasil..."
-  Call AtualizarCotacaoEtf(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoEtf(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 60
   Application.StatusBar = "Transferindo dados de Ações Internacionais... " & intPercentual & "% completo."
   Debug.Print "Transferindo ações USD..."
-  Call AtualizarCotacaoStock(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoStock(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 70
   Application.StatusBar = "Transferindo dados de REIT... " & intPercentual & "% completo."
   Debug.Print "Transferindo REIT..."
-  Call AtualizarCotacaoReit(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoReit(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 80
   Application.StatusBar = "Transferindo dados de Treasury... " & intPercentual & "% completo."
   Debug.Print "Transferindo Treasury..."
-  Call AtualizarCotacaoTreasuries(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoTreasuries(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 90
   Application.StatusBar = "Transferindo dados de Ouro... " & intPercentual & "% completo."
   Debug.Print "Transferindo Ouro..."
-  Call AtualizarCotacaoOuro(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoOuro(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 100
   Application.StatusBar = "Transferindo dados de Cripto... " & intPercentual & "% completo."
   Debug.Print "Transferindo Cripto..."
-  Call AtualizarCotacaoCripto(wsPlanilhaAtual, wsPlanilhaAcoes)
+  Call AtualizarCotacaoCripto(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   wsPlanilhaAtual.Range(RANGE_CELULA_DOLAR_FINAL_MES).Value = wsPlanilhaAcoes.Range(RANGE_CELULA_DOLAR).Value
-
+  Debug.Print "Ativos não encontrados: " & strAtivosNaoEncontrados
 
 FimAtualizarDadosWeb:
   wsPlanilhaAcoes.Visible = xlSheetHidden
@@ -101,6 +103,9 @@ FimAtualizarDadosWeb:
   Set wsPlanilhaAtual = Nothing
   Set wsPlanilhaAcoes = Nothing
   Set wsPlanilhaTesouroDireto = Nothing
+  If (strAtivosNaoEncontrados <> "") Then
+    MsgBox "Ativos não encontrados: " & vbLf & "  " & strAtivosNaoEncontrados, vbExclamation
+  End If
   Exit Sub
    
 ErroAtualizarDadosWeb:
@@ -186,13 +191,14 @@ ErroAtualizarConsultasEConexoesTesouroDireto:
   End If
 End Function
 
-Private Sub AtualizarCotacaoAcoes(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoAcoes(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoAcoes
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoAcoes
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ACOES))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ACOES))
@@ -207,22 +213,24 @@ Private Sub AtualizarCotacaoAcoes(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes 
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoAcoes:
   MostrarMsgErro ("AtualizarCotacaoAcoes")
 End Sub
 
-Private Sub AtualizarCotacaoFii(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoFii(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoFii
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoFii
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_FII))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_FII))
@@ -237,9 +245,10 @@ Private Sub AtualizarCotacaoFii(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoFii:
@@ -306,13 +315,14 @@ ErrorAtualizarCotacaoSelic:
   MostrarMsgErro ("AtualizarCotacaoSelic")
 End Sub
 
-Private Sub AtualizarCotacaoEtf(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoEtf(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoEtf
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoEtf
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_ETF))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_ETF))
@@ -327,22 +337,24 @@ Private Sub AtualizarCotacaoEtf(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoEtf:
   MostrarMsgErro ("AtualizarCotacaoEtf")
 End Sub
 
-Private Sub AtualizarCotacaoStock(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoStock(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoStock
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoStock
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_STOCK))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_STOCK))
@@ -357,22 +369,24 @@ Private Sub AtualizarCotacaoStock(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes 
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoStock:
   MostrarMsgErro ("AtualizarCotacaoStock")
 End Sub
 
-Private Sub AtualizarCotacaoReit(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoReit(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoReit
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoReit
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_REIT))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_REIT))
@@ -387,22 +401,24 @@ Private Sub AtualizarCotacaoReit(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes A
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoReit:
   MostrarMsgErro ("AtualizarCotacaoReit")
 End Sub
 
-Private Sub AtualizarCotacaoTreasuries(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoTreasuries(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoTreasuries
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoTreasuries
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_TREASURY))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_TREASURY))
@@ -417,22 +433,24 @@ Private Sub AtualizarCotacaoTreasuries(wsPlanilhaAtual As Worksheet, wsPlanilhaA
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoTreasuries:
   MostrarMsgErro ("AtualizarCotacaoTreasuries")
 End Sub
 
-Private Sub AtualizarCotacaoOuro(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoOuro(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoOuro
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoOuro
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_OURO))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_OURO))
@@ -447,22 +465,24 @@ Private Sub AtualizarCotacaoOuro(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes A
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoOuro:
   MostrarMsgErro ("AtualizarCotacaoOuro")
 End Sub
 
-Private Sub AtualizarCotacaoCripto(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet)
+Private Sub AtualizarCotacaoCripto(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
   ' Sub AtualizarCotacaoCripto
   ' atualiza valor da cota final do ativo
   Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
   Dim intColunaAtivo As Integer, intColunaQtde As Integer
   Dim intColunaSaldoFinal As Integer
   Dim infoAtivos() As infoAtivo
+  Dim strRetorno As String
   On Error GoTo ErrorAtualizarCotacaoCripto
   intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_CRIPTO))
   intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_CRIPTO))
@@ -477,23 +497,26 @@ Private Sub AtualizarCotacaoCripto(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes
     Exit Sub
   End If
   'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
+  strRetorno = AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
     intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
     wsPlanilhaAtual, wsPlanilhaAcoes, infoAtivos)
+  strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, strRetorno)
   
   Exit Sub
 ErrorAtualizarCotacaoCripto:
   MostrarMsgErro ("AtualizarCotacaoCripto")
 End Sub
 
-Private Sub AtualizarCotacao(intPrimeiraLinha As Integer, intUltimaLinha As Integer, _
+Private Function AtualizarCotacao(intPrimeiraLinha As Integer, intUltimaLinha As Integer, _
     intColunaAtivo As Integer, intColunaQtde As Integer, intColunaSaldoFinal As Integer, _
-    wsPlanilhaAtual As Worksheet, wsPlanilhaOrigem As Worksheet, infoAtivos() As infoAtivo)
+    wsPlanilhaAtual As Worksheet, wsPlanilhaOrigem As Worksheet, infoAtivos() As infoAtivo) As String
   ' Sub AtualizarCotacao
   ' Atualiza cada ativo com quantidade maior que zero com a cotação atual
   On Error GoTo ErrorAtualizarCotacao
   Dim intCount As Integer, intLinhaDestino As Integer
   Dim dblCotacaoAtual As Double
+  Dim strAtivosNaoEncontrados As String
+  strAtivosNaoEncontrados = ""
   For intCount = LBound(infoAtivos) To UBound(infoAtivos)
     Dim infoAtivo As infoAtivo
     infoAtivo = infoAtivos(intCount)
@@ -502,13 +525,16 @@ Private Sub AtualizarCotacao(intPrimeiraLinha As Integer, intUltimaLinha As Inte
       If (dblCotacaoAtual > 0) Then
         Call GravarValor(intPrimeiraLinha, intUltimaLinha, intColunaAtivo, intColunaQtde, _
                          intColunaSaldoFinal, dblCotacaoAtual, wsPlanilhaAtual, infoAtivo)
+      Else
+        strAtivosNaoEncontrados = AnexarAtivo(strAtivosNaoEncontrados, infoAtivo.strAtivo)
       End If
     End If
   Next intCount
-  Exit Sub
+  AtualizarCotacao = strAtivosNaoEncontrados
+  Exit Function
 ErrorAtualizarCotacao:
   MostrarMsgErro ("AtualizarCotacao")
-End Sub
+End Function
 
 Private Function BuscarCotacaoAtual(strAtivo As String, wsPlanilhaOrigem As Worksheet) As Double
   ' Function BuscarCotacaoAtual
@@ -641,4 +667,20 @@ Private Function IsArrayEmpty(infoAtivos() As infoAtivo) As Boolean
    Else
       IsArrayEmpty = False
    End If
+End Function
+
+Private Function AnexarAtivo(strAtivos As String, strNovoAtivo As String) As String
+  On Error GoTo errorAnexarAtivo
+    If (strAtivos = "") Then
+      AnexarAtivo = strNovoAtivo
+      Exit Function
+    End If
+    If (strNovoAtivo = "") Then
+      AnexarAtivo = strAtivos
+      Exit Function
+    End If
+    AnexarAtivo = strAtivos & ", " & strNovoAtivo
+  Exit Function
+errorAnexarAtivo:
+  MostrarMsgErro ("AnexarAtivo")
 End Function

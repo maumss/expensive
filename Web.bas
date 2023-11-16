@@ -16,6 +16,11 @@ Sub AtualizarDadosWeb()
   If (Range(RANGE_SITUAC_PLANILHA).Value <> SITUAC_ABERTO) Then
     Exit Sub
   End If
+  'Pede confirmação
+  If MsgBox("Você deseja atualizar as cotações das carteiras?", _
+        vbYesNo + vbQuestion, "Copiar Resumo Mensal") = vbNo Then
+    Exit Sub
+  End If
   Dim wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, wsPlanilhaTesouroDireto As Worksheet
   Dim blnOldStatusBar As Boolean
   Dim intPercentual As Integer

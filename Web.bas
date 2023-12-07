@@ -37,7 +37,9 @@ Sub AtualizarDadosWeb()
   
   intPercentual = 0
   Application.StatusBar = "Buscando cotações das bolsas de valores... " & intPercentual & "% completo."
+  Application.Calculation = xlCalculationAutomatic
   Call AtualizarAcoesEMoedas
+  Application.Calculation = xlCalculationManual
   
   intPercentual = 5
   Application.StatusBar = "Buscando cotações do Tesouro Direto... " & intPercentual & "% completo."

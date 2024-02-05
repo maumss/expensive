@@ -98,12 +98,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
   ' testa se alterou os valores finais de ações, opções ou fii's
   If Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ACOES)) Is Nothing Or _
      Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_FII)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_STOCK)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_REIT)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_TREASURY)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_OURO)) Is Nothing Or _
-     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_CRIPTO)) Is Nothing Then
+     Not Application.Intersect(Target, Range(RANGE_COLUNA_SALDO_FINAL_ETF)) Is Nothing Then
     ' testa se gerou imposto a pagar
     If Target.Count = 1 And Not IsEmpty(Target) Then
       boolIgnoraAgenda = Range(RANGE_CELULA_IGNORA_AGENDA_CRIPTO).Value
@@ -251,3 +246,4 @@ Private Sub Workbook_BeforeClose(cancel As Boolean)
   wsPlanilhaAtual.Activate
   Application.ScreenUpdating = True
 End Sub
+

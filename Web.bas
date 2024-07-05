@@ -110,9 +110,6 @@ FimAtualizarDadosWeb:
   Set wsPlanilhaAtual = Nothing
   Set wsPlanilhaAcoes = Nothing
   Set wsPlanilhaTesouroDireto = Nothing
-  If (strAtivosNaoEncontrados <> "") Then
-    MsgBox "Ativos não encontrados: " & vbLf & "  " & strAtivosNaoEncontrados, vbExclamation
-  End If
   Exit Sub
    
 ErroAtualizarDadosWeb:

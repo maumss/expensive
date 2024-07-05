@@ -156,21 +156,8 @@ Sub PuxarDataAtual()
   Set wsPlanilha = ActiveSheet
   Set rgAlvo = Selection
   Debug.Print "PuxarDataAtual: " & Date
-  If IsEmpty(rgAlvo) Then
-    If (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_MOVIMENTACAO)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CARTOES)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ACOES)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_FII)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TESOURO_DIRETO)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TESOURO_SELIC)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_ETF)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_STOCK)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_REIT)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_TREASURY)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_OURO)) Is Nothing) Or _
-       (Not Application.Intersect(rgAlvo, Range(RANGE_COLUNA_DATA_CRIPTO)) Is Nothing) Then
-      rgAlvo.Value = Date
-    End If
+  If (IsEmpty(rgAlvo) And InStr(rgAlvo.NumberFormat, "/yy") > 0) Then
+    rgAlvo.Value = Date
   End If
   Exit Sub
   

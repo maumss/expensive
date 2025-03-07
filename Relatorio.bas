@@ -166,8 +166,14 @@ Sub GerarRelatRetrato()
     monthNumber = "0" & monthNumber
   End If
   fileName = RetornarFileName() & "-" & "snapshot" & monthNumber & ".pdf"
-  dirFile = RetornarCurrentFolder() & fileName
+  If (InStr(RetornarCurrentFolder(), "Cofre")) > 0 Then
+    dirFile = RetornarMyDocumetsFolder() & "\" & fileName
+  Else
+    dirFile = RetornarCurrentFolder() & "\" & fileName
+  End If
+  Debug.Print "Arquivo destino: " & dirFile
   Do While uniqueName = False
+    Debug.Print "Existe arquivo no destino: " & Len(Dir(dirFile))
     If Len(Dir(dirFile)) <> 0 Then
       userAnswer = MsgBox("Arquivo já existe! Click " & _
         "[Sim] para sobreescrever. Clique [Não] para Renomear.", vbYesNoCancel)
@@ -234,7 +240,13 @@ erroRelatRetrato:
 End Sub
 
 Private Function RetornarCurrentFolder() As String
-    RetornarCurrentFolder = ActiveWorkbook.Path & "\"
+    RetornarCurrentFolder = ActiveWorkbook.Path
+End Function
+
+Private Function RetornarMyDocumetsFolder() As String
+    Dim WshShell As Object
+    Set WshShell = CreateObject("WScript.Shell")
+    RetornarMyDocumetsFolder = WshShell.SpecialFolders("MyDocuments")
 End Function
 
 Private Function RetornarFileName() As String

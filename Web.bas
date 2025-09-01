@@ -43,9 +43,9 @@ Sub AtualizarDadosWeb()
   
   intPercentual = 5
   Application.StatusBar = "Buscando cotações do Tesouro Direto... " & intPercentual & "% completo."
-  If Not AtualizarConsultasEConexoesTesouroDireto(wsPlanilhaTesouroDireto) Then
-    MsgBox "Algumas consultas e conexões não foram atualizadas...", vbExclamation
-  End If
+  'If Not AtualizarConsultasEConexoesTesouroDireto(wsPlanilhaTesouroDireto) Then
+  '  MsgBox "Algumas consultas e conexões do TD não foram atualizadas...", vbExclamation
+  'End If
   
   intPercentual = 10
   Application.StatusBar = "Transferindo dados de Ações Brasil... " & intPercentual & "% completo."
@@ -58,14 +58,14 @@ Sub AtualizarDadosWeb()
   Call AtualizarCotacaoFii(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
   intPercentual = 30
-  Application.StatusBar = "Transferindo dados de Tesouro Direto pré e indexado... " & intPercentual & "% completo."
-  Debug.Print "Transferindo TD..."
-  Call AtualizarCotacaoTd(wsPlanilhaAtual, wsPlanilhaTesouroDireto)
+  'Application.StatusBar = "Transferindo dados de Tesouro Direto pré e indexado... " & intPercentual & "% completo."
+  'Debug.Print "Transferindo TD..."
+  'Call AtualizarCotacaoTd(wsPlanilhaAtual, wsPlanilhaTesouroDireto)
   
   intPercentual = 40
-  Application.StatusBar = "Transferindo dados de Tesouro Direto Selic... " & intPercentual & "% completo."
-  Debug.Print "Transferindo Selic..."
-  Call AtualizarCotacaoSelic(wsPlanilhaAtual, wsPlanilhaTesouroDireto)
+  'Application.StatusBar = "Transferindo dados de Tesouro Direto Selic... " & intPercentual & "% completo."
+  'Debug.Print "Transferindo Selic..."
+  'Call AtualizarCotacaoSelic(wsPlanilhaAtual, wsPlanilhaTesouroDireto)
   
   intPercentual = 50
   Application.StatusBar = "Transferindo dados de ETF... " & intPercentual & "% completo."
@@ -598,7 +598,7 @@ Private Sub GravarValor(intPrimeiraLinha As Integer, intUltimaLinha As Integer, 
   Dim intPosArray As Integer, intCont As Integer
   For intCont = intPrimeiraLinha To intUltimaLinha
      If (wsPlanilhaAtual.Cells(intCont, intColunaAtivo).Value = infoAtivo.strAtivo _
-         And Not IsEmpty(wsPlanilhaAtual.Cells(intCont, intColunaQtde))) Then
+         And wsPlanilhaAtual.Cells(intCont, intColunaQtde) > 0) Then
        wsPlanilhaAtual.Cells(intCont, intColunaSaldoFinal).Value = dblCotacaoAtual
      End If
   Next intCont

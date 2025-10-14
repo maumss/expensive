@@ -21,7 +21,7 @@ Public Const RANGE_CELULA_FIM_PORTFOLIO As String = "C77"
 Public Const RANGE_PLAN_FECHADA = "retPlanFechada"
 
 ' Planilha Retrato
-Public Const RANGE_RELAT_RETRAT = "$A$1:$Q$175"
+Public Const RANGE_RELAT_RETRAT = "$A$1:$Q$197"
 
 ' Planilhas Jan. a Dez - geral
 Public Const RANGE_SITUAC_PLANILHA As String = "E4"

@@ -12,10 +12,10 @@ Public Const RANGE_TOLERANCIA As String = "orcTolerancia"
 Public Const TIPO_LANCAMENTO_INVESTIMENTOS As String = "investimentos"
 
 ' Planilha Alocacao
-Public Const RANGE_CELULA_INICIO_ADHOC As String = "C87"
-Public Const RANGE_CELULA_FIM_ADHOC As String = "C91"
-Public Const RANGE_CELULA_INICIO_PORTFOLIO As String = "C38"
-Public Const RANGE_CELULA_FIM_PORTFOLIO As String = "C77"
+Public Const RANGE_CELULA_INICIO_ADHOC As String = "C95"
+Public Const RANGE_CELULA_FIM_ADHOC As String = "C99"
+Public Const RANGE_CELULA_INICIO_PORTFOLIO As String = "C36"
+Public Const RANGE_CELULA_FIM_PORTFOLIO As String = "C75"
 
 ' Planilha Retorno
 Public Const RANGE_PLAN_FECHADA = "retPlanFechada"
@@ -23,7 +23,7 @@ Public Const RANGE_PLAN_FECHADA = "retPlanFechada"
 ' Planilha Retrato
 Public Const RANGE_RELAT_RETRAT = "$A$1:$Q$197"
 
-' Planilhas Jan. a Dez - geral
+' Planilhas Jan a Dez - geral
 Public Const RANGE_SITUAC_PLANILHA As String = "E4"
 Public Const RANGE_DATA_POSICAO As String = "N4"
 Public Const SITUAC_ABERTO As String = "Aberto"
@@ -31,13 +31,13 @@ Public Const SITUAC_FECHADO As String = "Fechado"
 Public Const RANGE_SALDO_MES As String = "B2"
 Public Const NOME_PLAN_DEZ As String = "Dez"
 
-' Planilhas Jan. a Dez - Conta corretora
+' Planilhas Jan a Dez - Conta corretora
 Public Const RANGE_SALDO_CONTA_XP As String = "B22"
 Public Const RANGE_SALDO_CONTA_AVENUE_USD_TOTAL As String = "B26"
 Public Const RANGE_SALDO_CONTA_AVENUE_USD_DO_BRASIL As String = "B28"
 Public Const RANGE_SALDO_CONTA_AVENUE_BR As String = "B30"
 
-' Planilhas Jan. a Dez - movimentações
+' Planilhas Jan a Dez - movimentações
 Public Const RANGE_HEADER_MOVIMENTACAO As String = "D14"
 Public Const RANGE_HEADER_DATA_MOVIMENTACAO As String = "D15"
 Public Const RANGE_PRIMEIRA_DATA_MOVIMENTACAO As String = "D16"
@@ -48,7 +48,7 @@ Public Const RANGE_COLUNA_DATA_MOVIMENTACAO As String = "D16:D66"
 Public Const RANGE_COLUNA_VALOR_MOVIMENTACAO As String = "G16:G66"
 Public Const RANGE_TAB_MOVIMENTACAO As String = "D16:G66"
 
-' Planilhas Jan. a Dez - cartões
+' Planilhas Jan a Dez - cartões
 Public Const RANGE_COLUNA_VALOR_CARTOES As String = "N16:N66"
 Public Const RANGE_ULTIMO_VALOR_CARTAO As String = "N66"
 Public Const RANGE_HEADER_CARTOES As String = "J14"
@@ -56,7 +56,7 @@ Public Const RANGE_PRIMEIRA_DATA_CARTOES As String = "J16"
 Public Const RANGE_COLUNA_DATA_CARTOES As String = "J16:J66"
 Public Const RANGE_TAB_CARTOES As String = "J16:N66"
 
-' Portfólio
+' Planilhas Jan a Dez - Portfólio
 Public Const RANGE_COLUNA_ATIVO_PORTFOLIO As String = "D74:D112"
 Public Const RANGE_COLUNA_SALDO_INICIAL_PORTFOLIO As String = "F74:F112"
 Public Const RANGE_COLUNA_AUXILIAR_REND_PORTFOLIO As String = "I74:I112"
@@ -64,7 +64,7 @@ Public Const RANGE_COLUNA_SALDO_FINAL_PORTFOLIO As String = "N74:N112"
 
 Public Const RANGE_AREA_RELATORIO As String = "C72:N115"
 
-' Carteira Ações
+' Planilhas Jan a Dez - Carteira Ações
 Public Const RANGE_COLUNA_DATA_ACOES As String = "D117:D146"
 Public Const RANGE_COLUNA_ATIVO_ACOES As String = "E117:E146"
 Public Const RANGE_COLUNA_QTDE_ACOES As String = "G117:G146"
@@ -75,7 +75,7 @@ Public Const RANGE_COLUNA_RESULTADO_COMUM_ACOES As String = "X117:X146"
 Public Const RANGE_COLUNA_RESULTADO_DAYTRADE_ACOES As String = "AB117:AB146"
 Public Const RANGE_TAB_ACOES As String = "D117:N146"
 
-' Carteira Fundos Imobiliários
+' Planilhas Jan a Dez - Carteira Fundos Imobiliários
 Public Const RANGE_COLUNA_DATA_FII As String = "D153:D182"
 Public Const RANGE_COLUNA_ATIVO_FII As String = "E153:E182"
 Public Const RANGE_COLUNA_QTDE_FII As String = "G153:G182"
@@ -85,21 +85,21 @@ Public Const RANGE_COLUNA_RESULTADO_COMUM_FII As String = "X153:X182"
 Public Const RANGE_COLUNA_RESULTADO_DAYTRADE_FII As String = "AB153:AB182"
 Public Const RANGE_TAB_FII As String = "D153:N182"
 
-' Carteira Tesouro Direto RF
+' Planilhas Jan a Dez - Carteira Tesouro Direto RF
 Public Const RANGE_COLUNA_DATA_TESOURO_DIRETO As String = "D189:D203"
 Public Const RANGE_COLUNA_ATIVO_TESOURO_DIRETO As String = "E189:E203"
 Public Const RANGE_COLUNA_QTDE_TESOURO_DIRETO As String = "G189:G203"
 Public Const RANGE_COLUNA_SALDO_INICIAL_TESOURO_DIRETO As String = "F189:F203"
 Public Const RANGE_COLUNA_SALDO_FINAL_TESOURO_DIRETO As String = "N189:N203"
 
-' Carteira Tesouro Direto Selic
+' Planilhas Jan a Dez - Carteira Tesouro Direto Selic
 Public Const RANGE_COLUNA_DATA_TESOURO_SELIC As String = "D210:D215"
 Public Const RANGE_COLUNA_ATIVO_TESOURO_SELIC As String = "E210:E215"
 Public Const RANGE_COLUNA_QTDE_TESOURO_SELIC As String = "G210:G215"
 Public Const RANGE_COLUNA_SALDO_INICIAL_TESOURO_SELIC As String = "F210:F215"
 Public Const RANGE_COLUNA_SALDO_FINAL_TESOURO_SELIC As String = "N210:N215"
 
-' Carteira ETF
+' Planilhas Jan a Dez - Carteira ETF
 Public Const RANGE_COLUNA_DATA_ETF As String = "D222:D228"
 Public Const RANGE_COLUNA_ATIVO_ETF As String = "E222:E228"
 Public Const RANGE_COLUNA_QTDE_ETF As String = "G222:G228"
@@ -108,7 +108,7 @@ Public Const RANGE_COLUNA_SALDO_FINAL_ETF As String = "N222:N228"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_ETF As String = "X222:X228"
 Public Const RANGE_COLUNA_RESULTADO_DAYTRADE_ETF As String = "AB222:AB228"
 
-' Carteira Ações USD
+' Planilhas Jan a Dez - Carteira Ações USD
 Public Const RANGE_COLUNA_DATA_STOCK As String = "D235:D264"
 Public Const RANGE_COLUNA_ATIVO_STOCK As String = "E235:E264"
 Public Const RANGE_COLUNA_QTDE_STOCK As String = "G235:G264"
@@ -118,7 +118,7 @@ Public Const RANGE_CELULA_TRIBUTA_STOCK As String = "Q265"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_STOCK As String = "X235:X264"
 Public Const RANGE_TAB_STOCK As String = "D235:N264"
 
-' Carteira REIT
+' Planilhas Jan a Dez - Carteira REIT
 Public Const RANGE_COLUNA_DATA_REIT As String = "D271:D300"
 Public Const RANGE_COLUNA_ATIVO_REIT As String = "E271:E300"
 Public Const RANGE_COLUNA_QTDE_REIT As String = "G271:G300"
@@ -128,7 +128,7 @@ Public Const RANGE_CELULA_TRIBUTA_REIT As String = "Q301"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_REIT As String = "X271:X300"
 Public Const RANGE_TAB_REIT As String = "D271:N300"
 
-' Carteira Treasuries
+' Planilhas Jan a Dez - Carteira Treasuries
 Public Const RANGE_COLUNA_DATA_TREASURY As String = "D307:D316"
 Public Const RANGE_COLUNA_ATIVO_TREASURY As String = "E307:E316"
 Public Const RANGE_COLUNA_QTDE_TREASURY As String = "G307:G316"
@@ -136,7 +136,7 @@ Public Const RANGE_COLUNA_SALDO_INICIAL_TREASURY As String = "F307:F316"
 Public Const RANGE_COLUNA_SALDO_FINAL_TREASURY As String = "N307:N316"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_TREASURY As String = "X307:X316"
 
-' Carteira Ouro
+' Planilhas Jan a Dez - Carteira Ouro
 Public Const RANGE_COLUNA_DATA_OURO As String = "D323:D332"
 Public Const RANGE_COLUNA_ATIVO_OURO As String = "E323:E332"
 Public Const RANGE_COLUNA_QTDE_OURO As String = "G323:G332"
@@ -144,7 +144,7 @@ Public Const RANGE_COLUNA_SALDO_INICIAL_OURO As String = "F323:F332"
 Public Const RANGE_COLUNA_SALDO_FINAL_OURO As String = "N323:N332"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_OURO As String = "X323:X332"
 
-' Carteira Cripto
+' Planilhas Jan a Dez - Carteira Cripto
 Public Const RANGE_COLUNA_DATA_CRIPTO As String = "D339:D348"
 Public Const RANGE_COLUNA_ATIVO_CRIPTO As String = "E339:E348"
 Public Const RANGE_COLUNA_QTDE_CRIPTO As String = "G339:G348"

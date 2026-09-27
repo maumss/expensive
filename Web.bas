@@ -21,7 +21,7 @@ Sub AtualizarDadosWeb()
         vbYesNo + vbQuestion, "Copiar Resumo Mensal") = vbNo Then
     Exit Sub
   End If
-  Dim wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, wsPlanilhaTesouroDireto As Worksheet
+  Dim wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet
   Dim blnOldStatusBar As Boolean
   Dim intPercentual As Integer
   Dim strAtivosNaoEncontrados As String
@@ -30,9 +30,7 @@ Sub AtualizarDadosWeb()
   CongelarCalculosPlanilha (True)
   Set wsPlanilhaAtual = ActiveSheet
   Set wsPlanilhaAcoes = Worksheets("Acoes")
-  Set wsPlanilhaTesouroDireto = Worksheets("TesouroDireto")
   wsPlanilhaAcoes.Visible = xlSheetVisible
-  wsPlanilhaTesouroDireto.Visible = xlSheetVisible
   strAtivosNaoEncontrados = ""
   
   intPercentual = 0
@@ -40,12 +38,6 @@ Sub AtualizarDadosWeb()
   Application.Calculation = xlCalculationAutomatic
   Call AtualizarAcoesEMoedas
   Application.Calculation = xlCalculationManual
-  
-  intPercentual = 5
-  Application.StatusBar = "Buscando cotações do Tesouro Direto... " & intPercentual & "% completo."
-  'If Not AtualizarConsultasEConexoesTesouroDireto(wsPlanilhaTesouroDireto) Then
-  '  MsgBox "Algumas consultas e conexões do TD não foram atualizadas...", vbExclamation
-  'End If
   
   intPercentual = 10
   Application.StatusBar = "Transferindo dados de Ações Brasil... " & intPercentual & "% completo."
@@ -56,16 +48,6 @@ Sub AtualizarDadosWeb()
   Application.StatusBar = "Transferindo dados de FII... " & intPercentual & "% completo."
   Debug.Print "Transferindo FII..."
   Call AtualizarCotacaoFii(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
-  
-  intPercentual = 30
-  'Application.StatusBar = "Transferindo dados de Tesouro Direto pré e indexado... " & intPercentual & "% completo."
-  'Debug.Print "Transferindo TD..."
-  'Call AtualizarCotacaoTd(wsPlanilhaAtual, wsPlanilhaTesouroDireto)
-  
-  intPercentual = 40
-  'Application.StatusBar = "Transferindo dados de Tesouro Direto Selic... " & intPercentual & "% completo."
-  'Debug.Print "Transferindo Selic..."
-  'Call AtualizarCotacaoSelic(wsPlanilhaAtual, wsPlanilhaTesouroDireto)
   
   intPercentual = 50
   Application.StatusBar = "Transferindo dados de ETF... " & intPercentual & "% completo."
@@ -102,14 +84,12 @@ Sub AtualizarDadosWeb()
 
 FimAtualizarDadosWeb:
   wsPlanilhaAcoes.Visible = xlSheetHidden
-  wsPlanilhaTesouroDireto.Visible = xlSheetHidden
   CongelarCalculosPlanilha (False)
   Application.StatusBar = False
   Application.DisplayStatusBar = blnOldStatusBar
   wsPlanilhaAtual.Activate
   Set wsPlanilhaAtual = Nothing
   Set wsPlanilhaAcoes = Nothing
-  Set wsPlanilhaTesouroDireto = Nothing
   Exit Sub
    
 ErroAtualizarDadosWeb:
@@ -162,35 +142,6 @@ ErroAtualizarConsultasEConexoes:
       Resume Next
     Else
       MostrarMsgErro ("AtualizarConsultasEConexoes")
-    End If
-  End If
-End Function
-
-Private Function AtualizarConsultasEConexoesTesouroDireto(wsPlanilhaTesouroDireto As Worksheet) As Boolean
-  On Error GoTo ErroAtualizarConsultasEConexoesTesouroDireto
-  
-  Dim strHoje As String, strAtualiz As String
-  
-  Debug.Print "Atualizando consultas e conexões do Tesouro Direto..."
-  strHoje = Format(Now, "dd/mm/yyyy")
-  strAtualiz = Format(wsPlanilhaTesouroDireto.Range(RANGE_DATA_ATUALIZ_TD).Value, "dd/mm/yyyy")
-  Debug.Print "Data atual: " & strHoje & " - última atualização: " & strAtualiz
-  AtualizarConsultasEConexoesTesouroDireto = True
-  If (strHoje = strAtualiz) Then
-    Debug.Print "A cotação do Tesouro Direto já foi atualizada hoje."
-    Exit Function
-  End If
-  ActiveWorkbook.Connections("Consulta - TesouroDireto").Refresh
-  Debug.Print "Concluído atualização do Tesouro Direto."
-  wsPlanilhaTesouroDireto.Range(RANGE_DATA_ATUALIZ_TD).Value = Now
-ErroAtualizarConsultasEConexoesTesouroDireto:
-  If Err.Number <> 0 Then
-    Debug.Print "Erro ao atualizar Tesouro Direto. Erro: " & Err.Number & " - " & Err.Description
-    AtualizarConsultasEConexoesTesouroDireto = False
-    If Err.Number = 1004 Then
-      Resume Next
-    Else
-      MostrarMsgErro ("AtualizarConsultasEConexoesTesouroDireto")
     End If
   End If
 End Function
@@ -257,66 +208,6 @@ Private Sub AtualizarCotacaoFii(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As
   Exit Sub
 ErrorAtualizarCotacaoFii:
   MostrarMsgErro ("AtualizarCotacaoFii")
-End Sub
-
-Private Sub AtualizarCotacaoTd(wsPlanilhaAtual As Worksheet, wsPlanilhaTesouroDireto As Worksheet)
-  ' Sub AtualizarCotacaoTd
-  ' atualiza valor da cota final do ativo
-  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
-  Dim intColunaAtivo As Integer, intColunaQtde As Integer
-  Dim intColunaSaldoFinal As Integer
-  Dim infoAtivos() As infoAtivo
-  On Error GoTo ErrorAtualizarCotacaoTd
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_DIRETO))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_DIRETO))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_TESOURO_DIRETO))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_TESOURO_DIRETO))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_TESOURO_DIRETO))
-    
-  Call ColetarDados(intPrimeiraLinha, intUltimaLinha, _
-   intColunaAtivo, intColunaQtde, _
-   wsPlanilhaAtual, infoAtivos)
-  If (IsArrayEmpty(infoAtivos) = True) Then
-    Exit Sub
-  End If
-  'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
-    intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
-    wsPlanilhaAtual, wsPlanilhaTesouroDireto, infoAtivos)
-  
-  Exit Sub
-ErrorAtualizarCotacaoTd:
-  MostrarMsgErro ("AtualizarCotacaoTd")
-End Sub
-
-Private Sub AtualizarCotacaoSelic(wsPlanilhaAtual As Worksheet, wsPlanilhaTesouroDireto As Worksheet)
-  ' Sub AtualizarCotacaoSelic
-  ' atualiza valor da cota final do ativo
-  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer
-  Dim intColunaAtivo As Integer, intColunaQtde As Integer
-  Dim intColunaSaldoFinal As Integer
-  Dim infoAtivos() As infoAtivo
-  On Error GoTo ErrorAtualizarCotacaoSelic
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_SELIC))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_ATIVO_TESOURO_SELIC))
-  intColunaAtivo = RetornarPrimeiraColuna(Range(RANGE_COLUNA_ATIVO_TESOURO_SELIC))
-  intColunaQtde = RetornarPrimeiraColuna(Range(RANGE_COLUNA_QTDE_TESOURO_SELIC))
-  intColunaSaldoFinal = RetornarPrimeiraColuna(Range(RANGE_COLUNA_SALDO_FINAL_TESOURO_SELIC))
-    
-  Call ColetarDados(intPrimeiraLinha, intUltimaLinha, _
-   intColunaAtivo, intColunaQtde, _
-   wsPlanilhaAtual, infoAtivos)
-  If (IsArrayEmpty(infoAtivos) = True) Then
-    Exit Sub
-  End If
-  'atualizar cada ativo com a a cotação atual
-  Call AtualizarCotacao(intPrimeiraLinha, intUltimaLinha, _
-    intColunaAtivo, intColunaQtde, intColunaSaldoFinal, _
-    wsPlanilhaAtual, wsPlanilhaTesouroDireto, infoAtivos)
-  
-  Exit Sub
-ErrorAtualizarCotacaoSelic:
-  MostrarMsgErro ("AtualizarCotacaoSelic")
 End Sub
 
 Private Sub AtualizarCotacaoEtf(wsPlanilhaAtual As Worksheet, wsPlanilhaAcoes As Worksheet, ByRef strAtivosNaoEncontrados As String)
@@ -548,32 +439,6 @@ Private Function BuscarCotacaoAtual(strAtivo As String, wsPlanilhaOrigem As Work
   Dim strTicketSimples As String
   BuscarCotacaoAtual = 0
   
-  ' se for ativo do Tesouro Direto
-  If InStr(strAtivo, ":") = 0 Then
-    With wsPlanilhaOrigem.Range(RANGE_COLUNA_TICKETS_TD)
-      Set celula = .Find(What:=strAtivo, LookIn:=xlValues)
-      If Not celula Is Nothing Then
-        BuscarCotacaoAtual = wsPlanilhaOrigem.Cells(celula.Row, RetornarPrimeiraColuna(Range(RANGE_COLUNA_PRECO_TD))).Value
-      Else
-        Debug.Print "Cotação do ativo do tesouro [" & strAtivo & "] não encontrada."
-      End If
-    End With
-    GoTo FimCotacaoAtual
-  End If
-  
-  strTicketSimples = Trim(Split(strAtivo, ":")(1))
-  ' se for Bitcoin
-  If strTicketSimples = "BTC" Then
-    BuscarCotacaoAtual = wsPlanilhaOrigem.Range(RANGE_CELULA_BTC).Value
-    GoTo FimCotacaoAtual
-  End If
-  ' se for Etherium
-  If strTicketSimples = "ETH" Then
-    BuscarCotacaoAtual = wsPlanilhaOrigem.Range(RANGE_CELULA_ETH).Value
-    GoTo FimCotacaoAtual
-  End If
-  
-  ' se for ações ou ETF
   With wsPlanilhaOrigem.Range(RANGE_COLUNA_TICKETS)
     Set celula = .Find(What:=strTicketSimples, LookIn:=xlValues)
     If Not celula Is Nothing Then
@@ -688,3 +553,4 @@ Private Function AnexarAtivo(strAtivos As String, strNovoAtivo As String) As Str
 errorAnexarAtivo:
   MostrarMsgErro ("AnexarAtivo")
 End Function
+

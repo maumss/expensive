@@ -153,26 +153,13 @@ Public Const RANGE_COLUNA_SALDO_FINAL_CRIPTO As String = "N369:N378"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_CRIPTO As String = "X369:X378"
 Public Const RANGE_CELULA_IGNORA_AGENDA_CRIPTO As String = "R381"
 
-' Planilhas Jan. a Dez - indicadores
-Public Const RANGE_COLUNA_DESCR_INDICADORES As String = "D388:D396"
-Public Const RANGE_COLUNA_MES_INDICADORES As String = "F388:F396"
-Public Const RANGE_COLUNA_ANO_INDICADORES As String = "H388:H396"
-Public Const RANGE_COLUNA_DOZE_MESES_INDICADORES As String = "I388:I396"
-Public Const RANGE_CELULA_DOLAR_FINAL_MES As String = "G393"
-Public Const SP500 As String = "S&P 500"
-Public Const RANGE_CELULA_DOLAR_BACEN_COMPRA As String = "F400"
-Public Const RANGE_CELULA_DOLAR_BACEN_VENDA As String = "G400"
+'Planilhas Jan a Dez - Indicadores
+Public Const RANGE_CELULA_DOLAR_FINAL_MES_INDICADORES As String = "G393"
 
 ' Planilha Acoes
-Public Const RANGE_TAB_ACOES_365 As String = "B7:J146"
-Public Const RANGE_COLUNA_TICKETS As String = "E7:E146"
-Public Const RANGE_COLUNA_PRECO As String = "G7:G146"
-Public Const RANGE_TAB_MOEDAS_365 As String = "C151:D153"
-Public Const RANGE_CELULA_DOLAR As String = "D151"
-Public Const RANGE_CELULA_BTC As String = "D152"
-Public Const RANGE_CELULA_ETH As String = "D153"
-
-' Planilha TesouroDireto
-Public Const RANGE_DATA_ATUALIZ_TD = "H2"
-Public Const RANGE_COLUNA_TICKETS_TD As String = "F2:F36"
-Public Const RANGE_COLUNA_PRECO_TD As String = "D2:D36"
+Public Const RANGE_TAB_ACOES_ACOES365 As String = "B7:K146"
+Public Const RANGE_COLUNA_TICKETS_ACOES365 As String = "B7:B146"
+Public Const RANGE_COLUNA_PRECO_ACOES365 As String = "G7:G146"
+Public Const RANGE_COLUNA_DATA_ATUAL_ACOES365 As String = "J7:J146"
+Public Const RANGE_TAB_MOEDAS_ACOES365 As String = "C151:D153"
+Public Const RANGE_CELULA_DOLAR_ACOES365 As String = "D151"

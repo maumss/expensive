@@ -29,7 +29,7 @@ Sub AtualizarDadosWeb()
   Application.DisplayStatusBar = True
   CongelarCalculosPlanilha (True)
   Set wsPlanilhaAtual = ActiveSheet
-  Set wsPlanilhaAcoes = Worksheets("Acoes")
+  Set wsPlanilhaAcoes = Worksheets("Acoes365")
   wsPlanilhaAcoes.Visible = xlSheetVisible
   strAtivosNaoEncontrados = ""
   
@@ -79,8 +79,12 @@ Sub AtualizarDadosWeb()
   Debug.Print "Transferindo Cripto..."
   Call AtualizarCotacaoCripto(wsPlanilhaAtual, wsPlanilhaAcoes, strAtivosNaoEncontrados)
   
-  wsPlanilhaAtual.Range(RANGE_CELULA_DOLAR_FINAL_MES).Value = wsPlanilhaAcoes.Range(RANGE_CELULA_DOLAR).Value
-  Debug.Print "Ativos não encontrados: " & strAtivosNaoEncontrados
+  wsPlanilhaAtual.Range(RANGE_CELULA_DOLAR_FINAL_MES_INDICADORES).Value = wsPlanilhaAcoes.Range(RANGE_CELULA_DOLAR_ACOES365).Value
+  
+  If strAtivosNaoEncontrados <> "" Then
+    Debug.Print "Ativos não encontrados ou desatualizados: " & strAtivosNaoEncontrados
+  End If
+  Debug.Print "Atualização de cotações concluída."
 
 FimAtualizarDadosWeb:
   wsPlanilhaAcoes.Visible = xlSheetHidden
@@ -102,9 +106,9 @@ Private Sub AtualizarAcoesEMoedas()
   
   Dim wsAcoes As Worksheet
   Debug.Print "Atualizando ações e moedas..."
-  Set wsAcoes = Worksheets("Acoes")
-  wsAcoes.Range(RANGE_TAB_ACOES_365).RefreshLinkedDataType
-  wsAcoes.Range(RANGE_TAB_MOEDAS_365).RefreshLinkedDataType
+  Set wsAcoes = Worksheets("Acoes365")
+  wsAcoes.Range(RANGE_TAB_ACOES_ACOES365).RefreshLinkedDataType
+  wsAcoes.Range(RANGE_TAB_MOEDAS_ACOES365).RefreshLinkedDataType
   Debug.Print "Concluído atualização de ações e moedas."
   Exit Sub
 ErroAtualizarAcoesEMoedas:
@@ -437,20 +441,32 @@ Private Function BuscarCotacaoAtual(strAtivo As String, wsPlanilhaOrigem As Work
   On Error GoTo ErrorBuscarCotacaoAtual
   Dim celula As Range
   Dim strTicketSimples As String
-  BuscarCotacaoAtual = 0
+  Dim dtCotacao As Date
+  Dim varCotacao As Variant
+  Dim varPreco As Variant
   
-  With wsPlanilhaOrigem.Range(RANGE_COLUNA_TICKETS)
-    Set celula = .Find(What:=strTicketSimples, LookIn:=xlValues)
+  BuscarCotacaoAtual = 0
+  strTicketSimples = Trim(strAtivo)
+  
+  With wsPlanilhaOrigem.Range(RANGE_COLUNA_TICKETS_ACOES365)
+    Set celula = .Find(What:=strTicketSimples, LookIn:=xlValues, _
+                        LookAt:=xlWhole)
     If Not celula Is Nothing Then
-      BuscarCotacaoAtual = wsPlanilhaOrigem.Cells(celula.Row, RetornarPrimeiraColuna(Range(RANGE_COLUNA_PRECO))).Value
-    Else
-      Debug.Print "Cotação do ativo [" & strTicketSimples & "] não encontrada."
+      varCotacao = wsPlanilhaOrigem.Cells(celula.Row, RetornarPrimeiraColuna(wsPlanilhaOrigem.Range(RANGE_COLUNA_DATA_ATUAL_ACOES365))).Value
+      varPreco = wsPlanilhaOrigem.Cells(celula.Row, RetornarPrimeiraColuna(wsPlanilhaOrigem.Range(RANGE_COLUNA_PRECO_ACOES365))).Value
+      If IsDate(varCotacao) And IsNumeric(varPreco) Then
+        dtCotacao = CDate(varCotacao)
+        If DateValue(dtCotacao) = Date Then
+          BuscarCotacaoAtual = CDbl(varPreco)
+        End If
+      End If
     End If
   End With
 FimCotacaoAtual:
   Exit Function
 ErrorBuscarCotacaoAtual:
   MostrarMsgErro ("BuscarCotacaoAtual")
+  Resume FimCotacaoAtual
 End Function
 
 Private Sub GravarValor(intPrimeiraLinha As Integer, intUltimaLinha As Integer, _

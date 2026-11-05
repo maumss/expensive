@@ -1,5 +1,19 @@
-' Módulo de funções sobre a geração de relatório
 Option Explicit
+
+' ---------------------------------------------------------------------
+' Módulo: Relatorio.bas
+' Descrição: Módulo de funções sobre a geração de relatório
+' ---------------------------------------------------------------------
+
+
+Private Const TITULO_RELATORIO As String = "Investimentos"
+Private Const TITULO_RETRATO As String = "Retrato do mês"
+Private Const MSG_AJUSTANDO_IMPRESSAO As String = "Ajustando área de impressão. Por favor, aguarde..."
+Private Const PASTA_COFRE As String = "Cofre"
+Private Const SUFIXO_RETRATO As String = "-snapshot"
+Private Const EXTENSAO_PDF As String = ".pdf"
+Private Const CARACTERES_INVALIDOS_ARQUIVO As String = "\/:*?""<>|"
+Private Const LIMITE_COLUNAS_RETRATO As Long = 6
 
 Private Type Cabecalho
   strHeaderEsquerdo As String
@@ -13,194 +27,132 @@ Private Type Rodape
   strFooterDireito As String
 End Type
 
-Sub GerarRelatRend()
-  '
-  ' Sub relatRend        De: 22/05/04
-  ' Cria relatório sobre Rendimentos
-  '
-  On Error GoTo erroRelatRend
-    
+'
+' Sub relatRend        De: 22/05/04
+' Cria relatório sobre Rendimentos
+'
+Public Sub GerarRelatRend()  
+  Dim udtCabecalho As Cabecalho
+  Dim udtRodape As Rodape
+  Dim blnAlterouImpressao As Boolean
+  On Error GoTo ErroGerarRelatRend
+
   If MsgBox("Gostaria de gerar relatório da posição " & vbLf & _
-            "de investimentos atual?", vbQuestion + vbYesNo, "Investimentos") = vbNo Then
+            "de investimentos atual?", vbQuestion + vbYesNo, TITULO_RELATORIO) = vbNo Then
     Exit Sub
   End If
-  Application.StatusBar = "Ajustando área de impressão. Por favor, aguarde..."
-  '============= define cabeçalho ==================
-  Dim udtCabecalho As Cabecalho
+  Application.StatusBar = MSG_AJUSTANDO_IMPRESSAO
   udtCabecalho = RetornarCabecalho
-  '============= define rodapé =====================
-  Dim udtRodape As Rodape
   udtRodape = RetornarRodape
   '============= ajusta configurações de impressão ===========
   Application.ScreenUpdating = False
+  blnAlterouImpressao = True
   With ActiveSheet.PageSetup
-      .PrintArea = RANGE_AREA_RELATORIO
-      .LeftHeader = udtCabecalho.strHeaderEsquerdo
-      .CenterHeader = udtCabecalho.strHeaderCentro
-      .RightHeader = udtCabecalho.strHeaderDireito
-      .LeftFooter = udtRodape.strFooterEsquerdo
-      .CenterFooter = udtRodape.strFooterCentro
-      .RightFooter = udtRodape.strFooterDireito
-      .LeftMargin = Application.CentimetersToPoints(1.9)
-      .RightMargin = Application.CentimetersToPoints(1.9)
-      .TopMargin = Application.CentimetersToPoints(2.5)
-      .BottomMargin = Application.CentimetersToPoints(2.5)
-      .HeaderMargin = Application.CentimetersToPoints(1.3)
-      .FooterMargin = Application.CentimetersToPoints(1.3)
-      .PrintHeadings = False
-      .PrintGridlines = False
-      .PrintNotes = False
-      .CenterHorizontally = True
-      .CenterVertically = False
-      .Orientation = RetornarOrientacao(Range(RANGE_AREA_RELATORIO)) ' Paisagem ou retrato
-      .Draft = False
-      .PaperSize = xlPaperA4
-      .FirstPageNumber = xlAutomatic
-      .Order = xlDownThenOver
-      .BlackAndWhite = False
-      .Zoom = False
-      .FitToPagesWide = 1     'força largura de uma página
-      .FitToPagesTall = False 'ainda 1 de largura mas ilimitada p/ baixo
+    .PrintArea = RANGE_AREA_RELATORIO
+    .LeftHeader = udtCabecalho.strHeaderEsquerdo
+    .CenterHeader = udtCabecalho.strHeaderCentro
+    .RightHeader = udtCabecalho.strHeaderDireito
+    .LeftFooter = udtRodape.strFooterEsquerdo
+    .CenterFooter = udtRodape.strFooterCentro
+    .RightFooter = udtRodape.strFooterDireito
+    .LeftMargin = Application.CentimetersToPoints(1.9)
+    .RightMargin = Application.CentimetersToPoints(1.9)
+    .TopMargin = Application.CentimetersToPoints(2.5)
+    .BottomMargin = Application.CentimetersToPoints(2.5)
+    .HeaderMargin = Application.CentimetersToPoints(1.3)
+    .FooterMargin = Application.CentimetersToPoints(1.3)
+    .PrintHeadings = False
+    .PrintGridlines = False
+    .PrintNotes = False
+    .CenterHorizontally = True
+    .CenterVertically = False
+    .Orientation = RetornarOrientacao(ActiveSheet.Range(RANGE_AREA_RELATORIO)) ' Paisagem ou retrato
+    .Draft = False
+    .PaperSize = xlPaperA4
+    .FirstPageNumber = xlAutomatic
+    .Order = xlDownThenOver
+    .BlackAndWhite = False
+    .Zoom = False
+    .FitToPagesWide = 1     'força largura de uma página
+    .FitToPagesTall = False 'ainda 1 de largura mas ilimitada p/ baixo
   End With
   ActiveWindow.SelectedSheets.PrintPreview
-  
-fimRelat:
-  ActiveSheet.PageSetup.PrintArea = ""
-  Application.StatusBar = "Pronto"
+
+FimGerarRelatRend:
+  On Error Resume Next
+  If blnAlterouImpressao Then
+    ActiveSheet.PageSetup.PrintArea = ""
+  End If
+  Application.StatusBar = False
   Application.ScreenUpdating = True
   Exit Sub
-erroRelatRend:
 
-  MostrarMsgErro ("GerarRelatRend")
-  Resume fimRelat
+ErroGerarRelatRend:
+  MostrarMsgErro "GerarRelatRend"
+  Resume FimGerarRelatRend
 End Sub
 
-Private Function RetornarOrientacao(rgAreaRelatorio As Range) As Integer
-  Const XL_PORTRAIT As Integer = 1 ' retrato
-  Const XL_LANDSCAPE As Integer = 2 ' paisagem
-  Dim intPageSettg, intLastCol As Integer
-  intLastCol = RetornarUltimaLinha(rgAreaRelatorio) - RetornarPrimeiraLinha(rgAreaRelatorio)
-  If intLastCol < 6 Then
-    RetornarOrientacao = XL_PORTRAIT
+Private Function RetornarOrientacao(ByVal rgAreaRelatorio As Range) As XlPageOrientation
+  If (RetornarUltimaColuna(rgAreaRelatorio) - RetornarPrimeiraColuna(rgAreaRelatorio)) < LIMITE_COLUNAS_RETRATO Then
+    RetornarOrientacao = xlPortrait
   Else
-    RetornarOrientacao = XL_LANDSCAPE
+    RetornarOrientacao = xlLandscape
   End If
 End Function
 
 Private Function RetornarCabecalho() As Cabecalho
   Dim udtCabecalho As Cabecalho
-  Dim strDeMes As String
-  strDeMes = RetornarMesPlanilha
-  udtCabecalho.strHeaderEsquerdo = "Posição de " & Trim(strDeMes)
+  udtCabecalho.strHeaderEsquerdo = "Posição de " & RetornarNomeMesCompleto(RetornarNumeroMesPlanilha(ActiveSheet.Name))
   udtCabecalho.strHeaderCentro = ""
-  udtCabecalho.strHeaderDireito = Application.Text(Now(), "dd/mm/yyyy HH:mm:ss")
+  udtCabecalho.strHeaderDireito = Format$(Now, "dd/mm/yyyy hh:mm:ss")
   RetornarCabecalho = udtCabecalho
-End Function
-
-Private Function RetornarMesPlanilha() As String
-  Select Case ActiveSheet.Name
-     Case "Jan"
-       RetornarMesPlanilha = "Janeiro"
-     Case "Fev"
-       RetornarMesPlanilha = "Fevereiro"
-     Case "Mar"
-       RetornarMesPlanilha = "Março"
-     Case "Abr"
-       RetornarMesPlanilha = "Abril"
-     Case "Mai"
-       RetornarMesPlanilha = "Maio"
-     Case "Jun"
-       RetornarMesPlanilha = "Junho"
-     Case "Jul"
-       RetornarMesPlanilha = "Julho"
-     Case "Ago"
-       RetornarMesPlanilha = "Agosto"
-     Case "Set"
-       RetornarMesPlanilha = "Setembro"
-     Case "Out"
-       RetornarMesPlanilha = "Outubro"
-     Case "Nov"
-       RetornarMesPlanilha = "Novembro"
-     Case Else
-       RetornarMesPlanilha = "Dezembro"
-  End Select
 End Function
 
 Private Function RetornarRodape() As Rodape
   Dim udtRodape As Rodape
-  Dim strNmPlan As String
-  Dim intPos As Integer
-  strNmPlan = ThisWorkbook.Name
-  intPos = InStr(strNmPlan, ".")
-  strNmPlan = Left(strNmPlan, (intPos - 1))
-  strNmPlan = UCase(Left(strNmPlan, 1)) & LCase(Mid(strNmPlan, 2, (Len(strNmPlan) - 1)))
-  udtRodape.strFooterEsquerdo = "&8" & strNmPlan & Chr(10) & _
-                   "Última atualização em: " & Range(RANGE_DATA_POSICAO).Value & Chr(10) & _
-                   Chr(169) & Year(Now()) & _
+  Dim strNomePasta As String
+  strNomePasta = RetornarNomeBasePasta()
+  strNomePasta = UCase$(Left$(strNomePasta, 1)) & LCase$(Mid$(strNomePasta, 2))
+  udtRodape.strFooterEsquerdo = "&8" & strNomePasta & vbLf & _
+                   "Última atualização em: " & ActiveSheet.Range(RANGE_DATA_POSICAO).Value & vbLf & _
+                   Chr$(169) & Year(Now) & _
                    " Propriedade Confidencial de Mauricio Soares"
   udtRodape.strFooterCentro = "Página &P de &N"
   udtRodape.strFooterDireito = "&8" & _
-                  "Mês Líquido = diferença entre saldos" & Chr(10) & _
-                  "Mês Real = Mês Líquido - IGPM" & Chr(10) & _
-                  "Outros, fonte: " & Chr(34) & "HSBC Bank Brasil S.A." & Chr(34)
+                  "Mês Líquido = diferença entre saldos" & vbLf & _
+                  "Mês Real = Mês Líquido - IGPM" & vbLf & _
+                  "Outros, fonte: " & Chr$(34) & "HSBC Bank Brasil S.A." & Chr$(34)
   RetornarRodape = udtRodape
 End Function
 
-Sub GerarRelatRetrato()
+'
+' Sub relatRend        De: 31/03/18
+' Cria relatório sobre Situação no Mês
+'
+Public Sub GerarRelatRetrato()  
+  Dim strNomeArquivo As String, strPastaDestino As String, strCaminhoArquivo As String
+  Dim strMesFechado As String
+  Dim blnAlterouImpressao As Boolean
+  On Error GoTo ErroGerarRelatRetrato
 
-  '
-  ' Sub relatRend        De: 31/03/18
-  ' Cria relatório sobre Situação no Mês
-  '
-  On Error GoTo erroRelatRetrato
-  
-  Dim fileName As String, dirFile As String, monthNumber As String, mesFechado As String
-  Dim uniqueName As Boolean
-  Dim userAnswer As VbMsgBoxResult
-  Const XL_PORTRAIT As Integer = 1 ' retrato
   ' define o nome do PDF
-  'MsgBox RetornarFileName()
-  mesFechado = Range(RANGE_PLAN_FECHADA).Value
-  monthNumber = Month(DateValue(mesFechado & " 1"))
-  If (Len(monthNumber) < 2) Then
-    monthNumber = "0" & monthNumber
+  strMesFechado = CStr(RetornarRangeNomeado(RANGE_PLAN_FECHADA).Value)
+  strNomeArquivo = RetornarNomeBasePasta() & SUFIXO_RETRATO & _
+    Format$(Month(DateValue(strMesFechado & " 1")), "00") & EXTENSAO_PDF
+  strPastaDestino = ThisWorkbook.Path
+  If InStr(strPastaDestino, PASTA_COFRE) > 0 Then
+    strPastaDestino = RetornarPastaMeusDocumentos()
   End If
-  fileName = RetornarFileName() & "-" & "snapshot" & monthNumber & ".pdf"
-  If (InStr(RetornarCurrentFolder(), "Cofre")) > 0 Then
-    dirFile = RetornarMyDocumetsFolder() & "\" & fileName
-  Else
-    dirFile = RetornarCurrentFolder() & "\" & fileName
+  strCaminhoArquivo = DefinirCaminhoArquivo(strPastaDestino, strNomeArquivo)
+  If Len(strCaminhoArquivo) = 0 Then
+    ' cancelado pelo usuário
+    Exit Sub
   End If
-  Debug.Print "Arquivo destino: " & dirFile
-  Do While uniqueName = False
-    Debug.Print "Existe arquivo no destino: " & Len(Dir(dirFile))
-    If Len(Dir(dirFile)) <> 0 Then
-      userAnswer = MsgBox("Arquivo já existe! Click " & _
-        "[Sim] para sobreescrever. Clique [Não] para Renomear.", vbYesNoCancel)
-      If userAnswer = vbYes Then
-        uniqueName = True
-      ElseIf userAnswer = vbNo Then
-        Do
-          'Recupera novo nome de arquivo
-          fileName = Application.InputBox("Digite um novo nome de arquivo " & _
-            "(irá perguntá-lo novamente se você digitar um nome de arquivo inválido)", , _
-            fileName, Type:=2)
-          'sai se o usuário quiser
-          If fileName = "False" Or fileName = "" Then
-            Exit Sub
-          End If
-        Loop While ValidFileName(fileName) = False
-        uniqueName = True
-       Else
-         Exit Sub 'cancela
-       End If
-     Else
-       uniqueName = True
-    End If
-  Loop
-  
-  Application.StatusBar = "Ajustando área de impressão. Por favor, aguarde..."
+  Debug.Print "Arquivo destino: " & strCaminhoArquivo
+
+  Application.StatusBar = MSG_AJUSTANDO_IMPRESSAO
   Application.ScreenUpdating = False
+  blnAlterouImpressao = True
   With ActiveSheet.PageSetup
     .PrintArea = RANGE_RELAT_RETRAT
     .LeftMargin = Application.CentimetersToPoints(0.64)
@@ -214,81 +166,109 @@ Sub GerarRelatRetrato()
     .PrintNotes = False
     .CenterHorizontally = True
     .CenterVertically = False
-    .Orientation = XL_PORTRAIT
+    .Orientation = xlPortrait
     .Draft = False
     .PaperSize = xlPaperA4
     .BlackAndWhite = False
     .Zoom = False
     .FitToPagesWide = 1 'força largura de uma página
     .FitToPagesTall = False 'não força altura
-   End With
-   ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, _
-        fileName:=fileName, _
-        Quality:=xlQualityStandard, _
-        IncludeDocProperties:=True, _
-        IgnorePrintAreas:=False, _
-        OpenAfterPublish:=True
-fimRetrato:
-  ActiveSheet.PageSetup.PrintArea = ""
-  Application.StatusBar = "Pronto"
+  End With
+  ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, _
+       Filename:=strCaminhoArquivo, _
+       Quality:=xlQualityStandard, _
+       IncludeDocProperties:=True, _
+       IgnorePrintAreas:=False, _
+       OpenAfterPublish:=True
+
+FimGerarRelatRetrato:
+  On Error Resume Next
+  If blnAlterouImpressao Then
+    ActiveSheet.PageSetup.PrintArea = ""
+  End If
+  Application.StatusBar = False
   Application.ScreenUpdating = True
   Exit Sub
-  
-erroRelatRetrato:
-  MostrarMsgErro ("GerarRelatRetrato")
-  Resume fimRetrato
+
+ErroGerarRelatRetrato:
+  MostrarMsgErro "GerarRelatRetrato"
+  Resume FimGerarRelatRetrato
 End Sub
 
-Private Function RetornarCurrentFolder() As String
-    RetornarCurrentFolder = ActiveWorkbook.Path
+'
+' Monta o caminho do arquivo; se já existir, pergunta se deve sobrescrever ou renomear.
+' Retorna vazio se o usuário cancelar.
+'
+Private Function DefinirCaminhoArquivo(ByVal strPasta As String, ByVal strNomeArquivo As String) As String  
+  Dim strCaminho As String
+  Dim varResposta As Variant
+  Do
+    strCaminho = strPasta & Application.PathSeparator & strNomeArquivo
+    If Len(Dir(strCaminho)) = 0 Then
+      Exit Do
+    End If
+    Select Case MsgBox("Arquivo já existe! Clique [Sim] para sobrescrever. Clique [Não] para renomear.", _
+                       vbYesNoCancel + vbQuestion, TITULO_RETRATO)
+      Case vbYes
+        Exit Do
+      Case vbNo
+        Do
+          'Recupera novo nome de arquivo
+          varResposta = Application.InputBox("Digite um novo nome de arquivo " & _
+            "(irá perguntá-lo novamente se você digitar um nome de arquivo inválido)", TITULO_RETRATO, _
+            strNomeArquivo, Type:=2)
+          'sai se o usuário quiser
+          If VarType(varResposta) = vbBoolean Then
+            Exit Function
+          End If
+          strNomeArquivo = Trim$(CStr(varResposta))
+          If Len(strNomeArquivo) = 0 Then
+            Exit Function
+          End If
+        Loop While Not IsNomeArquivoValido(strNomeArquivo)
+        If LCase$(Right$(strNomeArquivo, Len(EXTENSAO_PDF))) <> EXTENSAO_PDF Then
+          strNomeArquivo = strNomeArquivo & EXTENSAO_PDF
+        End If
+        ' volta ao início do laço para verificar se o novo nome também já existe
+      Case Else
+        Exit Function
+    End Select
+  Loop
+  DefinirCaminhoArquivo = strCaminho
 End Function
 
-Private Function RetornarMyDocumetsFolder() As String
-    Dim WshShell As Object
-    Set WshShell = CreateObject("WScript.Shell")
-    RetornarMyDocumetsFolder = WshShell.SpecialFolders("MyDocuments")
+Private Function RetornarPastaMeusDocumentos() As String
+  Dim objShell As Object
+  Set objShell = CreateObject("WScript.Shell")
+  RetornarPastaMeusDocumentos = objShell.SpecialFolders("MyDocuments")
 End Function
 
-Private Function RetornarFileName() As String
-  Dim fileName As String
-  Dim myPath As String
-  Dim uniqueName As Boolean
-
-  myPath = ActiveWorkbook.FullName
-  fileName = Mid(myPath, InStrRev(myPath, "\") + 1, _
-    InStrRev(myPath, ".") - InStrRev(myPath, "\") - 1)
-  RetornarFileName = fileName
+'
+' Nome da pasta de trabalho sem a extensão
+'
+Private Function RetornarNomeBasePasta() As String  
+  Dim strNome As String
+  Dim lngPosPonto As Long
+  strNome = ThisWorkbook.Name
+  lngPosPonto = InStrRev(strNome, ".")
+  If lngPosPonto > 1 Then
+    strNome = Left$(strNome, lngPosPonto - 1)
+  End If
+  RetornarNomeBasePasta = strNome
 End Function
 
-Private Function ValidFileName(fileName As String) As Boolean
-  'Determina se um dado nome de arquivo excel é válido
-
-  Dim tempPath As String
-  Dim wb As Workbook
-
-  'Determina a pasta onde arquivos temporários são gravados
-  tempPath = Environ("TEMP")
-
-  'Cria um arquivo XLSM temporário file (XLSM no caso de ter macros)
-  On Error GoTo InvalidFileName
-  CongelarCalculosPlanilha (True)
-  Set wb = Workbooks.Add
-  wb.SaveAs tempPath & "\" & fileName & ".xlsm", xlExcel8
-  
-  On Error Resume Next
-  'Fecha o arquivo temporário
-  wb.Close (False)
-  'Apaga o arquivo temporário
-  Kill tempPath & "\" & fileName & ".xlsm"
-  CongelarCalculosPlanilha (False)
-  'O nome do arquivo é válido
-  ValidFileName = True
-  Exit Function
-
-  'ERROR HANDLERS
-InvalidFileName:
-  wb.Close (False)
-  CongelarCalculosPlanilha (False)
-  'O nome do arquivo é inválido
-  ValidFileName = False
+'
+' Determina se um nome de arquivo é válido no Windows (sem caracteres reservados)
+'
+Private Function IsNomeArquivoValido(ByVal strNomeArquivo As String) As Boolean  
+  Dim lngPosicao As Long
+  If Len(Trim$(strNomeArquivo)) = 0 Then
+    Exit Function
+  End If
+  For lngPosicao = 1 To Len(CARACTERES_INVALIDOS_ARQUIVO)
+    If InStr(strNomeArquivo, Mid$(CARACTERES_INVALIDOS_ARQUIVO, lngPosicao, 1)) > 0 Then
+      Exit Function
+    End If
+  Next lngPosicao
+  IsNomeArquivoValido = True
 End Function

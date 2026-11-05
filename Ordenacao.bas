@@ -1,346 +1,212 @@
-' Módulo de ordenamento das tabelas de movimentos e cartões
 Option Explicit
 
-Sub OrdenarMovimentos()
-  '
-  ' OrdenarMovimentos Macro
-  ' Ordena tabelas de Movimentos e Cartões em ordem crescente de data.
-  '
-  ' Atalho do teclado: Ctrl+o
-  '
-  On Error GoTo ErroOrdena
+' --------------------------------------------------------------------------------
+' Módulo: Ordenacao.bas
+' Descrição: Módulo de ordenamento das tabelas de movimentos, cartões e carteiras
+' --------------------------------------------------------------------------------
+
+' Data usada temporariamente para manter no topo os ativos sem compra/venda no mês
+Private Const DATA_FALSA As Date = #12/31/1980#
+
+'
+' OrdenarMovimentos Macro
+' Ordena tabelas de Movimentos e Cartões em ordem crescente de data.
+'
+' Atalho do teclado: Ctrl+o
+'
+Public Sub OrdenarMovimentos()
+  Dim wsPlanilha As Worksheet
+  Dim blnCongelou As Boolean
+  On Error GoTo ErroOrdenarMovimentos
   If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
   End If
+  Set wsPlanilha = ActiveSheet
   Debug.Print "Ordenando movimentos..."
-  Application.ScreenUpdating = False
-  Application.EnableEvents = False
-  'Range(RANGE_TAB_MOVIMENTACAO).Select
-  'Selection.Sort Key1:=Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO), Order1:=xlAscending, Header:=xlGuess, _
-  '      OrderCustom:=1, MatchCase:=False, Orientation:=xlTopToBottom, _
-  '      DataOption1:=xlSortNormal
-  ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_MOVIMENTACAO), _
-        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-  With ActiveSheet.Sort
-      .SetRange Range(RANGE_TAB_MOVIMENTACAO)
-      .Header = xlGuess
-      .MatchCase = False
-      .Orientation = xlTopToBottom
-      .SortMethod = xlPinYin
-      .Apply
-  End With
-  
-  'Range(RANGE_TAB_CARTOES).Select
-  ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_CARTOES), _
-        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-  With ActiveSheet.Sort
-      .SetRange Range(RANGE_TAB_CARTOES)
-      .Header = xlGuess
-      .MatchCase = False
-      .Orientation = xlTopToBottom
-      .SortMethod = xlPinYin
-      .Apply
-  End With
-        
-FimOrdena:
-  Application.ScreenUpdating = True
-  Application.EnableEvents = True
+  CongelarCalculosPlanilha True
+  blnCongelou = True
+  OrdenarIntervalo wsPlanilha, RANGE_COLUNA_DATA_MOVIMENTACAO, RANGE_TAB_MOVIMENTACAO
+  OrdenarIntervalo wsPlanilha, RANGE_COLUNA_DATA_CARTOES, RANGE_TAB_CARTOES
+
+FimOrdenarMovimentos:
+  On Error Resume Next
+  If blnCongelou Then
+    CongelarCalculosPlanilha False
+  End If
   ' seleciona a coluna de datas
-  RetornarUltimaCelulaMovimentacoes.Select
+  If Not wsPlanilha Is Nothing Then
+    RetornarUltimaCelulaMovimentacoes(wsPlanilha).Select
+  End If
+  Debug.Print "Ordenação completada."
   Exit Sub
-  
-ErroOrdena:
-  MostrarMsgErro ("OrdenarMovimentos")
-  Resume FimOrdena
+
+ErroOrdenarMovimentos:
+  MostrarMsgErro "OrdenarMovimentos"
+  Resume FimOrdenarMovimentos
 End Sub
 
-Sub OrdenarAcoesFii()
-  On Error GoTo ErroOrdenarAcoesFii
-  
-  Call OrdenarAcoes
-  Call OrdenarFii
-  Call OrdenarStock
-  Call OrdenarReit
-  
+'
+' Ordena todas as carteiras da planilha ativa
+'
+Public Sub OrdenarCarteirasPlanilhaAtiva()
+  On Error GoTo ErroOrdenarCarteirasPlanilhaAtiva
+  OrdenarCarteiras ActiveSheet
   Exit Sub
-ErroOrdenarAcoesFii:
-  MostrarMsgErro ("OrdenarAcoesFii")
+
+ErroOrdenarCarteirasPlanilhaAtiva:
+  MostrarMsgErro "OrdenarCarteirasPlanilhaAtiva"
 End Sub
 
-
-Private Sub OrdenarAcoes()
-  '
-  ' OrdenarAcoes Macro
-  ' Ordena tabelas de Ações, Fii, Stock e Reit em ordem crescente de ticket.
-  '
-  On Error GoTo ErroOrdenarAcoes
-  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
+'
+' Ordena as carteiras de Ações, Fii, Tesouro Direto, Tesouro Selic, ETF, Stock, Reit,
+' Treasury, Ouro e Cripto em ordem crescente de ticket,
+' mantendo agrupados por data os ativos com compra ou venda no mês.
+'
+Public Sub OrdenarCarteiras(ByVal wsPlanilha As Worksheet)
+  Dim blnCongelou As Boolean
+  On Error GoTo ErroOrdenarCarteiras
+  If Not IsPlanilhaAberta(wsPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
   End If
-  Debug.Print "Ordenando ações..."
-  Application.ScreenUpdating = False
-  Application.EnableEvents = False
-  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer, intColunaData As Integer
-  Dim blnHasCompraOuVenda As Boolean
-  
-  ' Ordena book acoes
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_DATA_ACOES))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_DATA_ACOES))
-  intColunaData = RetornarPrimeiraColuna(Range(RANGE_COLUNA_DATA_ACOES))
-  blnHasCompraOuVenda = HasCompraOuVenda(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  If blnHasCompraOuVenda Then Call InserirDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_ATIVO_ACOES), _
-        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-  With ActiveSheet.Sort
-      .SetRange Range(RANGE_TAB_ACOES)
-      .Header = xlGuess
-      .MatchCase = False
-      .Orientation = xlTopToBottom
-      .SortMethod = xlPinYin
-      .Apply
-  End With
-  If blnHasCompraOuVenda Then
-    ActiveSheet.Sort.SortFields.Clear
-    ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_ACOES), _
-          SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-    With ActiveSheet.Sort
-        .SetRange Range(RANGE_TAB_ACOES)
-        .Header = xlGuess
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
-        .Apply
-    End With
-    Call RestaurarDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
+  CongelarCalculosPlanilha True
+  blnCongelou = True
+  OrdenarCarteira wsPlanilha, "ações", RANGE_COLUNA_DATA_ACOES, RANGE_COLUNA_ATIVO_ACOES, RANGE_TAB_ACOES
+  OrdenarCarteira wsPlanilha, "fii", RANGE_COLUNA_DATA_FII, RANGE_COLUNA_ATIVO_FII, RANGE_TAB_FII
+  OrdenarCarteira wsPlanilha, "tesouro direto", RANGE_COLUNA_DATA_TESOURO_DIRETO, RANGE_COLUNA_ATIVO_TESOURO_DIRETO, _
+    RANGE_TAB_TESOURO_DIRETO
+  OrdenarCarteira wsPlanilha, "tesouro selic", RANGE_COLUNA_DATA_TESOURO_SELIC, RANGE_COLUNA_ATIVO_TESOURO_SELIC, _
+    RANGE_TAB_TESOURO_SELIC
+  OrdenarCarteira wsPlanilha, "etf", RANGE_COLUNA_DATA_ETF, RANGE_COLUNA_ATIVO_ETF, RANGE_TAB_ETF
+  OrdenarCarteira wsPlanilha, "stock", RANGE_COLUNA_DATA_STOCK, RANGE_COLUNA_ATIVO_STOCK, RANGE_TAB_STOCK
+  OrdenarCarteira wsPlanilha, "reit", RANGE_COLUNA_DATA_REIT, RANGE_COLUNA_ATIVO_REIT, RANGE_TAB_REIT
+  OrdenarCarteira wsPlanilha, "treasury", RANGE_COLUNA_DATA_TREASURY, RANGE_COLUNA_ATIVO_TREASURY, RANGE_TAB_TREASURY
+  OrdenarCarteira wsPlanilha, "ouro", RANGE_COLUNA_DATA_OURO, RANGE_COLUNA_ATIVO_OURO, RANGE_TAB_OURO
+  OrdenarCarteira wsPlanilha, "cripto", RANGE_COLUNA_DATA_CRIPTO, RANGE_COLUNA_ATIVO_CRIPTO, RANGE_TAB_CRIPTO
+  ' a ordenação deixa selecionada a última tabela ordenada
+  ReposicionarSelecao wsPlanilha
+
+FimOrdenarCarteiras:
+  If blnCongelou Then
+    CongelarCalculosPlanilha False
   End If
-        
-FimOrdenarAcoes:
-  Application.ScreenUpdating = True
-  Application.EnableEvents = True
   Exit Sub
-  
-ErroOrdenarAcoes:
-  MostrarMsgErro ("OrdenarAcoes")
-  Resume FimOrdenarAcoes
+
+ErroOrdenarCarteiras:
+  MostrarMsgErro "OrdenarCarteiras"
+  Resume FimOrdenarCarteiras
 End Sub
 
-Private Sub OrdenarFii()
-  '
-  ' OrdenarFii Macro
-  ' Ordena tabelas de Ações, Fii, Stock e Reit em ordem crescente de ticket.
-  '
-  On Error GoTo ErroOrdenarFii
-  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
-    Exit Sub
+'
+' Seleciona a primeira linha livre das movimentações, mesmo que a planilha não seja a ativa
+'
+Private Sub ReposicionarSelecao(ByVal wsPlanilha As Worksheet)
+  Dim objPlanilhaAtiva As Object
+  ' ajuste apenas visual: não deve interromper a ordenação já concluída
+  On Error Resume Next
+  Set objPlanilhaAtiva = ActiveSheet
+  If Not objPlanilhaAtiva Is wsPlanilha Then
+    wsPlanilha.Activate
   End If
-  Debug.Print "Ordenando fii..."
-  Application.ScreenUpdating = False
-  Application.EnableEvents = False
-  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer, intColunaData As Integer
-  Dim blnHasCompraOuVenda As Boolean
-  
-  ' Ordena book fii
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_DATA_FII))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_DATA_FII))
-  intColunaData = RetornarPrimeiraColuna(Range(RANGE_COLUNA_DATA_FII))
-  blnHasCompraOuVenda = HasCompraOuVenda(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  If blnHasCompraOuVenda Then Call InserirDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_ATIVO_FII), _
-        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-  With ActiveSheet.Sort
-      .SetRange Range(RANGE_TAB_FII)
-      .Header = xlGuess
-      .MatchCase = False
-      .Orientation = xlTopToBottom
-      .SortMethod = xlPinYin
-      .Apply
-  End With
-  If blnHasCompraOuVenda Then
-    ActiveSheet.Sort.SortFields.Clear
-    ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_FII), _
-          SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-    With ActiveSheet.Sort
-        .SetRange Range(RANGE_TAB_FII)
-        .Header = xlGuess
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
-        .Apply
-    End With
-    Call RestaurarDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
+  RetornarUltimaCelulaMovimentacoes(wsPlanilha).Select
+  If Not objPlanilhaAtiva Is wsPlanilha Then
+    objPlanilhaAtiva.Activate
   End If
-        
-FimOrdenarFii:
-  Application.ScreenUpdating = True
-  Application.EnableEvents = True
-  Exit Sub
-  
-ErroOrdenarFii:
-  MostrarMsgErro ("OrdenarFii")
-  Resume FimOrdenarFii
 End Sub
 
-Private Sub OrdenarStock()
-  '
-  ' OrdenarStock Macro
-  ' Ordena tabelas de Ações, Fii, Stock e Reit em ordem crescente de ticket.
-  '
-  On Error GoTo ErroOrdenarStock
-  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
-    Exit Sub
-  End If
-  Debug.Print "Ordenando stock..."
-  Application.ScreenUpdating = False
-  Application.EnableEvents = False
-  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer, intColunaData As Integer
+Private Sub OrdenarCarteira(ByVal wsPlanilha As Worksheet, ByVal strNomeCarteira As String, _
+    ByVal strRangeData As String, ByVal strRangeAtivo As String, ByVal strRangeTabela As String)
+  Dim rgData As Range
   Dim blnHasCompraOuVenda As Boolean
-    
-  ' Ordena book stok
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_DATA_STOCK))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_DATA_STOCK))
-  intColunaData = RetornarPrimeiraColuna(Range(RANGE_COLUNA_DATA_STOCK))
-  blnHasCompraOuVenda = HasCompraOuVenda(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  If blnHasCompraOuVenda Then Call InserirDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_ATIVO_STOCK), _
-        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-  With ActiveSheet.Sort
-      .SetRange Range(RANGE_TAB_STOCK)
-      .Header = xlGuess
-      .MatchCase = False
-      .Orientation = xlTopToBottom
-      .SortMethod = xlPinYin
-      .Apply
-  End With
-  
+  On Error GoTo ErroOrdenarCarteira
+  Debug.Print "Ordenando " & strNomeCarteira & "..."
+  Set rgData = wsPlanilha.Range(strRangeData)
+  blnHasCompraOuVenda = HasCompraOuVenda(rgData)
   If blnHasCompraOuVenda Then
-    ActiveSheet.Sort.SortFields.Clear
-    ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_STOCK), _
-          SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-    With ActiveSheet.Sort
-        .SetRange Range(RANGE_TAB_STOCK)
-        .Header = xlGuess
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
-        .Apply
-    End With
-    Call RestaurarDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
+    InserirDataFalsa rgData
   End If
-        
-FimOrdenarStock:
-  Application.ScreenUpdating = True
-  Application.EnableEvents = True
+  OrdenarIntervalo wsPlanilha, strRangeAtivo, strRangeTabela
+  If blnHasCompraOuVenda Then
+    OrdenarIntervalo wsPlanilha, strRangeData, strRangeTabela
+    RestaurarDataFalsa rgData
+  End If
   Exit Sub
-  
-ErroOrdenarStock:
-  MostrarMsgErro ("OrdenarStock")
-  Resume FimOrdenarStock
+
+ErroOrdenarCarteira:
+  MostrarMsgErro "OrdenarCarteira (" & strNomeCarteira & ")"
+  Resume RestaurarCarteira
+
+RestaurarCarteira:
+  ' não deixa a data falsa na planilha caso a ordenação tenha sido interrompida
+  On Error Resume Next
+  If blnHasCompraOuVenda Then
+    RestaurarDataFalsa rgData
+  End If
 End Sub
 
-Private Sub OrdenarReit()
-  '
-  ' OrdenarReit Macro
-  ' Ordena tabelas de Ações, Fii, Stock e Reit em ordem crescente de ticket.
-  '
-  On Error GoTo ErroOrdenarReit
-  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
-    Exit Sub
-  End If
-  Debug.Print "Ordenando reit..."
-  Application.ScreenUpdating = False
-  Application.EnableEvents = False
-  Dim intPrimeiraLinha As Integer, intUltimaLinha As Integer, intColunaData As Integer
-  Dim blnHasCompraOuVenda As Boolean
-  
-  ' Ordena book reit
-  intPrimeiraLinha = RetornarPrimeiraLinha(Range(RANGE_COLUNA_DATA_REIT))
-  intUltimaLinha = RetornarUltimaLinha(Range(RANGE_COLUNA_DATA_REIT))
-  intColunaData = RetornarPrimeiraColuna(Range(RANGE_COLUNA_DATA_REIT))
-  blnHasCompraOuVenda = HasCompraOuVenda(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  If blnHasCompraOuVenda Then Call InserirDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  ActiveSheet.Sort.SortFields.Clear
-  ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_ATIVO_REIT), _
-        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-  With ActiveSheet.Sort
-      .SetRange Range(RANGE_TAB_REIT)
-      .Header = xlGuess
-      .MatchCase = False
-      .Orientation = xlTopToBottom
-      .SortMethod = xlPinYin
-      .Apply
+'
+' Ordena a tabela em ordem crescente pela coluna chave (as tabelas não possuem cabeçalho)
+'
+Private Sub OrdenarIntervalo(ByVal wsPlanilha As Worksheet, ByVal strRangeChave As String, _
+    ByVal strRangeTabela As String)  
+  With wsPlanilha.Sort
+    .SortFields.Clear
+    .SortFields.Add Key:=wsPlanilha.Range(strRangeChave), _
+      SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    .SetRange wsPlanilha.Range(strRangeTabela)
+    .Header = xlNo
+    .MatchCase = False
+    .Orientation = xlTopToBottom
+    .SortMethod = xlPinYin
+    .Apply
   End With
-  
-  If blnHasCompraOuVenda Then
-    ActiveSheet.Sort.SortFields.Clear
-    ActiveSheet.Sort.SortFields.Add Key:=Range(RANGE_COLUNA_DATA_REIT), _
-          SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-    With ActiveSheet.Sort
-        .SetRange Range(RANGE_TAB_REIT)
-        .Header = xlGuess
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
-        .Apply
-    End With
-    Call RestaurarDataFalsa(intPrimeiraLinha, intUltimaLinha, intColunaData)
-  End If
-        
-FimOrdenarReit:
-  Application.ScreenUpdating = True
-  Application.EnableEvents = True
-  Exit Sub
-  
-ErroOrdenarReit:
-  MostrarMsgErro ("OrdenarReit")
-  Resume FimOrdenarReit
 End Sub
 
-Private Function HasCompraOuVenda(intPrimeiraLinha As Integer, intUltimaLinha As Integer, intColunaData As Integer) As Boolean
-  On Error GoTo ErroHasCompraOuVenda
-  Dim intCont As Integer
-  
-  For intCont = intPrimeiraLinha To intUltimaLinha
-    If Trim(ActiveSheet.Cells(intCont, intColunaData) & " ") <> "" Then
+Private Function IsValorEmBranco(ByVal varValor As Variant) As Boolean
+  If IsError(varValor) Then
+    Exit Function
+  End If
+  IsValorEmBranco = (Len(Trim$(CStr(varValor))) = 0)
+End Function
+
+Private Function HasCompraOuVenda(ByVal rgData As Range) As Boolean
+  Dim varDatas As Variant
+  Dim lngLinha As Long
+  varDatas = rgData.Value
+  For lngLinha = 1 To UBound(varDatas, 1)
+    If Not IsValorEmBranco(varDatas(lngLinha, 1)) Then
       HasCompraOuVenda = True
       Exit Function
     End If
-  Next intCont
- HasCompraOuVenda = False
-  
-  Exit Function
-ErroHasCompraOuVenda:
-  MostrarMsgErro ("HasCompraOuVenda")
+  Next lngLinha
 End Function
 
-Private Sub InserirDataFalsa(intPrimeiraLinha As Integer, intUltimaLinha As Integer, intColunaData As Integer)
-  On Error GoTo ErroInserirDataFalsa
-  Dim intCont As Integer
-  
-  For intCont = intPrimeiraLinha To intUltimaLinha
-    If Trim(ActiveSheet.Cells(intCont, intColunaData) & " ") = "" And Trim(ActiveSheet.Cells(intCont, intColunaData + 1) & " ") <> "" Then
-      ActiveSheet.Cells(intCont, intColunaData) = #12/31/1980#
+'
+' Preenche com a data falsa as linhas com ativo e sem data
+'
+Private Sub InserirDataFalsa(ByVal rgData As Range)  
+  Dim varDatas As Variant, varAtivos As Variant
+  Dim lngLinha As Long
+  varDatas = rgData.Value
+  varAtivos = rgData.Offset(0, 1).Value
+  For lngLinha = 1 To UBound(varDatas, 1)
+    If IsValorEmBranco(varDatas(lngLinha, 1)) And Not IsValorEmBranco(varAtivos(lngLinha, 1)) Then
+      rgData.Cells(lngLinha, 1).Value = DATA_FALSA
     End If
-  Next intCont
-  
-  Exit Sub
-ErroInserirDataFalsa:
-  MostrarMsgErro ("InserirDataFalsa")
+  Next lngLinha
 End Sub
 
-Private Sub RestaurarDataFalsa(intPrimeiraLinha As Integer, intUltimaLinha As Integer, intColunaData As Integer)
-  On Error GoTo ErroRestaurarDataFalsa
-  Dim intCont As Integer
-  For intCont = intPrimeiraLinha To intUltimaLinha
-    Debug.Print ActiveSheet.Cells(intCont, intColunaData).Value
-    If ActiveSheet.Cells(intCont, intColunaData).Value = #12/31/1980# Then ActiveSheet.Cells(intCont, intColunaData) = ""
-  Next intCont
-  
-  Exit Sub
-ErroRestaurarDataFalsa:
-  MostrarMsgErro ("RestaurarDataFalsa")
+'
+' Remove a data falsa inserida antes da ordenação
+'
+Private Sub RestaurarDataFalsa(ByVal rgData As Range)  
+  Dim varDatas As Variant
+  Dim lngLinha As Long
+  varDatas = rgData.Value
+  For lngLinha = 1 To UBound(varDatas, 1)
+    If VarType(varDatas(lngLinha, 1)) = vbDate Then
+      If varDatas(lngLinha, 1) = DATA_FALSA Then
+        rgData.Cells(lngLinha, 1).ClearContents
+      End If
+    End If
+  Next lngLinha
 End Sub

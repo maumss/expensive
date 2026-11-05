@@ -1,17 +1,21 @@
 Option Explicit
-'Módulo referente ao formulário de avaliação
 
-Public Sub AvaliarRisco()
-  '
-  ' Avalia Macro
-  ' Avalia tolerância ao risco nos investimentos
-  '
-  ' Atalho do teclado: Ctrl+a
-  '
-  On Error GoTo erroAvalia
+' ---------------------------------------------------------------------
+' Módulo: Avaliacao.bas
+' Descrição: Módulo referente ao formulário de avaliação
+' ---------------------------------------------------------------------
+
+'
+' Avalia Macro
+' Avalia tolerância ao risco nos investimentos
+'
+' Atalho do teclado: Ctrl+a
+'
+Public Sub AvaliarRisco()  
+  On Error GoTo ErroAvalia
   UserFormTolerancia.Show False
   Exit Sub
   
-erroAvalia:
+ErroAvalia:
   MostrarMsgErro ("AvaliarRisco")
 End Sub

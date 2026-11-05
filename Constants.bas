@@ -1,11 +1,28 @@
-' Constantes globais
+Option Explicit
+
+' ---------------------------------------------------------------------
+' Módulo: Constants.bas
+' Descrição: Constantes globais
+' ---------------------------------------------------------------------
 
 Public Const BROKER As String = "Broker"
 Public Const RESERVA_ESTRATEGICA As String = "Reserva estratégica"
+Public Const PREFIXO_RESERVA As String = "Reserva"
+
+' Erros de negócio lançados pelas rotinas (Err.Raise)
+Public Const ERRO_TABELA_CHEIA As Long = vbObjectError + 513
+
+' Quantidade mínima para um ativo ser considerado em carteira; abaixo disso é resíduo de ponto flutuante
+Public Const QUANTIDADE_MINIMA_ATIVO As Double = 0.009
+
+' Nomes das planilhas
+Public Const NOME_PLAN_INTRO As String = "Intro"
+Public Const NOME_PLAN_ALOCACAO As String = "Alocacao"
+Public Const NOME_PLAN_ACOES365 As String = "Acoes365"
 
 ' Planilha Intro
 Public Const RANGE_DATA_ULTIMA_ATUALIZ As String = "E12"
-Public Const RANGE_POSICAO = "intPosicao"
+Public Const RANGE_POSICAO As String = "intPosicao"
 
 ' Planilha Orcamento
 Public Const RANGE_TOLERANCIA As String = "orcTolerancia"
@@ -18,10 +35,10 @@ Public Const RANGE_CELULA_INICIO_PORTFOLIO As String = "C36"
 Public Const RANGE_CELULA_FIM_PORTFOLIO As String = "C75"
 
 ' Planilha Retorno
-Public Const RANGE_PLAN_FECHADA = "retPlanFechada"
+Public Const RANGE_PLAN_FECHADA As String = "retPlanFechada"
 
 ' Planilha Retrato
-Public Const RANGE_RELAT_RETRAT = "$A$1:$Q$197"
+Public Const RANGE_RELAT_RETRAT As String = "$A$1:$Q$197"
 
 ' Planilhas Jan a Dez - geral
 Public Const RANGE_SITUAC_PLANILHA As String = "E4"
@@ -91,6 +108,7 @@ Public Const RANGE_COLUNA_ATIVO_TESOURO_DIRETO As String = "E219:E233"
 Public Const RANGE_COLUNA_QTDE_TESOURO_DIRETO As String = "G219:G233"
 Public Const RANGE_COLUNA_SALDO_INICIAL_TESOURO_DIRETO As String = "F219:F233"
 Public Const RANGE_COLUNA_SALDO_FINAL_TESOURO_DIRETO As String = "N219:N233"
+Public Const RANGE_TAB_TESOURO_DIRETO As String = "D219:N233"
 
 ' Planilhas Jan a Dez - Carteira Tesouro Direto Selic
 Public Const RANGE_COLUNA_DATA_TESOURO_SELIC As String = "D240:D245"
@@ -98,6 +116,7 @@ Public Const RANGE_COLUNA_ATIVO_TESOURO_SELIC As String = "E240:E245"
 Public Const RANGE_COLUNA_QTDE_TESOURO_SELIC As String = "G240:G245"
 Public Const RANGE_COLUNA_SALDO_INICIAL_TESOURO_SELIC As String = "F240:F245"
 Public Const RANGE_COLUNA_SALDO_FINAL_TESOURO_SELIC As String = "N240:N245"
+Public Const RANGE_TAB_TESOURO_SELIC As String = "D240:N245"
 
 ' Planilhas Jan a Dez - Carteira ETF
 Public Const RANGE_COLUNA_DATA_ETF As String = "D252:D258"
@@ -107,6 +126,7 @@ Public Const RANGE_COLUNA_SALDO_INICIAL_ETF As String = "F252:F258"
 Public Const RANGE_COLUNA_SALDO_FINAL_ETF As String = "N252:N258"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_ETF As String = "X252:X258"
 Public Const RANGE_COLUNA_RESULTADO_DAYTRADE_ETF As String = "AB252:AB258"
+Public Const RANGE_TAB_ETF As String = "D252:N258"
 
 ' Planilhas Jan a Dez - Carteira Ações USD
 Public Const RANGE_COLUNA_DATA_STOCK As String = "D265:D294"
@@ -135,6 +155,7 @@ Public Const RANGE_COLUNA_QTDE_TREASURY As String = "G337:G346"
 Public Const RANGE_COLUNA_SALDO_INICIAL_TREASURY As String = "F337:F346"
 Public Const RANGE_COLUNA_SALDO_FINAL_TREASURY As String = "N337:N346"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_TREASURY As String = "X337:X346"
+Public Const RANGE_TAB_TREASURY As String = "D337:N346"
 
 ' Planilhas Jan a Dez - Carteira Ouro
 Public Const RANGE_COLUNA_DATA_OURO As String = "D353:D362"
@@ -143,6 +164,7 @@ Public Const RANGE_COLUNA_QTDE_OURO As String = "G353:G362"
 Public Const RANGE_COLUNA_SALDO_INICIAL_OURO As String = "F353:F362"
 Public Const RANGE_COLUNA_SALDO_FINAL_OURO As String = "N353:N362"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_OURO As String = "X353:X362"
+Public Const RANGE_TAB_OURO As String = "D353:N362"
 
 ' Planilhas Jan a Dez - Carteira Cripto
 Public Const RANGE_COLUNA_DATA_CRIPTO As String = "D369:D378"
@@ -152,6 +174,7 @@ Public Const RANGE_COLUNA_SALDO_INICIAL_CRIPTO As String = "F369:F378"
 Public Const RANGE_COLUNA_SALDO_FINAL_CRIPTO As String = "N369:N378"
 Public Const RANGE_COLUNA_RESULTADO_COMUM_CRIPTO As String = "X369:X378"
 Public Const RANGE_CELULA_IGNORA_AGENDA_CRIPTO As String = "R381"
+Public Const RANGE_TAB_CRIPTO As String = "D369:N378"
 
 'Planilhas Jan a Dez - Indicadores
 Public Const RANGE_CELULA_DOLAR_FINAL_MES_INDICADORES As String = "G393"

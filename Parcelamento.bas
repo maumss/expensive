@@ -1,8 +1,20 @@
 Option Explicit
-' Módulo de construção de parcelamentos de uma conta no formato: conta (a/b)
-' Cria parcelamento do valor da seleção atual. Se a descrição contiver o texto "(1/x)", será
-' criada x entradas nas planilhas seguintes com o mesmo valor inicial, caso contrário perguntará
-' o número de parcelas e dividirá o valor atual.
+
+' --------------------------------------------------------------------------------------------------
+' Módulo: Parcelamento.bas
+' Descrição: Módulo de construção de parcelamentos de uma conta no formato: conta (a/b)
+'   Cria parcelamento do valor da seleção atual. Se a descrição contiver o texto "(1/x)", será
+'   criada x entradas nas planilhas seguintes com o mesmo valor inicial, caso contrário perguntará
+'   o número de parcelas e dividirá o valor atual.
+' --------------------------------------------------------------------------------------------------
+
+Private Const TITULO_CRIAR_PARCELAS As String = "Criar parcelas"
+Private Const ABRE_PARENTESES As String = "("
+Private Const FECHA_PARENTESES As String = ")"
+Private Const BARRA As String = "/"
+Private Const PRIMEIRA_PARCELA As Integer = 1
+Private Const MAXIMO_PARCELAS As Integer = 999
+Private Const PARCELAS_INVALIDAS As Integer = -1
 
 Private Type InfoParcelamento
   intPosAbreParent As Integer
@@ -22,109 +34,141 @@ Private Type Movimentacao
   blnMovCartao As Boolean
 End Type
 
-'Cria entrada nas planilhas futuras com base no parcelamento da seleção corrente
-Sub MontarParcelamento()
-   On Error GoTo ErroCriarParcelamento
-   Dim strTextoOriginal As String
-   'Testa se é planilha mensal válida e se está aberta
-   If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
-     Exit Sub
-   End If
-   'Testa se já está na planilha de Dezembro
-   If ActiveSheet.Name = NOME_PLAN_DEZ Then
-    MsgBox "Não existe planilha posterior a essa para criar parcelas", vbCritical
+'
+' Cria entrada nas planilhas futuras com base no parcelamento da seleção corrente
+'
+' Atalho do teclado: Ctrl+p
+'
+Public Sub MontarParcelamento()
+  Dim wsPlanilhaAtual As Worksheet, wsPlanilhaDestino As Worksheet
+  Dim rgAlvo As Range
+  Dim udtMovimentacao As Movimentacao
+  Dim udtInfoParcelamento As InfoParcelamento
+  Dim varDescricoes As Variant, varDescricao As Variant
+  Dim intParcela As Integer
+  Dim lngParcelasCriadas As Long, lngParcelasPrevistas As Long
+  Dim blnCongelou As Boolean, blnConcluiu As Boolean
+  On Error GoTo ErroMontarParcelamento
+
+  'Testa se é planilha mensal válida e se está aberta
+  If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
     Exit Sub
-   End If
-   Dim wsPlanilha As Worksheet
-   Dim rgAlvo As Range
-   Set wsPlanilha = ActiveSheet
-   Set rgAlvo = Selection
-   If IsLocalIvalido(rgAlvo) Then
-     Exit Sub
-   End If
-   'Pede confirmação
-   If MsgBox("Você deseja criar parcelas com base nesta movimentação?", _
-        vbYesNo + vbQuestion, "Mover lançamento") = vbNo Then
-     Exit Sub
-   End If
-  
-   Dim udtMovimentacao As Movimentacao
-   udtMovimentacao = RetornarMovimentacao(rgAlvo)
-   If Len(udtMovimentacao.strDescMov) = 0 Then
-     Exit Sub
-   End If
-   Dim udtInfoParcelamento As InfoParcelamento
-   udtInfoParcelamento = RetornarInfoParcelamento(udtMovimentacao.strDescMov, udtMovimentacao.dblValorMov)
-   If udtInfoParcelamento.intTotalParcelas = 0 Then
-     ' cancelou o parcelamento
-     Exit Sub
-   End If
-   Dim varArray As Variant
-   varArray = RetornarArrayDeParcelamento(udtMovimentacao.strDescMov, udtInfoParcelamento)
-   If IsArrayEmpty(varArray) Then
-     Exit Sub
-   End If
-   Dim lngIndPlanAtual As Long, lngIndPlan As Long
-   If (Not IsTextoPreParcelado(udtInfoParcelamento)) Then
-     Call AlterarTextoAtual(rgAlvo, udtInfoParcelamento, udtMovimentacao)
-   End If
-   lngIndPlanAtual = Worksheets(ActiveSheet.Name).Index
-   lngIndPlan = lngIndPlanAtual + 1
-   Dim vntTexto As Variant
-   Dim intParcela As Integer
-   intParcela = 1
-   For Each vntTexto In varArray
-     Call CriarEntradaNaPlanilha(lngIndPlan, vntTexto, udtInfoParcelamento.dblValorParcela, udtMovimentacao, intParcela)
-     lngIndPlan = lngIndPlan + 1
-     intParcela = intParcela + 1
-   Next vntTexto
-   Worksheets(lngIndPlanAtual).Activate
-   'rgAlvo.Select
-      
-   Exit Sub
-ErroCriarParcelamento:
-  MostrarMsgErro ("MontarParcelamento")
+  End If
+  'Testa se já está na planilha de Dezembro
+  If ActiveSheet.Name = NOME_PLAN_DEZ Then
+    MsgBox "Não existe planilha posterior a essa para criar parcelas", vbCritical, TITULO_CRIAR_PARCELAS
+    Exit Sub
+  End If
+  If Not TypeOf Selection Is Range Then
+    Exit Sub
+  End If
+  Set wsPlanilhaAtual = ActiveSheet
+  Set rgAlvo = Selection.Cells(1)
+  If IsLocalInvalido(wsPlanilhaAtual, rgAlvo) Then
+    Exit Sub
+  End If
+  'Pede confirmação
+  If MsgBox("Você deseja criar parcelas com base nesta movimentação?", _
+       vbYesNo + vbQuestion, TITULO_CRIAR_PARCELAS) = vbNo Then
+    Exit Sub
+  End If
+
+  udtMovimentacao = RetornarMovimentacao(wsPlanilhaAtual, rgAlvo)
+  If Len(udtMovimentacao.strDescMov) = 0 Then
+    Exit Sub
+  End If
+  udtInfoParcelamento = RetornarInfoParcelamento(udtMovimentacao.strDescMov, udtMovimentacao.dblValorMov)
+  If udtInfoParcelamento.intTotalParcelas = 0 Then
+    ' cancelou o parcelamento
+    Exit Sub
+  End If
+  If Not IsParcelamentoValido(udtInfoParcelamento) Then
+    MsgBox "Não há parcelas a criar: verifique o número de parcelas informado ou da descrição.", _
+      vbExclamation, TITULO_CRIAR_PARCELAS
+    Exit Sub
+  End If
+  varDescricoes = RetornarArrayDeParcelamento(udtMovimentacao.strDescMov, udtInfoParcelamento)
+  lngParcelasPrevistas = UBound(varDescricoes) - LBound(varDescricoes) + 1
+
+  CongelarCalculosPlanilha True
+  blnCongelou = True
+  If Not IsTextoPreParcelado(udtInfoParcelamento) Then
+    AlterarTextoAtual wsPlanilhaAtual, rgAlvo, udtInfoParcelamento, udtMovimentacao
+  End If
+  Set wsPlanilhaDestino = wsPlanilhaAtual
+  intParcela = PRIMEIRA_PARCELA
+  For Each varDescricao In varDescricoes
+    Set wsPlanilhaDestino = RetornarProximaPlanilha(wsPlanilhaDestino)
+    If wsPlanilhaDestino Is Nothing Then
+      ' chegou ao fim do ano
+      Exit For
+    End If
+    If IsPlanilhaAberta(wsPlanilhaDestino.Range(RANGE_SITUAC_PLANILHA)) Then
+      CriarEntradaNaPlanilha wsPlanilhaDestino, CStr(varDescricao), udtInfoParcelamento.dblValorParcela, _
+        udtMovimentacao, intParcela
+      lngParcelasCriadas = lngParcelasCriadas + 1
+    End If
+    intParcela = intParcela + 1
+  Next varDescricao
+  blnConcluiu = True
+
+FimMontarParcelamento:
+  If blnCongelou Then
+    CongelarCalculosPlanilha False
+  End If
+  If blnConcluiu And lngParcelasCriadas < lngParcelasPrevistas Then
+    MsgBox "Foram criadas " & lngParcelasCriadas & " de " & lngParcelasPrevistas & " parcelas." & vbNewLine & _
+      "As demais não foram criadas porque a planilha destino não existe ou está Fechada.", _
+      vbInformation, TITULO_CRIAR_PARCELAS
+  End If
+  Exit Sub
+
+ErroMontarParcelamento:
+  MostrarMsgErro "MontarParcelamento"
+  Resume FimMontarParcelamento
 End Sub
 
-Private Function IsLocalIvalido(rgAlvo As Range) As Boolean
-  IsLocalIvalido = (Application.Intersect(rgAlvo, Range(RANGE_TAB_MOVIMENTACAO)) Is Nothing) And _
-       (Application.Intersect(rgAlvo, Range(RANGE_TAB_CARTOES)) Is Nothing)
+Private Function IsLocalInvalido(ByVal wsPlanilha As Worksheet, ByVal rgAlvo As Range) As Boolean
+  IsLocalInvalido = (Application.Intersect(rgAlvo, wsPlanilha.Range(RANGE_TAB_MOVIMENTACAO)) Is Nothing) And _
+       (Application.Intersect(rgAlvo, wsPlanilha.Range(RANGE_TAB_CARTOES)) Is Nothing)
 End Function
 
-Private Function RetornarMovimentacao(rgAlvo As Range) As Movimentacao
-  Dim intLinhaAtual As Integer, intColunaInicial As Integer, intColunaInicioCartao As Integer
-  intLinhaAtual = rgAlvo.Row
+Private Function RetornarMovimentacao(ByVal wsPlanilha As Worksheet, ByVal rgAlvo As Range) As Movimentacao
   Dim udtMovimentacao As Movimentacao
-  If IsMovimentoCartao(rgAlvo) Then
-    intColunaInicial = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
-    udtMovimentacao.strNomeCartao = Cells(intLinhaAtual, intColunaInicial + 3).Value
-    udtMovimentacao.dblValorMov = Cells(intLinhaAtual, intColunaInicial + 4).Value
-    udtMovimentacao.blnMovCartao = True
+  Dim lngLinhaAtual As Long, lngColunaInicial As Long
+  lngLinhaAtual = rgAlvo.Row
+  udtMovimentacao.blnMovCartao = IsMovimentoCartao(wsPlanilha, rgAlvo)
+  If udtMovimentacao.blnMovCartao Then
+    lngColunaInicial = wsPlanilha.Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+    udtMovimentacao.strNomeCartao = CStr(wsPlanilha.Cells(lngLinhaAtual, lngColunaInicial + 3).Value)
+    udtMovimentacao.dblValorMov = RetornarValorNumerico(wsPlanilha.Cells(lngLinhaAtual, lngColunaInicial + 4).Value)
   Else
-    intColunaInicial = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
-    udtMovimentacao.dblValorMov = Cells(intLinhaAtual, intColunaInicial + 3).Value
-    udtMovimentacao.blnMovCartao = False
+    lngColunaInicial = wsPlanilha.Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
+    udtMovimentacao.dblValorMov = RetornarValorNumerico(wsPlanilha.Cells(lngLinhaAtual, lngColunaInicial + 3).Value)
   End If
-  udtMovimentacao.datDataMov = Cells(intLinhaAtual, intColunaInicial).Value
-  udtMovimentacao.strDescMov = Cells(intLinhaAtual, intColunaInicial + 1).Value
-  udtMovimentacao.strTipoMov = Cells(intLinhaAtual, intColunaInicial + 2).Value
+  udtMovimentacao.datDataMov = wsPlanilha.Cells(lngLinhaAtual, lngColunaInicial).Value
+  udtMovimentacao.strDescMov = CStr(wsPlanilha.Cells(lngLinhaAtual, lngColunaInicial + 1).Value)
+  udtMovimentacao.strTipoMov = CStr(wsPlanilha.Cells(lngLinhaAtual, lngColunaInicial + 2).Value)
   RetornarMovimentacao = udtMovimentacao
 End Function
 
-Private Function IsMovimentoCartao(rgAlvo As Range) As Boolean
-  IsMovimentoCartao = (Not Application.Intersect(rgAlvo, Range(RANGE_TAB_CARTOES)) Is Nothing)
+Private Function IsMovimentoCartao(ByVal wsPlanilha As Worksheet, ByVal rgAlvo As Range) As Boolean
+  IsMovimentoCartao = Not (Application.Intersect(rgAlvo, wsPlanilha.Range(RANGE_TAB_CARTOES)) Is Nothing)
 End Function
 
-'Verifica o formato de parcelas dizendo a posição na string que os separadores ocupam
-Private Function RetornarInfoParcelamento(strTextoOriginal As String, dblValorMov As Double) As InfoParcelamento
+'
+' Verifica o formato de parcelas dizendo a posição na string que os separadores ocupam
+'
+Private Function RetornarInfoParcelamento(ByVal strTextoOriginal As String, ByVal dblValorMov As Double) As InfoParcelamento
   Dim udtInfoParcelamento As InfoParcelamento
-  udtInfoParcelamento.intPosAbreParent = InStr(strTextoOriginal, "(")
-  udtInfoParcelamento.intPosFechaParent = InStr(strTextoOriginal, ")")
-  udtInfoParcelamento.intPosBarra = InStr(strTextoOriginal, "/")
-  ' verifica se o texto possui o formato de parcelas: "x----x (x/x)"
-  If (udtInfoParcelamento.intPosAbreParent < 0) Or (udtInfoParcelamento.intPosFechaParent < 0) Or _
-     (udtInfoParcelamento.intPosFechaParent < udtInfoParcelamento.intPosAbreParent) Or _
-     (udtInfoParcelamento.intPosBarra < udtInfoParcelamento.intPosAbreParent) Or _
+  ' considera o último grupo entre parênteses, no formato: "x----x (x/x)"
+  udtInfoParcelamento.intPosAbreParent = InStrRev(strTextoOriginal, ABRE_PARENTESES)
+  If udtInfoParcelamento.intPosAbreParent > 0 Then
+    udtInfoParcelamento.intPosBarra = InStr(udtInfoParcelamento.intPosAbreParent + 1, strTextoOriginal, BARRA)
+    udtInfoParcelamento.intPosFechaParent = InStr(udtInfoParcelamento.intPosAbreParent + 1, strTextoOriginal, FECHA_PARENTESES)
+  End If
+  If (udtInfoParcelamento.intPosAbreParent = 0) Or (udtInfoParcelamento.intPosBarra = 0) Or _
+     (udtInfoParcelamento.intPosFechaParent = 0) Or _
      (udtInfoParcelamento.intPosBarra > udtInfoParcelamento.intPosFechaParent) Then
     udtInfoParcelamento.intPosAbreParent = 0
     udtInfoParcelamento.intPosFechaParent = 0
@@ -132,171 +176,155 @@ Private Function RetornarInfoParcelamento(strTextoOriginal As String, dblValorMo
   End If
   udtInfoParcelamento.intParcelaInicial = RetornarParcelaInicialMaisUm(strTextoOriginal, udtInfoParcelamento)
   udtInfoParcelamento.intTotalParcelas = RetornarTotalParcelas(strTextoOriginal, udtInfoParcelamento)
-  udtInfoParcelamento.dblValorParcela = RetornarValorParcela(udtInfoParcelamento, dblValorMov)
+  If udtInfoParcelamento.intTotalParcelas > 0 Then
+    udtInfoParcelamento.dblValorParcela = RetornarValorParcela(udtInfoParcelamento, dblValorMov)
+  End If
   RetornarInfoParcelamento = udtInfoParcelamento
 End Function
 
-'Busca a parcela inicial a partir da parcela selecionada
-Private Function RetornarParcelaInicialMaisUm(strTextoOriginal As String, udtInfoParcelamento As InfoParcelamento) As Integer
-  Dim strParcelaInicial
-  RetornarParcelaInicialMaisUm = 0
+'
+' Precisa haver ao menos uma parcela posterior à atual
+'
+Private Function IsParcelamentoValido(ByRef udtInfoParcelamento As InfoParcelamento) As Boolean  
+  IsParcelamentoValido = (udtInfoParcelamento.intParcelaInicial > PRIMEIRA_PARCELA) And _
+    (udtInfoParcelamento.intParcelaInicial <= udtInfoParcelamento.intTotalParcelas)
+End Function
+
+'
+' Converte o texto em número de parcela; retorna PARCELAS_INVALIDAS se não for um inteiro válido
+'
+Private Function ConverterParaInteiro(ByVal strValor As String) As Integer
+  Dim dblValor As Double
+  ConverterParaInteiro = PARCELAS_INVALIDAS
+  strValor = Trim$(strValor)
+  If Len(strValor) = 0 Or Not IsNumeric(strValor) Then
+    Exit Function
+  End If
+  dblValor = CDbl(strValor)
+  If dblValor <> Fix(dblValor) Or dblValor < 0 Or dblValor > MAXIMO_PARCELAS Then
+    Exit Function
+  End If
+  ConverterParaInteiro = CInt(dblValor)
+End Function
+
+'
+' Busca a parcela inicial a partir da parcela selecionada
+'
+Private Function RetornarParcelaInicialMaisUm(ByVal strTextoOriginal As String, ByRef udtInfoParcelamento As InfoParcelamento) As Integer
+  Dim intParcelaAtual As Integer
   If IsTextoPreParcelado(udtInfoParcelamento) Then
-    strParcelaInicial = Mid(strTextoOriginal, udtInfoParcelamento.intPosAbreParent + 1, _
-        udtInfoParcelamento.intPosBarra - udtInfoParcelamento.intPosAbreParent - 1)
-    If IsNumeric(strParcelaInicial) Then
-      RetornarParcelaInicialMaisUm = CInt(strParcelaInicial) + 1
+    intParcelaAtual = ConverterParaInteiro(Mid$(strTextoOriginal, udtInfoParcelamento.intPosAbreParent + 1, _
+        udtInfoParcelamento.intPosBarra - udtInfoParcelamento.intPosAbreParent - 1))
+    If intParcelaAtual > 0 Then
+      RetornarParcelaInicialMaisUm = intParcelaAtual + 1
     End If
     Exit Function
   End If
   'se não estiver no formato parcelado, supõe que a próxima parcela será a dois
-  RetornarParcelaInicialMaisUm = 2
+  RetornarParcelaInicialMaisUm = PRIMEIRA_PARCELA + 1
 End Function
 
-'Busca ou define o total de parcelas que deverão ser criadas
-Private Function RetornarTotalParcelas(strTextoOriginal As String, udtInfoParcelamento As InfoParcelamento) As Integer
-  Dim strTotalParcelas
-  RetornarTotalParcelas = 0
+'
+' Busca ou define o total de parcelas que deverão ser criadas (0 = cancelado)
+'
+Private Function RetornarTotalParcelas(ByVal strTextoOriginal As String, ByRef udtInfoParcelamento As InfoParcelamento) As Integer
+  Dim strTotalParcelas As String
   If IsTextoPreParcelado(udtInfoParcelamento) Then
-    strTotalParcelas = Mid(strTextoOriginal, udtInfoParcelamento.intPosBarra + 1, _
+    strTotalParcelas = Mid$(strTextoOriginal, udtInfoParcelamento.intPosBarra + 1, _
        udtInfoParcelamento.intPosFechaParent - udtInfoParcelamento.intPosBarra - 1)
-    If IsNumeric(strTotalParcelas) Then
-      RetornarTotalParcelas = CInt(strTotalParcelas)
+  Else
+    'se não for formato parcelado, pede que o usuário digite
+    strTotalParcelas = InputBox("Entre o total de parcelas ou pressione Cancelar para finalizar:", TITULO_CRIAR_PARCELAS)
+    If Len(strTotalParcelas) = 0 Then
+      'pressionou cancelar
+      Exit Function
     End If
-    Exit Function
   End If
-  'se não for formato parcelado, pede que o usuário digite
-  strTotalParcelas = InputBox("Entre o total de parcelas ou pressione Cancelar para finalizar:")
-  If Len(strTotalParcelas) = 0 Then
-    'pressionou cancelar
-    RetornarTotalParcelas = 0
-    Exit Function
-  End If
-  If IsNumeric(strTotalParcelas) Then
-    RetornarTotalParcelas = CInt(strTotalParcelas)
-  End If
+  RetornarTotalParcelas = ConverterParaInteiro(strTotalParcelas)
 End Function
 
-'Calcula o valor da parcela
-Private Function RetornarValorParcela(udtInfoParcelamento As InfoParcelamento, dblValorMov As Double) As Double
-  Dim dblValorParcela As Double
+'
+' Calcula o valor da parcela
+'
+Private Function RetornarValorParcela(ByRef udtInfoParcelamento As InfoParcelamento, ByVal dblValorMov As Double) As Double
   If IsTextoPreParcelado(udtInfoParcelamento) Then
     RetornarValorParcela = dblValorMov
-    Exit Function
+  Else
+    RetornarValorParcela = dblValorMov / udtInfoParcelamento.intTotalParcelas
   End If
-  RetornarValorParcela = dblValorMov / udtInfoParcelamento.intTotalParcelas
 End Function
 
-'Monta um array com a descrição de cada parcela
-Private Function RetornarArrayDeParcelamento(strTextoOriginal As String, udtInfoParcelamento As InfoParcelamento) As Variant
+'
+' Monta um array com a descrição de cada parcela a ser criada
+'
+Private Function RetornarArrayDeParcelamento(ByVal strTextoOriginal As String, ByRef udtInfoParcelamento As InfoParcelamento) As Variant
   Dim astrItems() As String
-  On Error GoTo ErroRetornarArrayDeParcelamento
-  If (udtInfoParcelamento.intParcelaInicial = 0 Or udtInfoParcelamento.intTotalParcelas = 0) Then
-    RetornarArrayDeParcelamento = astrItems
-    Exit Function
-  End If
-  Dim intTamArray As Integer
-  intTamArray = udtInfoParcelamento.intTotalParcelas - 2
-  ReDim astrItems(0 To intTamArray)
-
   Dim strParteFixa As String
+  Dim intParcela As Integer, intIndice As Integer
+  ReDim astrItems(0 To udtInfoParcelamento.intTotalParcelas - udtInfoParcelamento.intParcelaInicial)
   strParteFixa = RetornarParteFixaDoTexto(strTextoOriginal, udtInfoParcelamento)
-  
-  Dim intParcela As Integer, intIndex As Integer
-  intIndex = 0
   For intParcela = udtInfoParcelamento.intParcelaInicial To udtInfoParcelamento.intTotalParcelas
-    astrItems(intIndex) = strParteFixa & CStr(intParcela) & "/" & CStr(udtInfoParcelamento.intTotalParcelas) & ")"
-    intIndex = intIndex + 1
+    astrItems(intIndice) = strParteFixa & CStr(intParcela) & BARRA & CStr(udtInfoParcelamento.intTotalParcelas) & FECHA_PARENTESES
+    intIndice = intIndice + 1
   Next intParcela
   RetornarArrayDeParcelamento = astrItems
-  
-  Exit Function
-ErroRetornarArrayDeParcelamento:
-  MostrarMsgErro ("RetornarArrayDeParcelamento")
 End Function
 
-'Retorna o prefixo da descrição de cada parcela
-Private Function RetornarParteFixaDoTexto(strTextoOriginal As String, udtInfoParcelamento As InfoParcelamento) As String
-  Dim strParteFixa As String
-  RetornarParteFixaDoTexto = strTextoOriginal & " ("
+'
+' Retorna o prefixo da descrição de cada parcela
+'
+Private Function RetornarParteFixaDoTexto(ByVal strTextoOriginal As String, ByRef udtInfoParcelamento As InfoParcelamento) As String
   If IsTextoPreParcelado(udtInfoParcelamento) Then
-    RetornarParteFixaDoTexto = Left(strTextoOriginal, udtInfoParcelamento.intPosAbreParent)
+    RetornarParteFixaDoTexto = Left$(strTextoOriginal, udtInfoParcelamento.intPosAbreParent)
+  Else
+    RetornarParteFixaDoTexto = strTextoOriginal & " " & ABRE_PARENTESES
   End If
 End Function
 
-'Retorna se o texto já pressupõe um parcelamento
-Private Function IsTextoPreParcelado(udtInfoParcelamento As InfoParcelamento) As Boolean
+'
+' Retorna se o texto já pressupõe um parcelamento
+'
+Private Function IsTextoPreParcelado(ByRef udtInfoParcelamento As InfoParcelamento) As Boolean
   IsTextoPreParcelado = (udtInfoParcelamento.intPosBarra > 0)
 End Function
 
-'Verifica se um array possui algum conteúdo
-Private Function IsArrayEmpty(varArray As Variant) As Boolean
-   ' Determina se um array contém algum elemento
-   Dim lngUBound As Long
-   On Error Resume Next
-   ' Se o array estiver vazio, um erro ocorrerá quando checar os limites do array
-   lngUBound = UBound(varArray)
-   If Err.Number <> 0 Then
-      IsArrayEmpty = True
-   Else
-      IsArrayEmpty = False
-   End If
-End Function
-
-'Caso não for pre-parcelado, deve mudar o texto atual para conter a parcela 1/x
-Private Sub AlterarTextoAtual(rgAlvo As Range, udtInfoParcelamento As InfoParcelamento, udtMovimentacao As Movimentacao)
-  Dim lngLinhaDest As Long
-  Dim intColunaDestino As Integer, intColunaValor As Integer
-  lngLinhaDest = rgAlvo.Row
-  If (udtMovimentacao.blnMovCartao) Then
-    intColunaDestino = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
-    intColunaValor = intColunaDestino + 4
+'
+' Caso não for pre-parcelado, deve mudar o texto atual para conter a parcela 1/x
+'
+Private Sub AlterarTextoAtual(ByVal wsPlanilha As Worksheet, ByVal rgAlvo As Range, _
+    ByRef udtInfoParcelamento As InfoParcelamento, ByRef udtMovimentacao As Movimentacao)
+  Dim lngLinhaDestino As Long, lngColunaDestino As Long, lngColunaValor As Long
+  lngLinhaDestino = rgAlvo.Row
+  If udtMovimentacao.blnMovCartao Then
+    lngColunaDestino = wsPlanilha.Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+    lngColunaValor = lngColunaDestino + 4
   Else
-    intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
-    intColunaValor = intColunaDestino + 3
+    lngColunaDestino = wsPlanilha.Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
+    lngColunaValor = lngColunaDestino + 3
   End If
-  Cells(lngLinhaDest, intColunaDestino + 1).Value = udtMovimentacao.strDescMov & " (1/" & _
-     CStr(udtInfoParcelamento.intTotalParcelas) & ")"
-  Cells(lngLinhaDest, intColunaValor).Value = udtInfoParcelamento.dblValorParcela
+  wsPlanilha.Cells(lngLinhaDestino, lngColunaDestino + 1).Value = udtMovimentacao.strDescMov & " " & _
+     ABRE_PARENTESES & PRIMEIRA_PARCELA & BARRA & CStr(udtInfoParcelamento.intTotalParcelas) & FECHA_PARENTESES
+  wsPlanilha.Cells(lngLinhaDestino, lngColunaValor).Value = udtInfoParcelamento.dblValorParcela
 End Sub
 
-'Cria tantas entradas quanto for o número de parcelas
-Private Sub CriarEntradaNaPlanilha(lngIndPlanDestino As Long, ByVal strTexto As String, _
-     dblValorParcela As Double, udtMovimentacao As Movimentacao, intParcela As Integer)
-   CongelarCalculosPlanilha (True)
-   On Error GoTo EndMacro:
-   ' Se posiciona na próxima planilha
-   Worksheets(lngIndPlanDestino).Activate
-   If Not IsPlanilhaAberta(Range(RANGE_SITUAC_PLANILHA)) Then
-     Exit Sub
-   End If
-   Dim lngLinhaDest As Long
-   Dim intColunaDestino As Integer
-   Dim datDataParcela As Date
-   datDataParcela = udtMovimentacao.datDataMov
-   If (udtMovimentacao.blnMovCartao) Then
-     lngLinhaDest = RetornarUltimaLinhaCartao + 1
-     intColunaDestino = Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
-   Else
-     lngLinhaDest = RetornarUltimaLinhaMovimentacoes + 1
-     intColunaDestino = Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
-     datDataParcela = DateAdd("m", intParcela, datDataParcela)
-   End If
-   Cells(lngLinhaDest, intColunaDestino).Value = datDataParcela
-   Cells(lngLinhaDest, intColunaDestino + 1).Value = strTexto
-   Cells(lngLinhaDest, intColunaDestino + 2).Value = udtMovimentacao.strTipoMov
-   Dim intColunaValor As Integer
-   intColunaValor = intColunaDestino + 3
-   If (udtMovimentacao.blnMovCartao) Then
-     Cells(lngLinhaDest, intColunaDestino + 3).Value = udtMovimentacao.strNomeCartao
-     intColunaValor = intColunaDestino + 4
-   End If
-   Cells(lngLinhaDest, intColunaValor).Value = dblValorParcela
-   
-EndMacro:
-  CongelarCalculosPlanilha (False)
-  Exit Sub
-  
-ErroCriarEntradaNaPlanilha:
-  MostrarMsgErro ("CriarEntradaNaPlanilha")
-  Resume EndMacro
+'
+' Cria a entrada de uma parcela na planilha destino
+'
+Private Sub CriarEntradaNaPlanilha(ByVal wsPlanilhaDestino As Worksheet, ByVal strTexto As String, _
+     ByVal dblValorParcela As Double, ByRef udtMovimentacao As Movimentacao, ByVal intParcela As Integer)
+  Dim lngLinhaDestino As Long, lngColunaDestino As Long
+  Dim datDataParcela As Date
+  datDataParcela = udtMovimentacao.datDataMov
+  If udtMovimentacao.blnMovCartao Then
+    lngLinhaDestino = RetornarLinhaLivreCartao(wsPlanilhaDestino)
+    lngColunaDestino = wsPlanilhaDestino.Range(RANGE_PRIMEIRA_DATA_CARTOES).Column
+    wsPlanilhaDestino.Cells(lngLinhaDestino, lngColunaDestino).Resize(1, 5).Value = _
+      Array(datDataParcela, strTexto, udtMovimentacao.strTipoMov, udtMovimentacao.strNomeCartao, dblValorParcela)
+  Else
+    lngLinhaDestino = RetornarLinhaLivreMovimentacoes(wsPlanilhaDestino)
+    lngColunaDestino = wsPlanilhaDestino.Range(RANGE_PRIMEIRA_DATA_MOVIMENTACAO).Column
+    datDataParcela = DateAdd("m", intParcela, datDataParcela)
+    wsPlanilhaDestino.Cells(lngLinhaDestino, lngColunaDestino).Resize(1, 4).Value = _
+      Array(datDataParcela, strTexto, udtMovimentacao.strTipoMov, dblValorParcela)
+  End If
 End Sub

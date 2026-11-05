@@ -1,277 +1,219 @@
-' Módulo de funções sobre o controle de Investimentos
 Option Explicit
 
-Function CalcularSaldoAtual(rgDescInvest As Range) As Double
-  '
-  ' Função saldoAtual   Data: 13/01/04
-  ' Determina o saldo atual do investimento de acordo com
-  ' o saldo inicial da Carteira da primeira planilha
-  ' mensal aberta
-  '
-  ' Variáveis
+' ---------------------------------------------------------------------
+' Módulo: Investimento.bas
+' Descrição: Módulo de funções sobre o controle de Investimentos
+' ---------------------------------------------------------------------
+
+Private Const TITULO_INVESTIMENTOS As String = "Investimentos"
+
+' Lembrete do Outlook para pagamento de DARF
+Private Const OUTLOOK_APPOINTMENT_ITEM As Integer = 1 '1 = Appointment
+Private Const OUTLOOK_OCUPADO As Integer = 2 '1 = Provisório, 2 = Ocupado, 3 = Ausente, 4 = Trabalhando em outro lugar, 5 = Disponível
+Private Const MINUTOS_POR_DIA As Integer = 1440
+Private Const DURACAO_LEMBRETE_MINUTOS As Integer = 30
+Private Const HORARIO_LEMBRETE As String = "10:00:00"
+Private Const ASSUNTO_LEMBRETE_DARF As String = "Pagar Darf"
+Private Const TEXTO_LEMBRETE_DARF As String = "Pagar imposto com código 6015, Ganhos líquidos em operações em bolsa."
+
+'
+' Função saldoAtual   Data: 13/01/04
+' Determina o saldo atual do investimento de acordo com
+' o saldo inicial da Carteira da primeira planilha
+' mensal aberta
+'
+Public Function CalcularSaldoAtual(ByVal rgDescInvest As Range) As Variant  
   Dim wsPlanilha As Worksheet
-  ' Principal
-  On Error GoTo ErroSaldoAtual
-  For Each wsPlanilha In Worksheets
-     ' A primeira planilha aberta que achar é a válida
-     If IsPlanilhaAberta(wsPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
-       CalcularSaldoAtual = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_PORTFOLIO), _
-             rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO))
-       Exit Function
-     End If
+  On Error GoTo ErroCalcularSaldoAtual
+  For Each wsPlanilha In ThisWorkbook.Worksheets
+    ' A primeira planilha aberta que achar é a válida
+    If IsPlanilhaAberta(wsPlanilha.Range(RANGE_SITUAC_PLANILHA)) Then
+      CalcularSaldoAtual = SomarSaldoPortfolio(wsPlanilha, rgDescInvest)
+      Exit Function
+    End If
   Next wsPlanilha
   ' Se todas as planilhas estão fechadas, pega a de Dezembro
-  CalcularSaldoAtual = Application.WorksheetFunction.SumIf(Worksheets("Dez.").Range(RANGE_COLUNA_ATIVO_PORTFOLIO), _
-       rgDescInvest, Worksheets("Dez.").Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO))
+  CalcularSaldoAtual = SomarSaldoPortfolio(ThisWorkbook.Worksheets(NOME_PLAN_DEZ), rgDescInvest)
   Exit Function
-  
-ErroSaldoAtual:
-  MostrarMsgErro ("CalcularSaldoAtual")
+
+ErroCalcularSaldoAtual:
+  ' função de planilha não deve abrir mensagens: devolve erro para a célula
+  CalcularSaldoAtual = CVErr(xlErrValue)
 End Function
 
-Function CalcularRendAtivo(rgColDescAtivo As Range, _
-                        rgColSaldoInicialAtivo As Range, _
-                        rgColAplicacaoAtivo As Range, _
-                        rgColRetornoAtivo As Range, _
-                        rgColResgateAtivo As Range, _
-                        rgColSaldoFinalAtivo As Range, _
-                        rgCelDescRentabilidade As Range) As Double
-  '
-  ' Função CalcularRendAtivo   Data: 29/04/16
-  ' Retorna o valor percentual do rendimento líquedo da aplicação
-  ' Nota: todas as células envolvidas devem estar nos parâmetros de
-  '  entrada da função para que o Excel possa saber que deve recal-
-  '  cular a função caso uma delas mude.
-  ' A outra maneira é teclar Ctrl + Alt + F9
-  '
+Private Function SomarSaldoPortfolio(ByVal wsPlanilha As Worksheet, ByVal rgDescInvest As Range) As Double
+  SomarSaldoPortfolio = Application.WorksheetFunction.SumIf(wsPlanilha.Range(RANGE_COLUNA_ATIVO_PORTFOLIO), _
+    rgDescInvest, wsPlanilha.Range(RANGE_COLUNA_SALDO_FINAL_PORTFOLIO))
+End Function
+
+'
+' Função CalcularRendAtivo   Data: 29/04/16
+' Retorna o valor percentual do rendimento líquido da aplicação
+' Nota: todas as células envolvidas devem estar nos parâmetros de
+'  entrada da função para que o Excel possa saber que deve recal-
+'  cular a função caso uma delas mude.
+' A outra maneira é teclar Ctrl + Alt + F9
+'
+Public Function CalcularRendAtivo(ByVal rgColDescAtivo As Range, _
+                        ByVal rgColSaldoInicialAtivo As Range, _
+                        ByVal rgColAplicacaoAtivo As Range, _
+                        ByVal rgColRetornoAtivo As Range, _
+                        ByVal rgColResgateAtivo As Range, _
+                        ByVal rgColSaldoFinalAtivo As Range, _
+                        ByVal rgCelDescRentabilidade As Range) As Variant  
+  Dim dblSaldoInicial As Double, dblAplicacao As Double, dblRetorno As Double
+  Dim dblResgate As Double, dblSaldoFinal As Double, dblCpmf As Double
   On Error GoTo ErroCalcularRendAtivo
-  Dim dblSaldoInicial As Double, dblAplicacao As Double, dblRetorno As Double, dblResgate As Double, dblSaldoFinal As Double, dblCpmf As Double
-  dblSaldoInicial = Application.WorksheetFunction.SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColSaldoInicialAtivo)
-  dblAplicacao = Application.WorksheetFunction.SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColAplicacaoAtivo)
-  dblRetorno = Application.WorksheetFunction.SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColRetornoAtivo)
-  dblResgate = Application.WorksheetFunction.SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColResgateAtivo)
-  dblSaldoFinal = Application.WorksheetFunction.SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColSaldoFinalAtivo)
-  
+  With Application.WorksheetFunction
+    dblSaldoInicial = .SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColSaldoInicialAtivo)
+    dblAplicacao = .SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColAplicacaoAtivo)
+    dblRetorno = .SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColRetornoAtivo)
+    dblResgate = .SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColResgateAtivo)
+    dblSaldoFinal = .SumIf(rgColDescAtivo, rgCelDescRentabilidade, rgColSaldoFinalAtivo)
+  End With
+
   dblCpmf = dblSaldoFinal - dblSaldoInicial - dblAplicacao + dblResgate - dblRetorno
-  
-  
+
   If (dblSaldoInicial + dblAplicacao) <> 0 Then
     CalcularRendAtivo = (((dblSaldoFinal + dblResgate - dblCpmf) / (dblSaldoInicial + dblAplicacao)) - 1) * 100
   Else
     CalcularRendAtivo = 0
   End If
   Exit Function
-  
+
 ErroCalcularRendAtivo:
-  MostrarMsgErro ("CalcularRendAtivo")
+  CalcularRendAtivo = CVErr(xlErrValue)
 End Function
 
-
-Sub CriticarInvestimento(ByVal rgAlvo As Range)
-  '
-  ' Sub CriticarInvestimento    Criado por: MSS  Em: 31.01.04
-  ' critica o investimento digitado
-  '
-  ' variáveis
-  Dim strTemp As String
-  ' principal
+'
+' Sub CriticarInvestimento    Criado por: MSS  Em: 31.01.04
+' critica o investimento digitado
+'
+Public Sub CriticarInvestimento(ByVal rgAlvo As Range)  
+  Dim strDescricao As String, strSugestao As String
   On Error GoTo ErroCriticarInvestimento
-  ' Se começar com Broker ou Reserva estratégica
-  If (InStr(1, rgAlvo.Value, BROKER) = 1 Or rgAlvo.Value = RESERVA_ESTRATEGICA) Then
+  If IsError(rgAlvo.Value) Then
     Exit Sub
   End If
-  If Not HasCarteira(rgAlvo.Value) Then
-    strTemp = RetornarParteNomeCarteira(rgAlvo.Value)
-    If strTemp > "" Then
-      If MsgBox("Você se refere a " & vbLf & _
-                strTemp & " ?", vbQuestion + vbYesNo, "Investimentos") = vbYes Then
-        rgAlvo.Value = strTemp
-        Exit Sub
-      End If
-    End If
-    If IsReserva(rgAlvo.Value) Then
+  strDescricao = CStr(rgAlvo.Value)
+  If Len(Trim$(strDescricao)) = 0 Then
+    Exit Sub
+  End If
+  ' Se começar com Broker ou for Reserva estratégica
+  If InStr(1, strDescricao, BROKER) = 1 Or strDescricao = RESERVA_ESTRATEGICA Then
+    Exit Sub
+  End If
+  If Len(BuscarInvestimento(strDescricao, False)) > 0 Then
+    Exit Sub
+  End If
+  strSugestao = BuscarInvestimento(strDescricao, True)
+  If Len(strSugestao) > 0 Then
+    If MsgBox("Você se refere a " & vbLf & strSugestao & " ?", _
+              vbQuestion + vbYesNo, TITULO_INVESTIMENTOS) = vbYes Then
+      rgAlvo.Value = strSugestao
       Exit Sub
     End If
-    MsgBox "Não foi encontrado um investimento com esta descrição." & vbNewLine & _
-               "Procure cadastrar o mesmo em uma de suas carteiras.", vbExclamation
   End If
+  If IsReserva(strDescricao) Then
+    Exit Sub
+  End If
+  MsgBox "Não foi encontrado um investimento com esta descrição." & vbNewLine & _
+         "Procure cadastrar o mesmo em uma de suas carteiras.", vbExclamation, TITULO_INVESTIMENTOS
   Exit Sub
+
 ErroCriticarInvestimento:
-  MostrarMsgErro ("CriticarInvestimento")
+  MostrarMsgErro "CriticarInvestimento"
 End Sub
 
-Private Function HasCarteira(strDescricao As String) As Boolean
-  '
-  ' Function HasCarteira
-  ' procura a descrição fornecida dentro da Carteira1 e Carteira2
-  '
-  ' variáveis
-  Dim intInicioLinhaCarteira1 As Integer, intFinalLinhaCarteira1 As Integer, _
-      intInicioLinhaCarteira2 As Integer, intFinalLinhaCarteira2 As Integer, _
-      intColunaCarteira As Integer
-  intInicioLinhaCarteira1 = Range(RANGE_CELULA_INICIO_ADHOC).Row
-  intFinalLinhaCarteira1 = Range(RANGE_CELULA_FIM_ADHOC).Row
-  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_PORTFOLIO).Row
-  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_PORTFOLIO).Row
-  intColunaCarteira = Range(RANGE_CELULA_INICIO_ADHOC).Column
-  Dim blnAchou As Boolean
-  Dim intLinha As Integer
-  ' principal
-  On Error GoTo ErroHasCarteira
-  blnAchou = False
-  For intLinha = intInicioLinhaCarteira1 To intFinalLinhaCarteira1
-     If IsEmpty(Sheets("Alocacao").Cells(intLinha, intColunaCarteira)) Then
-        Exit For
-     End If
-     If Sheets("Alocacao").Cells(intLinha, intColunaCarteira).Value = strDescricao Then
-       blnAchou = True
-       Exit For
-     End If
-  Next intLinha
-  If Not blnAchou Then
-    For intLinha = intInicioLinhaCarteira2 To intFinalLinhaCarteira2
-      If IsEmpty(Sheets("Alocacao").Cells(intLinha, intColunaCarteira)) Then
-        Exit For
-      End If
-      If Sheets("Alocacao").Cells(intLinha, intColunaCarteira).Value = strDescricao Then
-       blnAchou = True
-       Exit For
-     End If
-    Next intLinha
+'
+' Procura a descrição nas carteiras AdHoc e Portfólio da planilha Alocacao.
+' blnBuscaParcial = False: descrição idêntica; True: parte do nome, sem diferenciar maiúsculas.
+' Retorna a descrição encontrada ou vazio.
+'
+Private Function BuscarInvestimento(ByVal strDescricao As String, ByVal blnBuscaParcial As Boolean) As String  
+  Dim wsAlocacao As Worksheet
+  Set wsAlocacao = ThisWorkbook.Worksheets(NOME_PLAN_ALOCACAO)
+  BuscarInvestimento = BuscarInvestimentoNoIntervalo(wsAlocacao.Range(RANGE_CELULA_INICIO_ADHOC, RANGE_CELULA_FIM_ADHOC), _
+    strDescricao, blnBuscaParcial)
+  If Len(BuscarInvestimento) = 0 Then
+    BuscarInvestimento = BuscarInvestimentoNoIntervalo(wsAlocacao.Range(RANGE_CELULA_INICIO_PORTFOLIO, RANGE_CELULA_FIM_PORTFOLIO), _
+      strDescricao, blnBuscaParcial)
   End If
-  HasCarteira = blnAchou
-  Exit Function
-  
-ErroHasCarteira:
-  MostrarMsgErro ("HasCarteira")
 End Function
 
-Private Function RetornarParteNomeCarteira(strDescricao As String) As String
-  '
-  ' Function achaSbstrCarteira
-  ' procura por parte do nome dado na carteira1 e carteira2
-  '
-  ' variáveis
-  Dim intInicioLinhaCarteira1 As Integer, intFinalLinhaCarteira1 As Integer, _
-      intInicioLinhaCarteira2 As Integer, intFinalLinhaCarteira2 As Integer, _
-      intColunaCarteira As Integer
-  intInicioLinhaCarteira1 = Range(RANGE_CELULA_INICIO_ADHOC).Row
-  intFinalLinhaCarteira1 = Range(RANGE_CELULA_FIM_ADHOC).Row
-  intInicioLinhaCarteira2 = Range(RANGE_CELULA_INICIO_PORTFOLIO).Row
-  intFinalLinhaCarteira2 = Range(RANGE_CELULA_FIM_PORTFOLIO).Row
-  intColunaCarteira = Range(RANGE_CELULA_INICIO_ADHOC).Column
-  Dim blnAchou As Boolean
-  Dim strEncontrado As String
-  Dim intLinha As Integer
-  ' principal
-  On Error GoTo ErroRetornarParteNomeCarteira
-  blnAchou = False
-  strEncontrado = ""
-  For intLinha = intInicioLinhaCarteira1 To intFinalLinhaCarteira1
-     If IsEmpty(Sheets("Alocacao").Cells(intLinha, intColunaCarteira)) Then
-        Exit For
-     End If
-     If Not IsEmpty(Sheets("Alocacao").Cells(intLinha, intColunaCarteira)) And _
-        InStr(1, LCase(Sheets("Alocacao").Cells(intLinha, intColunaCarteira).Value), LCase(strDescricao), 1) > 0 Then
-       blnAchou = True
-       strEncontrado = Sheets("Alocacao").Cells(intLinha, intColunaCarteira).Value
-       Exit For
-     End If
-  Next intLinha
-  If Not blnAchou Then
-    For intLinha = intInicioLinhaCarteira2 To intFinalLinhaCarteira2
-      If IsEmpty(Sheets("Alocacao").Cells(intLinha, 3)) Then
-        Exit For
+Private Function BuscarInvestimentoNoIntervalo(ByVal rgCarteira As Range, ByVal strDescricao As String, _
+    ByVal blnBuscaParcial As Boolean) As String
+  Dim varValores As Variant
+  Dim lngLinha As Long
+  Dim strValor As String
+  varValores = rgCarteira.Value
+  For lngLinha = 1 To UBound(varValores, 1)
+    ' a carteira termina na primeira célula vazia
+    If IsEmpty(varValores(lngLinha, 1)) Then
+      Exit Function
+    End If
+    If Not IsError(varValores(lngLinha, 1)) Then
+      strValor = CStr(varValores(lngLinha, 1))
+      If blnBuscaParcial Then
+        If InStr(1, strValor, strDescricao, vbTextCompare) > 0 Then
+          BuscarInvestimentoNoIntervalo = strValor
+          Exit Function
+        End If
+      ElseIf strValor = strDescricao Then
+        BuscarInvestimentoNoIntervalo = strValor
+        Exit Function
       End If
-      If InStr(1, LCase(Sheets("Alocacao").Cells(intLinha, intColunaCarteira).Value), LCase(strDescricao), 1) > 0 Then
-        blnAchou = True
-        strEncontrado = Sheets("Alocacao").Cells(intLinha, intColunaCarteira).Value
-        Exit For
-      End If
-    Next intLinha
-  End If
-  RetornarParteNomeCarteira = strEncontrado
-  Exit Function
-  
-ErroRetornarParteNomeCarteira:
-  MostrarMsgErro ("RetornarParteNomeCarteira")
+    End If
+  Next lngLinha
 End Function
 
-Private Function IsReserva(strDescricao As String) As Boolean
-  '
-  ' Function IsReserva
-  ' verifica se trata de uma Reserva Estratégica
-  '
-  ' variáveis
-  Dim blnAchou As Boolean
-  ' principal
-  On Error GoTo ErroIsReserva
-  blnAchou = False
-  If InStr(1, strDescricao, "Reserva") = 1 Then
-    blnAchou = True
-  End If
-  IsReserva = blnAchou
-  Exit Function
-  
-ErroIsReserva:
-  MostrarMsgErro ("IsReserva")
+'
+' Verifica se trata de uma Reserva Estratégica
+'
+Private Function IsReserva(ByVal strDescricao As String) As Boolean  
+  IsReserva = (InStr(1, strDescricao, PREFIXO_RESERVA) = 1)
 End Function
-  
-Sub AgendarLembreteOutlook()
-  '
-  ' Sub AgendarLembreteOutlook    Criado por: MSS  Em: 06.10.19
-  ' cria um lembrete no calendário do Outlook
-  '
-  ' variáveis
+
+'
+' Sub AgendarLembreteOutlook    Criado por: MSS  Em: 06.10.19
+' cria um lembrete no calendário do Outlook
+'
+Public Sub AgendarLembreteOutlook()  
   Dim objOutlook As Object
   Dim objAppointmentItem As Object
-  Const APPOINTMENT As Integer = 1 '1 = Appointment
-  Const OCUPADO As Integer = 2 '1 = Provisório, 2 = Ocupado, 3 = Ausente, 4 = Trabalhando em outro lugar, 5 = Disponível
-  Const ONE_DAY As Integer = 1440
-  ' principal
   On Error GoTo ErroAgendarLembreteOutlook
   Set objOutlook = CreateObject("Outlook.Application")
-  Set objAppointmentItem = objOutlook.createitem(APPOINTMENT)
+  Set objAppointmentItem = objOutlook.CreateItem(OUTLOOK_APPOINTMENT_ITEM)
   With objAppointmentItem
-    .Subject = "Pagar Darf"
-    .Body = "Pagar imposto com código 6015, Ganhos líquidos em operações em bolsa."
+    .Subject = ASSUNTO_LEMBRETE_DARF
+    .Body = TEXTO_LEMBRETE_DARF
     .Location = ""
-    .Start = BuscarUltimoDiaUtilProxMes() + TimeValue("10:00:00") '#10/28/2019 10:00:00 AM#
-    '.End = BuscarUltimoDiaUtilProxMes() + TimeValue("10:30:00") '#10/28/2019 10:30:00 AM#
-    .Duration = 30 'duração em minutos
-    .BusyStatus = OCUPADO
+    .Start = BuscarUltimoDiaUtilProxMes() + TimeValue(HORARIO_LEMBRETE)
+    .Duration = DURACAO_LEMBRETE_MINUTOS
+    .BusyStatus = OUTLOOK_OCUPADO
     .ReminderSet = True
-    .ReminderMinutesBeforeStart = ONE_DAY
+    .ReminderMinutesBeforeStart = MINUTOS_POR_DIA
     .Save
   End With
-  Debug.Print objAppointmentItem.Subject & " : " & objAppointmentItem.Start 'escreve na janela de verificação imediata
-  Set objAppointmentItem = Nothing
-  Set objOutlook = Nothing
+  Debug.Print objAppointmentItem.Subject & " : " & objAppointmentItem.Start
   Exit Sub
-  
+
 ErroAgendarLembreteOutlook:
-  MostrarMsgErro ("AgendarLembreteOutlook")
+  MostrarMsgErro "AgendarLembreteOutlook"
 End Sub
 
-Private Function BuscarUltimoDiaUtilProxMes() As Date
-  Dim intAno, intMes, intDiaSemana As Integer
-  Dim dtData As Date
-  Const SABADO As Integer = 7
-  Const DOMINGO As Integer = 1
-  On Error GoTo ErroBuscarUltimoDiaUtilProxMesMenos3
-  intAno = Year(Now)
-  intMes = Month(Now)
-  dtData = DateAdd("m", 1, DateSerial(intAno, intMes + 1, 0))
-  intDiaSemana = Weekday(dtData)
-  If (intDiaSemana = DOMINGO) Then
-    dtData = dtData - 2
-  ElseIf (intDiaSemana = SABADO) Then
-    dtData = dtData - 1
-  End If
-  BuscarUltimoDiaUtilProxMes = dtData
-  Exit Function
-  
-ErroBuscarUltimoDiaUtilProxMesMenos3:
-  MostrarMsgErro ("BuscarUltimoDiaUtilProxMes")
+'
+' Último dia útil (seg a sex) do próximo mês
+'
+Private Function BuscarUltimoDiaUtilProxMes() As Date  
+  Dim datData As Date
+  ' dia 0 do mês seguinte ao próximo = último dia do próximo mês
+  datData = DateSerial(Year(Date), Month(Date) + 2, 0)
+  Select Case Weekday(datData, vbSunday)
+    Case vbSunday
+      datData = datData - 2
+    Case vbSaturday
+      datData = datData - 1
+  End Select
+  BuscarUltimoDiaUtilProxMes = datData
 End Function
-
